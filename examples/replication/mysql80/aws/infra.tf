@@ -1,10 +1,13 @@
 variable "awsprops" {
     default = {
     region = "eu-north-1"
+#    vpc = "vpc-051a880b5109c71f3"
     vpc = "vpc-040d2949629b597f8"
-    #ami = "ami-061eda1ede961cfb2"
-    ami = " ami-0cd4ea1b3ff1fa770"
+    #ami = "ami-0333305f9719618c7"
+    #ami = "ami-00c70b245f5354c0a"
+    ami = "ami-0916e5af9db35b1a4"
     itype = "t3.micro"
+#    subnet = "subnet-04fe882a8093e6cdd"
     subnet = "subnet-0d6ccc312ba7c4551"
     publicip = true
     secgroupname = "JOHANSECGROUPTEST"
@@ -13,10 +16,15 @@ variable "awsprops" {
 
 provider "aws" {
   region     = "eu-north-1"
-  #access_key = ""
-  #secret_key = ""
+  #region     = "eu-west-1"
+  access_key = ""
+  secret_key = ""
 }
 
+
+data "external" "my_ip" {
+  program = ["bash", "${path.module}/getmyip.sh"]
+}
 
 resource "aws_security_group" "project-iac-sg" {
   name = lookup(var.awsprops, "secgroupname")
@@ -35,21 +43,20 @@ resource "aws_security_group" "project-iac-sg" {
     from_port = 22
     protocol = "tcp"
     to_port = 22
-    cidr_blocks = ["90.230.41.169/32"]
+    cidr_blocks = ["${data.external.my_ip.result.ip}/32"]
   }
 
   ingress {
     from_port = 3306
     protocol = "tcp"
     to_port = 3306
-    cidr_blocks = ["90.230.41.169/32"]
+    cidr_blocks = ["${data.external.my_ip.result.ip}/32"]
   }
   ingress {
     from_port = 3306
     protocol = "tcp"
     to_port = 3306
     cidr_blocks = ["0.0.0.0/0"]
-#    security_group_id = aws_security_group.private.id
   }
 
   egress {
@@ -77,14 +84,14 @@ resource "aws_security_group_rule" "mysql" {
 
 resource "aws_key_pair" "deployer" {
   key_name   = "deployer-key"
-  public_key = ""
+  public_key = var.SSH_PUBLIC_KEY
 }
 
 resource "aws_instance" "project-iac" {
-  count = 3
+  count = 1
   ami = lookup(var.awsprops, "ami")
   instance_type = lookup(var.awsprops, "itype")
-  subnet_id = lookup(var.awsprops, "subnet") #FFXsubnet2
+  subnet_id = lookup(var.awsprops, "subnet") 
   associate_public_ip_address = lookup(var.awsprops, "publicip")
   key_name = aws_key_pair.deployer.key_name
 
@@ -104,16 +111,16 @@ resource "aws_instance" "project-iac" {
     Managed = "S9s"
   }
 
-   user_data = <<-EOF
+#    user_data = <<-EOF
 #cloud-config
-runcmd:
-  - sudo wget https://repo.percona.com/apt/percona-release_latest.$(lsb_release -sc)_all.deb
-  - sudo dpkg -i percona-release_latest.$(lsb_release -sc)_all.deb
-  - sudo percona-release enable-only tools release
-  - sudo apt-get update
-  - sudo percona-release setup pxc80
-  - sudo apt-get install -y socat percona-xtradb-cluster percona-xtrabackup-80
-EOF
+#runcmd:
+#  - sudo wget https://repo.percona.com/apt/percona-release_latest.$(lsb_release -sc)_all.deb
+#  - sudo dpkg -i percona-release_latest.$(lsb_release -sc)_all.deb
+#  - sudo percona-release enable-only tools release
+#  - sudo apt-get update
+#  - sudo percona-release setup ps80
+#  - sudo apt-get install -y socat percona-server-server percona-server-client percona-xtrabackup-80
+#EOF
 
   depends_on = [ aws_security_group.project-iac-sg ]
 }

@@ -10,6 +10,18 @@ variable "API_USER_PW" {
   sensitive   = true
 }
 
+variable "SSH_KEY_FILE" {
+  description = "Path to SSH Key file (e.g /home/user/.ssh/id_rsa)"
+  type        = string
+  sensitive   = true
+}
+
+variable "SSH_PUBLIC_KEY" {
+  description = "Content of id_rsa.pub (starting with 'ssh-rsa AAAAB')"
+  type        = string
+  sensitive   = true
+}
+
 variable "CONTROLLER_URL" {
   description = "ClusterControl controller coordinates"
   type        = string
