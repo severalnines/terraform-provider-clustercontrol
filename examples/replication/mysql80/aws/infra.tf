@@ -1,13 +1,9 @@
 variable "awsprops" {
     default = {
     region = "eu-north-1"
-#    vpc = "vpc-051a880b5109c71f3"
     vpc = "vpc-040d2949629b597f8"
-    #ami = "ami-0333305f9719618c7"
-    #ami = "ami-00c70b245f5354c0a"
     ami = "ami-0916e5af9db35b1a4"
     itype = "t3.micro"
-#    subnet = "subnet-04fe882a8093e6cdd"
     subnet = "subnet-0d6ccc312ba7c4551"
     publicip = true
     secgroupname = "JOHANSECGROUPTEST"
@@ -16,9 +12,7 @@ variable "awsprops" {
 
 provider "aws" {
   region     = "eu-north-1"
-  #region     = "eu-west-1"
-  access_key = ""
-  secret_key = ""
+  shared_credentials_files = [ var.AWS_CREDENTIALS_FILE ]
 }
 
 

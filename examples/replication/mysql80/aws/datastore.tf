@@ -13,7 +13,6 @@ resource "cc_mysql_maria_cluster" "mydatabase" {
   database_vendor = "percona"
   database_version = "8.0"
   database_topology = "replication"
- # ssh_key_file = "/home/johan/.ssh/id_rsa"
   ssh_key_file = var.SSH_KEY_FILE
   ssh_user = "ubuntu"
   install_software = "false"

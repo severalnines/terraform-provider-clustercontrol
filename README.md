@@ -37,13 +37,13 @@ terraform apply
 | Configuration Parameter     | Value                                            |
 |-----------------------------|--------------------------------------------------|
 | `cluster_name`              | `NAME_OF_DATABASE`                                   |
-| `database_type`             | `"mysql"`                                        |
-| `database_vendor`           | `percona|mariadb`                                      |
-| `database_version`          | `8.0|10.11`                                          |
-| `database_topology`         | `"replication"`                                  |
+| `database_type`             | `mysql`                                        |
+| `database_vendor`           | `percona`                                     |
+| `database_version`          | `8.0`                                  |
+| `database_topology`         | `replication`                                  |
 | `ssh_key_file`              | `SSH_KEYFILE, e. /home/user/.ssh/id_rsa`                      |
 | `ssh_user`                  | `"ubuntu"`                                       |
-| `install_software`          | `"true"`                                        |
+| `install_software`          | `"truex"`                                        |
 | `primary_database_host`     | `join(",", aws_instance.project-iac.*.public_ip)`|
 | `hostname_internal`         | `join(",", aws_instance.project-iac.*.private_ip)`|
 

@@ -1,10 +1,10 @@
 variable "API_USER" {
-  description = "API user's username"
+  description = "CMON API user's username"
   type        = string
   sensitive   = true
 }
 
-variable "API_USER_PW" {
+variable "CMON API_USER_PW" {
   description = "API user's password"
   type        = string
   sensitive   = true
@@ -17,7 +17,13 @@ variable "SSH_KEY_FILE" {
 }
 
 variable "SSH_PUBLIC_KEY" {
-  description = "Content of id_rsa.pub (starting with 'ssh-rsa AAAAB')"
+  description = "Content of id_rsa.pub (starting with 'ssh-rsa AAAA')"
+  type        = string
+  sensitive   = true
+}
+
+variable "AWS_CREDENTIALS_FILE" {
+  description = "Path to AWS Credentialsfile (e.g /home/user/.aws/credentials)"
   type        = string
   sensitive   = true
 }
