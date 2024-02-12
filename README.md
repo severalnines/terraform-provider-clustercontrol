@@ -43,7 +43,7 @@ terraform apply
 | `database_topology`         | `replication`                                  |
 | `ssh_key_file`              | `SSH_KEYFILE, e. /home/user/.ssh/id_rsa`                      |
 | `ssh_user`                  | `"ubuntu"`                                       |
-| `install_software`          | `"truex"`                                        |
+| `install_software`          | `"true"`                                        |
 | `primary_database_host`     | `join(",", aws_instance.project-iac.*.public_ip)`|
 | `hostname_internal`         | `join(",", aws_instance.project-iac.*.private_ip)`|
 
