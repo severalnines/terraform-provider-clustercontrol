@@ -4,8 +4,8 @@ variable "API_USER" {
   sensitive   = true
 }
 
-variable "CMON API_USER_PW" {
-  description = "API user's password"
+variable "API_USER_PW" {
+  description = "CMON API user's password"
   type        = string
   sensitive   = true
 }
