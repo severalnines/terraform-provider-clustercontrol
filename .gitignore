@@ -1,46 +1,32 @@
-# Binaries
-*.exe
-*.exe~
 *.dll
-*.so
-*.dylib
-*.out
-
-# Miscellaneus
+*.exe
 .DS_Store
-.go
-
-# IDEs
+example.tf
+*terraform.tfplan
+*terraform.tfstate
+*.tfvars
+*.lock.*
+#./*terraform.tfplan
+#./*terraform.tfstate
+#./*.tfvars
+#./*.lock.hcl
+bin/
+dist/
+modules-dev/
+/pkg/
+website/.vagrant
+website/.bundle
+website/build
+website/node_modules
+.vagrant/
+*.backup
+./*.tfstate
+.terraform/
+*.log
+*.bak
+*~
+.*.swp
 .idea
-
-# Package Files #
-*.jar
-*.war
-*.ear
-
-# Test binary, built with `go test -c`
+*.iml
 *.test
-
-# exclude jar for gradle wrapper
-!gradle/wrapper/*.jar
-
-# build files
-#**/target
-target
-.gradle
-build
-
-# Other
-bin
-vendor
-
-# terraform
-.terraform*
-terraform*
-
-#/bin
-#/.go
-#/.container-*
-#/.dockerfile-*
-#/.licenses
-
+*.iml
