@@ -1,31 +1,33 @@
-TEST?=$$(go list ./... | grep -v 'vendor')
 HOSTNAME=severalnines.com
 NAMESPACE=severalnines
-#NAME=cc
 NAME=clustercontrol
 BINARY=terraform-provider-${NAME}
+TARGET=./bin/${BINARY}
 VERSION=0.0.1
-OS_ARCH=linux_amd64
+OS_ARCH=darwin_amd64
 TARGET_DIR=~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
+
+.PHONY: docs
 
 default: install
 
 build:
-	go build -o ${BINARY}
+	go build -o ${TARGET}
 
-release:
-	goreleaser release --rm-dist --snapshot --skip-publish  --skip-sign
+all: ${TARGET}
 
-install: build
-	mkdir -p ${TARGET_DIR}
-	mv ${BINARY} ${TARGET_DIR}
-
-test: 
-	go test -i $(TEST) || exit 1                                                   
-	echo $(TEST) | xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4                    
-
-testacc: 
-	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 120m   
+${TARGET}:
+	 go build -o ${TARGET}
 
 clean:
-	/bin/rm -rf ${TARGET_DIR}
+	rm -rf ${TARGET}
+
+install: ${TARGET}
+	mkdir -p ${TARGET_DIR}
+	mv ${TARGET} ${TARGET_DIR}
+#	mkdir -p ~/.terraform.d/plugins/registry.terraform.io/severalnines/ccx/0.2.0/linux_amd64
+#	cp ./bin/terraform-provider-ccx ~/.terraform.d/plugins/registry.terraform.io/severalnines/ccx/0.2.0/linux_amd64/
+
+docs:
+	go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
+
