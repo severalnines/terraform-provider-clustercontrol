@@ -9,7 +9,7 @@ using ClusterControl.
 |------|
 | cc_db_instance |
 
-## Attributes specific to PostgreSQL primary and host-standby deployment
+## Attributes specific to PostgreSQL primary and hot-standby deployment
 
 | Attribute                | Data Type   | Required | Description                                                                       |
 |--------------------------|-------------|----------|-----------------------------------------------------------------------------------|

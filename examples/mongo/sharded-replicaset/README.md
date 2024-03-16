@@ -9,7 +9,7 @@ using ClusterControl.
 |------|
 | cc_db_instance |
 
-## Attributes specific to MongoDB sharded replicaset deployment
+## Attributes specific to MongoDB sharded (replicaset) deployment
 
 | Attribute                | Data Type   | Required | Description                                              |
 |--------------------------|-------------|----------|----------------------------------------------------------|
