@@ -34,7 +34,7 @@ This is the Terraform Provider for the Severalnines ClusterControl - Database Au
 
 | Name |
 |------|
-| cc_db_instance |
+| clustercontrol_db_cluster |
 
 ## Quick Start
 ### Installing and configuring ClusterControl for API access

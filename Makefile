@@ -3,7 +3,7 @@ NAMESPACE=severalnines
 NAME=clustercontrol
 BINARY=terraform-provider-${NAME}
 TARGET=./bin/${BINARY}
-VERSION=0.0.1
+VERSION=0.1.0
 OS_ARCH=darwin_amd64
 TARGET_DIR=~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
 

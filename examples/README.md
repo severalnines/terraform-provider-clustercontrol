@@ -6,7 +6,7 @@ This directory contains a set of examples of using ClusterControl to deploy vari
 
 | Name |
 |------|
-| cc_db_instance |
+| clustercontrol_db_cluster |
 
 ## Common attributes to all database types
 

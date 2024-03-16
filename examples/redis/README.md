@@ -7,7 +7,7 @@ using ClusterControl.
 
 | Name |
 |------|
-| cc_db_instance |
+| clustercontrol_db_cluster |
 
 ## Attributes specific to Redis sentinel
 

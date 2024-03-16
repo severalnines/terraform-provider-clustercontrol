@@ -1,8 +1,10 @@
 package provider
 
 const (
-	RESOURCE_DB_CLUSTER       = "cc_db_cluster"
-	RESOURCE_DB_LOAD_BALANCER = "cc_db_load_balancer"
+	//RESOURCE_DB_CLUSTER       = "cc_db_cluster"
+	//RESOURCE_DB_LOAD_BALANCER = "cc_db_load_balancer"
+	RESOURCE_DB_CLUSTER       = "clustercontrol_db_cluster"
+	RESOURCE_DB_LOAD_BALANCER = "clustercontrol_db_load_balancer"
 )
 
 const (
