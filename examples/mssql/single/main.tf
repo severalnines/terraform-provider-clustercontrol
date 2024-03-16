@@ -14,11 +14,11 @@ resource "cc_db_cluster" "this" {
   db_cluster_create      = true
   db_cluster_import      = false
   db_cluster_name        = "mydbcluster"
-  db_cluster_type        = "redis"
-  db_vendor              = "redis"
-  db_version             = "7"
-  # db_admin_username      = "pgadmin"
-  db_admin_user_password = "blah%blah"
+  db_cluster_type        = "mssql_single"
+  db_vendor              = "microsoft"
+  db_version             = "2022"
+  db_admin_username      = "SQLServerAdmin"
+  db_admin_user_password = "Iule3cX$Bs5b#KI42~j5D7Yk"
   db_port                = var.db_port
   db_data_directory      = var.db_data_directory
   disable_firewall       = var.disable_firewall

@@ -39,7 +39,7 @@ resource "cc_db_cluster" "this" {
     # hostname_internal = "foo"
     # port = "foo"
   }
-  
+
   # db_host {
   #   hostname = "test-primary-2"
   #   # hostname_data     = "hnd-foo"

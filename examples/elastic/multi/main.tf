@@ -16,7 +16,7 @@ resource "cc_db_cluster" "this" {
   db_cluster_name        = "mydbcluster"
   db_cluster_type        = "elastic"
   db_vendor              = "elasticsearch"
-  db_version             = "2022"
+  db_version             = "8.3.1"
   db_admin_username      = "esadmin"
   db_admin_user_password = "blah%blah"
   db_port                = var.db_port
@@ -31,12 +31,21 @@ resource "cc_db_cluster" "this" {
 
   db_host {
     hostname = "test-primary"
+    roles    = "master-data"
     # hostname_data = "foo"
     # hostname_internal = "foo"
     # port = "foo"
   }
   db_host {
-    hostname         = "test-primary-2"
+    hostname = "test-primary-2"
+    roles    = "master-data"
+    # hostname_data     = "hnd-foo"
+    # hostname_internal = "hni-foo"
+    # port              = "p-foo"
+  }
+  db_host {
+    hostname = "test-primary-3"
+    roles    = "master-data"
     # hostname_data     = "hnd-foo"
     # hostname_internal = "hni-foo"
     # port              = "p-foo"
