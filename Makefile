@@ -16,17 +16,15 @@ build:
 
 all: ${TARGET}
 
-${TARGET}:
-	 go build -o ${TARGET}
-
 clean:
-	rm -rf ${TARGET}
+	/bin/rm -rf ${TARGET_DIR}
 
-install: ${TARGET}
+install: build
 	mkdir -p ${TARGET_DIR}
 	mv ${TARGET} ${TARGET_DIR}
-#	mkdir -p ~/.terraform.d/plugins/registry.terraform.io/severalnines/ccx/0.2.0/linux_amd64
-#	cp ./bin/terraform-provider-ccx ~/.terraform.d/plugins/registry.terraform.io/severalnines/ccx/0.2.0/linux_amd64/
+
+release:
+	goreleaser release --rm-dist --snapshot --skip-publish  --skip-sign
 
 docs:
 	go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs

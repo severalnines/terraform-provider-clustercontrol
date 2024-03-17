@@ -1,4 +1,4 @@
-provider "cc" {
+provider "clustercontrol" {
   cc_api_user          = var.cc_api_user
   cc_api_user_password = var.cc_api_user_password
   cc_api_url           = var.cc_api_url
@@ -10,7 +10,8 @@ locals {
   is_db_import = var.db_cluster_import
 }
 
-resource "cc_db_cluster" "this" {
+resource "clustercontrol_db_cluster" "this" {
+#resource "cc_db_cluster" "this" {
   db_cluster_create        = true
   db_cluster_import        = false
   db_cluster_name          = "mydbcluster"
