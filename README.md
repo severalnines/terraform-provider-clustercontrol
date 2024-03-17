@@ -58,7 +58,32 @@ Where ``10.0.0.5`` is the private IP of the ClusterControl host. Restart Cluster
 
 Where ``username`` and ``password`` are valid login credentials for ClusterControl.
 
-### Deploying database clusters using terraform
+### Deploying database clusters using terraform for ClusterControl
 
-Navigate to the examples sub-directory for more information.
+**Navigate** to the examples sub-directory for more information.
 
+Setup ``terraform.tfvars`` file with the following secrets.
+
+
+```editor
+cc_api_url="https://<cc-host-or-ip>:9501/v2"
+cc_api_user="CHANGE-ME"
+cc_api_user_password="CHANGE-ME"
+```
+
+#### Running terraform to deploy database clusters
+
+```shell
+terraform init
+terraform validate
+terraform plan -var-file="terraform.tfvars"
+terraform apply -var-file="terraform.tfvars"
+```
+
+#### Destroying a deployed database cluster.
+
+After navigating to the appropriate directory which was used to deploy a cluster:
+
+```shell
+terraform destroy -var-file="terraform.tfvars"
+```
