@@ -7,6 +7,14 @@
   </picture>
 </a>
 
+<a href="https://severalnines.com">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="logos/severalnines/severalnies.png">
+    <source media="(prefers-color-scheme: light)" srcset="logos/severalnines/severalnies.png">
+    <img src="logos/severalnines/severalnies.png" alt="Terraform logo" title="Terraform" align="left" height="50">
+  </picture>
+</a>
+
 # Terraform ClusterControl Provider
 
 This is the Terraform Provider for the Severalnines ClusterControl - Database Automation Tool.
