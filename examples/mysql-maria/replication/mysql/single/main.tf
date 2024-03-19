@@ -17,22 +17,17 @@ resource "clustercontrol_db_cluster" "this" {
   db_cluster_type          = "replication"
   db_vendor                = "percona"
   db_version               = "8.0"
-  # db_admin_username        = var.db_admin_username
   db_admin_user_password   = "blah%blah"
   db_port                  = var.db_port
   db_data_directory        = var.db_data_directory
-  # db_config_template       = var.db_config_template
   disable_firewall         = var.disable_firewall
   db_install_software      = var.db_install_software
-  # db_sync_replication      = var.db_sync_replication
   db_semi_sync_replication = var.db_semi_sync_replication
   ssh_user                 = var.ssh_user
   ssh_user_password        = var.ssh_user_password
   ssh_key_file             = var.ssh_key_file
   ssh_port                 = var.ssh_port
   db_tags                  = ["terra-deploy"]
-  # db_tags                  = []
-  # db_tags                  = var.db_tags
 
   db_host {
     hostname = "test-primary"
@@ -42,25 +37,5 @@ resource "clustercontrol_db_cluster" "this" {
     # config_file = "foo"
     # data_dir = "foo"
   }
-  # db_host {
-  #   hostname          = "dev-replica"
-  #   hostname_data     = "hnd-foo"
-  #   hostname_internal = "hni-foo"
-  #   port              = "p-foo"
-  #   # config_file       = "cf-foo"
-  #   data_dir          = "dd-foo"
-  # }
-
-  # db_topology {
-  #   primary = "dev-primary"
-  #   replica = "dev-replica"
-  # }
-
-  # timeouts = {
-  #   create = lookup(var.timeouts, "create", null)
-  #   import = lookup(var.timeouts, "import", null)
-  #   delete = lookup(var.timeouts, "delete", null)
-  #   update = lookup(var.timeouts, "update", null)
-  # }
 
 }

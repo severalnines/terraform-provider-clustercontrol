@@ -1,23 +1,26 @@
 package provider
 
-type JobJson struct {
+import "github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
+
+type MinResponseFields struct {
+	Request_Status string
+	Debug_Messages []string
+}
+
+type MinJobSpecificResponseFields struct {
 	Job_Id      int32
 	Status      string
 	Status_Text string
 }
 
-type ClusterInfo struct {
-	Cluster_Id int32
-	Tags       []string
+type JobResponseFields struct {
+	TopLevel MinResponseFields
+	Job      MinJobSpecificResponseFields
 }
 
-type ResponseJobJson struct {
-	Request_Status string
-	Debug_Messages []string
-	Job            JobJson
+type ClusterResponseFields struct {
+	TopLevel MinResponseFields
+	Cluster  openapi.ClusterResponse
 }
 
-type ClusterInfoRespJson struct {
-	Request_Status string
-	Cluster        ClusterInfo
-}
+//func NewClusterResponse() (*Get)

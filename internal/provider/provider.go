@@ -69,7 +69,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		return nil, nil
 	}
 
-	resp, err := gApiClient.AuthApi.AuthPost(ctx).Authenticate(*authenticate).Execute()
+	resp, err := gApiClient.AuthAPI.AuthPost(ctx).Authenticate(*authenticate).Execute()
 	if err != nil {
 		PrintError(err, resp)
 		return nil, diag.FromErr(err)

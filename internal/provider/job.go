@@ -48,12 +48,7 @@ func SendAndWaitForJobCompletion(ctx context.Context, apiClient *openapi.APIClie
 	var resp *http.Response
 	var err error
 
-	//request, _ := json.Marshal(job)
-	//slog.Info(string(request))
-	//fmt.Fprintf(os.Stderr, string(request))
-	// os.Stderr.Write(request)
-
-	if resp, err = apiClient.JobsApi.JobsPost(ctx).Jobs(*job).Execute(); err != nil {
+	if resp, err = apiClient.JobsAPI.JobsPost(ctx).Jobs(*job).Execute(); err != nil {
 		PrintError(err, resp)
 		return err
 	}
@@ -65,7 +60,7 @@ func SendAndWaitForJobCompletion(ctx context.Context, apiClient *openapi.APIClie
 		return err
 	}
 
-	var jobResp ResponseJobJson
+	var jobResp JobResponseFields
 	if err = json.Unmarshal(respBytes, &jobResp); err != nil {
 		PrintError(err, resp)
 		return err
@@ -78,7 +73,7 @@ func SendAndWaitForJobCompletion(ctx context.Context, apiClient *openapi.APIClie
 		time.Sleep(10 * time.Second)
 
 		checkJobStatus := NewCCJobForJobStatusCheck(jobResp.Job.Job_Id)
-		if resp, err = apiClient.JobsApi.JobsPost(ctx).Jobs(*checkJobStatus).Execute(); err != nil {
+		if resp, err = apiClient.JobsAPI.JobsPost(ctx).Jobs(*checkJobStatus).Execute(); err != nil {
 			PrintError(err, resp)
 			return err
 		}

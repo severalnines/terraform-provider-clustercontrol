@@ -7,6 +7,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"log/slog"
+	"strconv"
+	"time"
 )
 
 type DbClusterInterface interface {
@@ -249,7 +251,7 @@ func resourceDbCluster() *schema.Resource {
 										Description: "TODO.",
 									},
 									TF_FIELD_CLUSTER_HOST_PRIORITY: {
-										Type:        schema.TypeString,
+										Type:        schema.TypeInt,
 										Optional:    true,
 										Description: "TODO.",
 									},
@@ -409,7 +411,6 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	jobData := jobSpec.GetJobData()
 
 	clusterType := d.Get(TF_FIELD_CLUSTER_TYPE).(string)
-	//fmt.Fprintf(os.Stderr, clusterType)
 	slog.Debug(clusterType)
 
 	var getInputs DbClusterInterface = nil
@@ -417,12 +418,8 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	switch clusterType {
 	case CLUSTER_TYPE_REPLICATION:
 		getInputs = NewMySQLMaria()
-		//fmt.Fprintf(os.Stderr, "NewMySQLMaria()")
-		//slog.Debug("NewMySQLMaria()")
 	case CLUSTER_TYPE_GALERA:
 		getInputs = NewMySQLMaria()
-		//fmt.Fprintf(os.Stderr, "NewMySQLMaria()")
-		//slog.Debug("NewMySQLMaria()")
 	case CLUSTER_TYPE_PG_SINGLE:
 		getInputs = NewPostgres()
 	case CLUSTER_TYPE_MOGNODB:
@@ -437,7 +434,6 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 		getInputs = NewElastic()
 	default:
 		slog.Warn(funcName, "Unknown cluster type", clusterType)
-		//fmt.Fprintf(os.Stderr, "Unknown cluster type: %s", clusterType)
 	}
 
 	if getInputs != nil {
@@ -465,25 +461,106 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	}
 
 	clusterName := jobData.GetClusterName()
-	d.SetId(clusterName)
+
+	var clusterId int32 = -1
+	if clusterId, err = GetClusterIdByClusterName(newCtx, apiClient, clusterName); err != nil {
+		slog.Error(err.Error())
+		return diag.FromErr(err)
+	}
+
+	// update resource can ask to change name, which is a valid ask.
+	d.SetId(strconv.Itoa(int(clusterId)))
+	//d.SetId(clusterName)
 
 	return diags
 }
 
 func resourceReadDbCluster(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	funcName := "resourceReadDbCluster"
+	slog.Debug(funcName)
+
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
+	var cluster *openapi.ClusterResponse
+	var err error
 
-	// apiClient := m.(*openapi.APIClient)
+	newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+
+	apiClient := m.(*openapi.APIClient)
+
+	clusterId := d.Id()
+
+	if cluster, err = GetClusterByClusterStrId(newCtx, apiClient, clusterId); err != nil {
+		// TODO
+	}
+
+	cluster.GetClusterType()
+	cluster.GetClusterId()
+	cluster.GetVendor()
+	cluster.GetVersion()
+	cluster.GetTags()
+
+	//foo := d.Get("foo")
+	//
+	//for _, f := range foo.([]any) {
+	//	f := f.(map[string]any)
+	//
+	//	for _, b := range f["bar"].([]any) {
+	//		b := b.(map[string]any)
+	//		b["version"] = uuid.New().String()
+	//	}
+	//}
+	//
+	//if err := d.Set("foo", foo); err != nil {
+	//	diags = append(diags, diag.Diagnostic{
+	//		Severity: diag.Error,
+	//		Summary:  err.Error(),
+	//	})
+	//	return diags
+	//}
+
+	d.Set("last_updated", time.Now().Format(time.RFC850))
 
 	return diags
 }
 
 func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	// Warning or errors can be collected in a slice type
-	var diags diag.Diagnostics
+	funcName := "resourceReadDbCluster"
+	slog.Debug(funcName)
 
-	return diags
+	// Warning or errors can be collected in a slice type
+	var cluster *openapi.ClusterResponse
+	var err error
+
+	newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+
+	apiClient := m.(*openapi.APIClient)
+
+	clusterId := d.Id()
+
+	if cluster, err = GetClusterByClusterStrId(newCtx, apiClient, clusterId); err != nil {
+		// TODO
+	}
+
+	cluster.GetClusterType()
+	cluster.GetClusterId()
+	cluster.GetVendor()
+	cluster.GetVersion()
+	cluster.GetTags()
+
+	// Warning or errors can be collected in a slice type
+	//var diags diag.Diagnostics
+	//
+	//resourceID := d.Id()
+	//
+	//if d.HasChange("foo") {
+	//	foo := d.Get("foo").([]any)
+	//	d.Set("last_updated", time.Now().Format(time.RFC850))
+	//}
+
+	d.Set("last_updated", time.Now().Format(time.RFC850))
+
+	return resourceReadDbCluster(ctx, d, m)
 }
 
 // Prem
@@ -504,17 +581,11 @@ func resourceDeleteDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	jobSpec.SetCommand(CMON_JOB_REMOVE_CLUSTER_COMMAND)
 	jobData := jobSpec.GetJobData()
 
-	var clusterId int32 = -1
 	var err error
+	var clusterId int = -1
+	clusterId, err = strconv.Atoi(d.Id())
 
-	clusterName := d.Id()
-
-	if clusterId, err = GetClusterIdByName(newCtx, apiClient, clusterName); err != nil {
-		slog.Error(err.Error())
-		return diag.FromErr(err)
-	}
-
-	jobData.SetClusterid(clusterId)
+	jobData.SetClusterid(int32(clusterId))
 	jobSpec.SetJobData(jobData)
 	job.SetJobSpec(jobSpec)
 	delCluster.SetJob(job)

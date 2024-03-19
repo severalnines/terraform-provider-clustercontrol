@@ -2,7 +2,11 @@ module github.com/premnalla/new-terraform-provider-clustercontrol
 
 go 1.21.6
 
-require github.com/hashicorp/terraform-plugin-sdk/v2 v2.32.0
+require (
+	github.com/google/uuid v1.4.0
+	github.com/hashicorp/terraform-plugin-docs v0.18.0
+	github.com/hashicorp/terraform-plugin-sdk/v2 v2.32.0
+)
 
 require (
 	github.com/Kunde21/markdownfmt/v3 v3.1.0 // indirect
@@ -18,7 +22,6 @@ require (
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/uuid v1.4.0 // indirect
 	github.com/hashicorp/cli v1.1.6 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-checkpoint v0.5.0 // indirect
@@ -34,7 +37,6 @@ require (
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/hashicorp/terraform-exec v0.20.0 // indirect
 	github.com/hashicorp/terraform-json v0.21.0 // indirect
-	github.com/hashicorp/terraform-plugin-docs v0.18.0 // indirect
 	github.com/hashicorp/terraform-plugin-go v0.21.0 // indirect
 	github.com/hashicorp/terraform-plugin-log v0.9.0 // indirect
 	github.com/hashicorp/terraform-registry-address v0.2.3 // indirect
@@ -53,7 +55,7 @@ require (
 	github.com/oklog/run v1.0.0 // indirect
 	github.com/posener/complete v1.2.3 // indirect
 	github.com/russross/blackfriday v1.6.0 // indirect
-	github.com/severalnines/clustercontrol-client-sdk/go v0.0.0-20240311125609-910f9ccac186 // indirect
+	github.com/severalnines/clustercontrol-client-sdk/go v0.0.0-20240318230100-a02c571abe95 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
@@ -66,7 +68,6 @@ require (
 	golang.org/x/exp v0.0.0-20230626212559-97b1e661b5df // indirect
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/net v0.18.0 // indirect
-	golang.org/x/oauth2 v0.14.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect

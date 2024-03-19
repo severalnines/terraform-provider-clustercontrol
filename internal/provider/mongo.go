@@ -108,8 +108,10 @@ func getReplicasets(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobDa
 			}
 			getCommonHostAttributes(memFromTF, iPort, clusterType, memHost)
 
-			priority := memFromTF[TF_FIELD_CLUSTER_HOST_PRIORITY].(string)
-			mem.SetPriority(priority)
+			if memFromTF[TF_FIELD_CLUSTER_HOST_PRIORITY] != nil {
+				priority := memFromTF[TF_FIELD_CLUSTER_HOST_PRIORITY].(int32)
+				mem.SetPriority(priority)
+			}
 			slave_delay := memFromTF[TF_FIELD_CLUSTER_HOST_SLAVE_DELAY].(string)
 			mem.SetSlaveDelay(slave_delay)
 			arbiter_only := memFromTF[TF_FIELD_CLUSTER_HOST_ARBITER_ONLY].(bool)

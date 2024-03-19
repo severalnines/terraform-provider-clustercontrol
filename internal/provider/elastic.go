@@ -22,7 +22,7 @@ func (m *Elastic) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 	}
 
 	snapshotLocation := d.Get(TF_FIELD_CLUSTER_SNAPSHOT_LOC).(string)
-	jobData.SetSnapshotLocaiton(snapshotLocation)
+	jobData.SetSnapshotLocation(snapshotLocation)
 
 	snapshotRepo := d.Get(TF_FIELD_CLUSTER_SNAPSHOT_REPO).(string)
 	jobData.SetSnapshotRepository(snapshotRepo)
