@@ -60,9 +60,8 @@ func (c *DbCommon) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJob
 	sshUser := d.Get(TF_FIELD_CLUSTER_SSH_USER).(string)
 	jobData.SetSshUser(sshUser)
 
-	// TODO: need to provide support for it in api definition (yaml)
-	//sshUserPassword := d.Get(TF_FIELD_CLUSTER_SSH_PW).(string)
-	//jobData.SetSshUserPassword(sshUserPassword)
+	sshUserPassword := d.Get(TF_FIELD_CLUSTER_SSH_PW).(string)
+	jobData.SetSudoPassword(sshUserPassword)
 
 	sshKeyFile := d.Get(TF_FIELD_CLUSTER_SSH_KEY_FILE).(string)
 	jobData.SetSshKeyfile(sshKeyFile)

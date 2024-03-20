@@ -26,6 +26,16 @@ func resourceDbCluster() *schema.Resource {
 		DeleteContext: resourceDeleteDbCluster,
 		Importer:      &schema.ResourceImporter{},
 		Schema: map[string]*schema.Schema{
+			TF_FIELD_RESOURCE_ID: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "TODO",
+			},
+			TF_FIELD_LAST_UPDATED: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "TODO",
+			},
 			TF_FIELD_CLUSTER_CREATE: {
 				Type:        schema.TypeBool,
 				Optional:    true,
@@ -469,7 +479,10 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	}
 
 	// update resource can ask to change name, which is a valid ask.
-	d.SetId(strconv.Itoa(int(clusterId)))
+	id := strconv.Itoa(int(clusterId))
+	d.SetId(id)
+	d.Set(TF_FIELD_RESOURCE_ID, id)
+	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC850))
 	//d.SetId(clusterName)
 
 	return diags
@@ -519,7 +532,7 @@ func resourceReadDbCluster(ctx context.Context, d *schema.ResourceData, m interf
 	//	return diags
 	//}
 
-	d.Set("last_updated", time.Now().Format(time.RFC850))
+	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC850))
 
 	return diags
 }
@@ -558,7 +571,7 @@ func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	//	d.Set("last_updated", time.Now().Format(time.RFC850))
 	//}
 
-	d.Set("last_updated", time.Now().Format(time.RFC850))
+	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC850))
 
 	return resourceReadDbCluster(ctx, d, m)
 }
@@ -599,6 +612,7 @@ func resourceDeleteDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 		return diags
 	}
 
+	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC850))
 	d.SetId("")
 
 	return diags

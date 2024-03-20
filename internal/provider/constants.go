@@ -46,6 +46,12 @@ const (
 	DEFAULT_MONGO_ELASTIC_HTTP_PORT     = "9200"
 	DEFAULT_MONGO_ELASTIC_TRANSFER_PORT = "9200"
 	DEFAULT_MONGO_MSSQL_PORT            = "1433"
+	DEFAULT_PROXYSQL_ADMIN_PORT         = "6032"
+	DEFAULT_PROXYSQL_LISTEN_PORT        = "6033"
+)
+
+const (
+	DEFAULT_MYSQL_PORT_I = 3306
 )
 
 const (
@@ -121,12 +127,19 @@ const (
 )
 
 const (
-	CMON_JOB_CREATE_CLUSTER_COMMAND = "create_cluster"
-	CMON_JOB_REMOVE_CLUSTER_COMMAND = "remove_cluster"
+	CMON_JOB_CREATE_CLUSTER_COMMAND  = "create_cluster"
+	CMON_JOB_REMOVE_CLUSTER_COMMAND  = "remove_cluster"
+	CMON_JOB_CREATE_PROXYSQL_COMMAND = "proxysql"
+	CMON_JOB_CREATE_HAPROXY_COMMAND  = "haproxy"
 )
 
 const (
 	CMON_CLUSTERS_OPERATION_GET_CLUSTERS = "getclusterinfo"
+)
+
+const (
+	LOAD_BLANCER_TYPE_PROXYSQL = "proxysql"
+	LOAD_BLANCER_TYPE_HAPROXY  = "haproxy"
 )
 
 // TODO: doesn't seem to be use anymore (03/07/2024)
@@ -136,8 +149,11 @@ const (
 //)
 
 const (
+	TF_FIELD_RESOURCE_ID                 = "db_resource_id"
+	TF_FIELD_LAST_UPDATED                = "last_updated"
 	TF_FIELD_CLUSTER_CREATE              = "db_cluster_create"
 	TF_FIELD_CLUSTER_IMPORT              = "db_cluster_import"
+	TF_FIELD_CLUSTER_ID                  = "db_cluster_id"
 	TF_FIELD_CLUSTER_NAME                = "db_cluster_name"
 	TF_FIELD_CLUSTER_TYPE                = "db_cluster_type"
 	TF_FIELD_CLUSTER_VENDOR              = "db_vendor"
@@ -180,6 +196,22 @@ const (
 	TF_FIELD_CLUSTER_MONGO_CONFIG_SERVER = "db_config_server"
 	TF_FIELD_CLUSTER_MONGOS_SERVER       = "db_mongos_server"
 	TF_FIELD_CLUSTER_TIMEOUTS            = "timeouts"
+
+	// Load balancer fields
+	TF_FIELD_LB_CREATE           = "db_lb_create"
+	TF_FIELD_LB_IMPORT           = "db_lb_import"
+	TF_FIELD_LB_TYPE             = "db_lb_type"
+	TF_FIELD_LB_VERSION          = "db_lb_version"
+	TF_FIELD_LB_ADMIN_USER       = "db_lb_admin_username"
+	TF_FIELD_LB_ADMIN_USER_PW    = "db_lb_admin_user_password"
+	TF_FIELD_LB_MONITOR_USER     = "db_lb_monitor_username"
+	TF_FIELD_LB_MONITOR_USER_PW  = "db_lb_monitor_user_password"
+	TF_FIELD_LB_PORT             = "db_lb_port"
+	TF_FIELD_LB_ADMIN_PORT       = "db_lb_admin_port"
+	TF_FIELD_LB_USE_CLUSTERING   = "db_lb_use_clustering"
+	TF_FIELD_LB_USE_RW_SPLITTING = "db_lb_use_rw_splitting"
+	TF_FIELD_LB_INSTALL_SW       = "db_lb_install_software"
+	TF_FIELD_LB_MY_HOST          = "db_my_host"
 )
 
 const (
