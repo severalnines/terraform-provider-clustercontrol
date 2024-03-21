@@ -26,7 +26,7 @@ func resourceDbCluster() *schema.Resource {
 		DeleteContext: resourceDeleteDbCluster,
 		Importer:      &schema.ResourceImporter{},
 		Schema: map[string]*schema.Schema{
-			TF_FIELD_RESOURCE_ID: {
+			TF_FIELD_CLUSTER_ID: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "TODO",
@@ -481,7 +481,7 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	// update resource can ask to change name, which is a valid ask.
 	id := strconv.Itoa(int(clusterId))
 	d.SetId(id)
-	d.Set(TF_FIELD_RESOURCE_ID, id)
+	d.Set(TF_FIELD_CLUSTER_ID, id)
 	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC850))
 	//d.SetId(clusterName)
 

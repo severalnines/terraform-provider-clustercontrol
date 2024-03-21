@@ -30,29 +30,13 @@ resource "clustercontrol_db_cluster" "this" {
   db_tags                  = ["terra-deploy"]
 
   db_host {
-    hostname = "test-primary-2"
+    hostname = "test-primary"
     # hostname_data = "foo"
     # hostname_internal = "foo"
     # port = "foo"
+    # config_file = "foo"
+    # data_dir = "foo"
   }
-  db_host {
-    hostname = "test-primary-3"
-    # hostname_data     = "hnd-foo"
-    # hostname_internal = "hni-foo"
-    # port              = "p-foo"
-  }
-
-  db_topology {
-    primary = "test-primary-2"
-    replica = "test-primary-3"
-  }
-
-  # timeouts = {
-  #   create = lookup(var.timeouts, "create", null)
-  #   import = lookup(var.timeouts, "import", null)
-  #   delete = lookup(var.timeouts, "delete", null)
-  #   update = lookup(var.timeouts, "update", null)
-  # }
 
 }
 
@@ -79,18 +63,13 @@ resource "clustercontrol_db_load_balancer" "this" {
   ssh_key_file                = var.ssh_key_file
   ssh_port                    = var.ssh_port
 
-  db_my_host {
+  db_host {
     hostname = "test-primary"
-    port     = var.db_lb_admin_port
+    port     = clustercontrol_db_cluster.this.db_port
   }
 
-  db_host {
+  db_my_host {
     hostname = "test-primary-2"
-    port     = clustercontrol_db_cluster.this.db_port
+    # port     = "3306"
   }
-  db_host {
-    hostname = "test-primary-3"
-    port     = clustercontrol_db_cluster.this.db_port
-  }
-
 }

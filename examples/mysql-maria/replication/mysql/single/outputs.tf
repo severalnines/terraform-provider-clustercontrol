@@ -3,6 +3,11 @@ output "db_cluster_name" {
   value       = try(clustercontrol_db_cluster.this.db_cluster_name, null)
 }
 
+output "db_cluster_id" {
+  description = "The DB cluster resource ID."
+  value       = try(clustercontrol_db_cluster.this.db_cluster_id, null)
+}
+
 # output "db_cluster_status" {
 #   description = "The DB cluster status"
 #   value       = try(clustercontrol_db_cluster.this.status, null)

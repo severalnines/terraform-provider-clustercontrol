@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"log/slog"
+	"strconv"
 	"time"
 )
 
@@ -48,7 +49,7 @@ func resourceDbLoadBalancer() *schema.Resource {
 			TF_FIELD_CLUSTER_ID: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "TODO: The name of the resource, also acts as it's unique ID",
+				Description: "The database cluster ID for which this LB is being deployed to.",
 			},
 			TF_FIELD_LB_TYPE: {
 				Type:        schema.TypeString,
@@ -104,12 +105,7 @@ func resourceDbLoadBalancer() *schema.Resource {
 				Optional:    true,
 				Description: "TODO",
 			},
-			TF_FIELD_CLUSTER_INSTALL_SW: {
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Description: "TODO",
-			},
-			TF_FIELD_CLUSTER_SEMISYNC_REP: {
+			TF_FIELD_LB_INSTALL_SW: {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "TODO",
@@ -194,10 +190,10 @@ func resourceCreateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 
 	apiClient := m.(*openapi.APIClient)
 
-	isCreate := d.Get(TF_FIELD_CLUSTER_CREATE).(bool)
-	isImport := d.Get(TF_FIELD_CLUSTER_IMPORT).(bool)
+	isCreate := d.Get(TF_FIELD_LB_CREATE).(bool)
+	isImport := d.Get(TF_FIELD_LB_IMPORT).(bool)
 	if !isCreate && !isImport {
-		slog.Info(fmt.Sprintf("%s: No work to be done. Create and Import are disabled.", funcName))
+		slog.Error(fmt.Sprintf("%s: No work to be done. Create and Import are disabled.", funcName))
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Neither ClueterCreate nor ClusterImport!",
@@ -212,6 +208,31 @@ func resourceCreateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 	job := createLb.GetJob()
 	jobSpec := job.GetJobSpec()
 	jobData := jobSpec.GetJobData()
+
+	var iCid int
+	clusterId := d.Get(TF_FIELD_CLUSTER_ID).(string)
+	if clusterId == "" {
+		strErr := fmt.Sprintf("%s: %s - not declared", funcName, TF_FIELD_CLUSTER_ID)
+		slog.Error(strErr)
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  strErr,
+		})
+		return diags
+	}
+
+	if iCid, err = strconv.Atoi(clusterId); err != nil {
+		strErr := fmt.Sprintf("%s: %s - non-numeric cluster-id", funcName, clusterId)
+		slog.Error(strErr)
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  strErr,
+		})
+		return diags
+	}
+	//jobData.SetClusterid(int32(iCid))
+	createLb.SetClusterId(int32(iCid))
+	//job.SetClassName()
 
 	var getInputs DbLoadBalancerInterface
 	switch lbType {
@@ -250,9 +271,10 @@ func resourceCreateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 	}
 
 	//clusterId := d.Get(TF_FIELD_CLUSTER_ID).(string) + ":" + lbType
-	clusterId := d.Get(TF_FIELD_CLUSTER_ID).(string)
-	d.SetId(clusterId)
-	d.Set(TF_FIELD_RESOURCE_ID, clusterId)
+	lbHostname := jobData.GetHostname()
+	resourceId := fmt.Sprintf("%s;%s;%s", clusterId, lbType, lbHostname)
+	d.SetId(resourceId)
+	d.Set(TF_FIELD_RESOURCE_ID, resourceId)
 	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC850))
 
 	return diags

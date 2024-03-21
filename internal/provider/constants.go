@@ -51,10 +51,6 @@ const (
 )
 
 const (
-	DEFAULT_MYSQL_PORT_I = 3306
-)
-
-const (
 	MYSQL_VERSION_8   = "8.0"
 	MYSQL_VERSION_5_7 = "5.7"
 )
@@ -140,6 +136,11 @@ const (
 const (
 	LOAD_BLANCER_TYPE_PROXYSQL = "proxysql"
 	LOAD_BLANCER_TYPE_HAPROXY  = "haproxy"
+)
+
+const (
+	JOB_ACTION_SETUP_PROXYSQL = "setupProxySql"
+	JOB_ACTION_SETUP_HAPROXY  = "setupHaProxy"
 )
 
 // TODO: doesn't seem to be use anymore (03/07/2024)
