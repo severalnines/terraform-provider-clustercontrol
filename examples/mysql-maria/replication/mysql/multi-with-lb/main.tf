@@ -61,7 +61,6 @@ resource "clustercontrol_db_load_balancer" "this" {
 
   db_lb_create                = true
   db_lb_import                = false
-  # db_cluster_id               = [clustercontrol_db_cluster.this.db_cluster_id]
   db_cluster_id               = clustercontrol_db_cluster.this.id
   db_lb_type                  = "proxysql"
   db_lb_version               = var.db_lb_version

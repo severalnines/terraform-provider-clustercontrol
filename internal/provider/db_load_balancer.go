@@ -230,9 +230,20 @@ func resourceCreateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 		})
 		return diags
 	}
+
+	if iCid == 0 {
+		strErr := fmt.Sprintf("%s: - invalid cluster-id 0", funcName)
+		slog.Error(strErr)
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  strErr,
+		})
+		return diags
+	}
+
+	//job.SetClassName()
 	//jobData.SetClusterid(int32(iCid))
 	createLb.SetClusterId(int32(iCid))
-	//job.SetClassName()
 
 	var getInputs DbLoadBalancerInterface
 	switch lbType {

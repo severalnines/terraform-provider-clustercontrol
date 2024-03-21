@@ -3,9 +3,14 @@ output "db_cluster_name" {
   value       = try(clustercontrol_db_cluster.this.db_cluster_name, null)
 }
 
-output "db_cluster_id" {
+output "cluster_id" {
   description = "The DB cluster resource ID."
-  value       = try(clustercontrol_db_cluster.this.db_cluster_id, null)
+  value       = try(clustercontrol_db_cluster.this.id, null)
+}
+
+output "database_port" {
+  description = "The DB cluster resource ID."
+  value       = try(clustercontrol_db_cluster.this.db_port, null)
 }
 
 # output "db_cluster_status" {
