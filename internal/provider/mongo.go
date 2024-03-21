@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"context"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"log/slog"
@@ -27,6 +28,24 @@ func (m *MongoDb) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 	getConfigServers(d, jobData)
 
 	getMongosServers(d, jobData)
+
+	return nil
+}
+
+func (c *MongoDb) HandleRead(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+
+	if err := c.common.HandleRead(ctx, d, m, clusterInfo); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *MongoDb) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+
+	if err := c.common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {
+		return err
+	}
 
 	return nil
 }

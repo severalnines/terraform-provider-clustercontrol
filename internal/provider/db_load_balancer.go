@@ -241,8 +241,6 @@ func resourceCreateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 		return diags
 	}
 
-	//job.SetClassName()
-	//jobData.SetClusterid(int32(iCid))
 	createLb.SetClusterId(int32(iCid))
 
 	var getInputs DbLoadBalancerInterface
@@ -281,7 +279,6 @@ func resourceCreateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 		return diags
 	}
 
-	//clusterId := d.Get(TF_FIELD_CLUSTER_ID).(string) + ":" + lbType
 	lbHostname := jobData.GetHostname()
 	resourceId := fmt.Sprintf("%s;%s;%s", clusterId, lbType, lbHostname)
 	d.SetId(resourceId)
@@ -338,7 +335,7 @@ func resourceDeleteDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 	//
 	//apiClient := m.(*openapi.APIClient)
 
-	//d.SetId("")
+	d.SetId("")
 
 	return diags
 }

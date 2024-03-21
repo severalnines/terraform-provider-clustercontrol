@@ -1,10 +1,15 @@
 package provider
 
 import (
+	"context"
+	"encoding/json"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
+	"io"
 	"log/slog"
+	"net/http"
 	"strconv"
+	"strings"
 )
 
 type DbCommon struct{}
@@ -78,6 +83,105 @@ func (c *DbCommon) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJob
 
 	// TODO: provide support for timeout configuration - galera deployment ....
 	//timeouts := d.Get("timeouts").(types.Map)
+
+	return nil
+}
+
+func (c *DbCommon) HandleRead(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+	funcName := "DbCommon::HandleRead"
+	slog.Info(funcName)
+
+	//var err error
+
+	return nil
+}
+
+func (c *DbCommon) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+	funcName := "DbCommon::HandleUpdate"
+	slog.Info(funcName)
+
+	//var err error
+
+	var configChanges []openapi.ClustersConfigurationInner
+
+	isConfigUpdated := false
+	if d.HasChange(TF_FIELD_CLUSTER_NAME) {
+		var clusterNameTf string
+		clusterNameTf = d.Get(TF_FIELD_CLUSTER_NAME).(string)
+		var tags = openapi.ClustersConfigurationInner{
+			Name:  &CMON_CLUSTERS_OPERATION_SET_NAME,
+			Value: &clusterNameTf,
+		}
+		configChanges = append(configChanges, tags)
+		isConfigUpdated = true
+	}
+
+	if d.HasChange(TF_FIELD_CLUSTER_TAGS) {
+		tfTags := d.Get(TF_FIELD_CLUSTER_TAGS).(*schema.Set).List()
+		tags := make([]string, len(tfTags))
+		for i, tfTag := range tfTags {
+			tags[i] = tfTag.(string)
+		}
+		newTags := strings.Join(tags[:], ";")
+		var cfgTags = openapi.ClustersConfigurationInner{
+			Name:  &CMON_CLUSTERS_OPERATION_SET_CLUSTER_TAG,
+			Value: &newTags,
+		}
+		configChanges = append(configChanges, cfgTags)
+		isConfigUpdated = true
+	}
+
+	var err error
+	var resp *http.Response
+	var clusterSetResp MinResponseFields
+
+	if isConfigUpdated {
+		apiClient := m.(*openapi.APIClient)
+
+		/*
+		 * Get `cluster_id` to return back to Terraform
+		 */
+		clusterInfoReq := *openapi.NewClusters(CMON_CLUSTERS_OPERATION_SET_CONFIG)
+		clusterInfoReq.SetClusterId(clusterInfo.GetClusterId())
+		//if isTagsNeedUpdate {
+		//	var tags = openapi.ClustersConfigurationInner{
+		//		Name:  &CMON_CLUSTERS_OPERATION_SET_CLUSTER_TAG,
+		//		Value: &commaSeparatedTags,
+		//	}
+		//	configChanges = append(configChanges, tags)
+		//}
+
+		//if isClusterNameNeedsUpdate {
+		//	clusterInfo.SetClassName(clusterNameTf)
+		//	var tags = openapi.ClustersConfigurationInner{
+		//		Name:  &CMON_CLUSTERS_OPERATION_SET_NAME,
+		//		Value: &clusterNameTf,
+		//	}
+		//	configChanges = append(configChanges, tags)
+		//}
+
+		// Finally set the config changes
+		clusterInfoReq.SetConfiguration(configChanges)
+
+		if resp, err = apiClient.ClustersAPI.ClustersPost(ctx).Clusters(clusterInfoReq).Execute(); err != nil {
+			PrintError(err, resp)
+			return err
+		}
+		slog.Info(funcName, "Resp `ClustersPost.setConfig`", resp, "clusterId", clusterInfo.GetClusterId())
+
+		var respBytes []byte
+		if respBytes, err = io.ReadAll(resp.Body); err != nil {
+			PrintError(err, nil)
+			return err
+		}
+
+		if err = json.Unmarshal(respBytes, &clusterSetResp); err != nil {
+			PrintError(err, nil)
+			return err
+		}
+		slog.Debug(funcName, "Resp `setConfig`", clusterSetResp)
+
+	}
 
 	return nil
 }

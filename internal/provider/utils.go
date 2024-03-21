@@ -54,7 +54,7 @@ func GetClusterByClusterStrId(ctx context.Context, apiClient *openapi.APIClient,
 	var err error
 
 	if clusterId, err = strconv.Atoi(clusterIdStr); err != nil {
-		// TODO
+		return nil, err
 	}
 
 	return (GetClusterByClusterIntId(ctx, apiClient, int32(clusterId)))

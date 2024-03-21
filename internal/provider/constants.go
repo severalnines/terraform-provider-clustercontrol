@@ -131,6 +131,7 @@ const (
 
 const (
 	CMON_CLUSTERS_OPERATION_GET_CLUSTERS = "getclusterinfo"
+	CMON_CLUSTERS_OPERATION_SET_CONFIG   = "setConfig"
 )
 
 const (

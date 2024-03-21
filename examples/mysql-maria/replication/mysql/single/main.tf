@@ -13,7 +13,7 @@ locals {
 resource "clustercontrol_db_cluster" "this" {
   db_cluster_create        = true
   db_cluster_import        = false
-  db_cluster_name          = "mydbcluster"
+  db_cluster_name          = "mydbcluster-1"
   db_cluster_type          = "replication"
   db_vendor                = "percona"
   db_version               = "8.0"
@@ -27,7 +27,8 @@ resource "clustercontrol_db_cluster" "this" {
   ssh_user_password        = var.ssh_user_password
   ssh_key_file             = var.ssh_key_file
   ssh_port                 = var.ssh_port
-  db_tags                  = ["terra-deploy"]
+  # db_tags                  = ["terra-deploy"]
+  db_tags                  = ["terra-deploy","terra-foo"]
 
   db_host {
     hostname = "test-primary"

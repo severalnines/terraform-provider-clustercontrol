@@ -13,6 +13,8 @@ import (
 
 type DbClusterInterface interface {
 	GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error
+	HandleRead(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error
+	HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error
 }
 
 func resourceDbCluster() *schema.Resource {
@@ -482,19 +484,20 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	id := strconv.Itoa(int(clusterId))
 	d.SetId(id)
 	d.Set(TF_FIELD_CLUSTER_ID, id)
-	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC850))
+	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC822))
 	//d.SetId(clusterName)
 
 	return diags
 }
 
+// Prem
 func resourceReadDbCluster(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	funcName := "resourceReadDbCluster"
 	slog.Debug(funcName)
 
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
-	var cluster *openapi.ClusterResponse
+	var clusterInfo *openapi.ClusterResponse
 	var err error
 
 	newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
@@ -503,46 +506,66 @@ func resourceReadDbCluster(ctx context.Context, d *schema.ResourceData, m interf
 
 	clusterId := d.Id()
 
-	if cluster, err = GetClusterByClusterStrId(newCtx, apiClient, clusterId); err != nil {
-		// TODO
+	if clusterInfo, err = GetClusterByClusterStrId(newCtx, apiClient, clusterId); err != nil {
+		slog.Error(err.Error())
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  err.Error(),
+		})
+		return diags
 	}
 
-	cluster.GetClusterType()
-	cluster.GetClusterId()
-	cluster.GetVendor()
-	cluster.GetVersion()
-	cluster.GetTags()
+	clusterType := d.Get(TF_FIELD_CLUSTER_TYPE).(string)
+	slog.Debug(clusterType)
 
-	//foo := d.Get("foo")
-	//
-	//for _, f := range foo.([]any) {
-	//	f := f.(map[string]any)
-	//
-	//	for _, b := range f["bar"].([]any) {
-	//		b := b.(map[string]any)
-	//		b["version"] = uuid.New().String()
-	//	}
-	//}
-	//
-	//if err := d.Set("foo", foo); err != nil {
-	//	diags = append(diags, diag.Diagnostic{
-	//		Severity: diag.Error,
-	//		Summary:  err.Error(),
-	//	})
-	//	return diags
-	//}
+	var readHandler DbClusterInterface = nil
 
-	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC850))
+	switch clusterType {
+	case CLUSTER_TYPE_REPLICATION:
+		readHandler = NewMySQLMaria()
+	case CLUSTER_TYPE_GALERA:
+		readHandler = NewMySQLMaria()
+	case CLUSTER_TYPE_PG_SINGLE:
+		readHandler = NewPostgres()
+	case CLUSTER_TYPE_MOGNODB:
+		readHandler = NewMongo()
+	case CLUSTER_TYPE_REDIS:
+		readHandler = NewRedis()
+	case CLUSTER_TYPE_MSSQL_SINGLE:
+		readHandler = NewMsSql()
+	case CLUSTER_TYPE_MSSQL_AO_ASYNC:
+		readHandler = NewMsSql()
+	case CLUSTER_TYPE_ELASTIC:
+		readHandler = NewElastic()
+	default:
+		slog.Warn(funcName, "Unknown cluster type", clusterType)
+	}
+
+	if readHandler != nil {
+		if err = readHandler.HandleRead(newCtx, d, m, clusterInfo); err != nil {
+			slog.Error(err.Error())
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error in DB cluster Read handler",
+			})
+			return diags
+		}
+	}
+
+	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC822))
 
 	return diags
 }
 
+// Prem
 func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	funcName := "resourceReadDbCluster"
 	slog.Debug(funcName)
+	// Warning or errors can be collected in a slice type
+	var diags diag.Diagnostics
 
 	// Warning or errors can be collected in a slice type
-	var cluster *openapi.ClusterResponse
+	var clusterInfo *openapi.ClusterResponse
 	var err error
 
 	newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
@@ -551,27 +574,53 @@ func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 
 	clusterId := d.Id()
 
-	if cluster, err = GetClusterByClusterStrId(newCtx, apiClient, clusterId); err != nil {
-		// TODO
+	if clusterInfo, err = GetClusterByClusterStrId(newCtx, apiClient, clusterId); err != nil {
+		slog.Error(err.Error())
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  err.Error(),
+		})
+		return diags
 	}
 
-	cluster.GetClusterType()
-	cluster.GetClusterId()
-	cluster.GetVendor()
-	cluster.GetVersion()
-	cluster.GetTags()
+	clusterType := d.Get(TF_FIELD_CLUSTER_TYPE).(string)
+	slog.Debug(clusterType)
 
-	// Warning or errors can be collected in a slice type
-	//var diags diag.Diagnostics
-	//
-	//resourceID := d.Id()
-	//
-	//if d.HasChange("foo") {
-	//	foo := d.Get("foo").([]any)
-	//	d.Set("last_updated", time.Now().Format(time.RFC850))
-	//}
+	var updateHandler DbClusterInterface = nil
 
-	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC850))
+	switch clusterType {
+	case CLUSTER_TYPE_REPLICATION:
+		updateHandler = NewMySQLMaria()
+	case CLUSTER_TYPE_GALERA:
+		updateHandler = NewMySQLMaria()
+	case CLUSTER_TYPE_PG_SINGLE:
+		updateHandler = NewPostgres()
+	case CLUSTER_TYPE_MOGNODB:
+		updateHandler = NewMongo()
+	case CLUSTER_TYPE_REDIS:
+		updateHandler = NewRedis()
+	case CLUSTER_TYPE_MSSQL_SINGLE:
+		updateHandler = NewMsSql()
+	case CLUSTER_TYPE_MSSQL_AO_ASYNC:
+		updateHandler = NewMsSql()
+	case CLUSTER_TYPE_ELASTIC:
+		updateHandler = NewElastic()
+	default:
+		slog.Warn(funcName, "Unknown cluster type", clusterType)
+	}
+
+	if updateHandler != nil {
+		if err = updateHandler.HandleUpdate(newCtx, d, m, clusterInfo); err != nil {
+			slog.Error(err.Error())
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error in DB cluster Read handler",
+			})
+			return diags
+		}
+	}
+
+	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC822))
 
 	return resourceReadDbCluster(ctx, d, m)
 }
@@ -612,7 +661,7 @@ func resourceDeleteDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 		return diags
 	}
 
-	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC850))
+	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC822))
 	d.SetId("")
 
 	return diags

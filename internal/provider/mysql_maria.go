@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -85,6 +86,24 @@ func (m *MySQLMaria) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJ
 		ccTopo.MasterSlaveLinks = append(ccTopo.MasterSlaveLinks, msLink)
 	}
 	jobData.SetTopology(ccTopo)
+
+	return nil
+}
+
+func (c *MySQLMaria) HandleRead(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+
+	if err := c.common.HandleRead(ctx, d, m, clusterInfo); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+
+	if err := c.common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {
+		return err
+	}
 
 	return nil
 }

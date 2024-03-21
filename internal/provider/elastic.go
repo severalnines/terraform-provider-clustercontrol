@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"context"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"log/slog"
@@ -51,6 +52,24 @@ func (m *Elastic) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 		nodes = append(nodes, node)
 	}
 	jobData.SetNodes(nodes)
+
+	return nil
+}
+
+func (c *Elastic) HandleRead(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+
+	if err := c.common.HandleRead(ctx, d, m, clusterInfo); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Elastic) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+
+	if err := c.common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {
+		return err
+	}
 
 	return nil
 }

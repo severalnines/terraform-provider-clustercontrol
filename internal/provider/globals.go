@@ -117,4 +117,9 @@ var (
 	}
 )
 
+var (
+	CMON_CLUSTERS_OPERATION_SET_NAME        = "name"
+	CMON_CLUSTERS_OPERATION_SET_CLUSTER_TAG = "tags"
+)
+
 //var foo = map[string]map[string]map[string]string{}
