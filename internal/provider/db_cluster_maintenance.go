@@ -72,7 +72,7 @@ func resourceCreateDbMaintenance(ctx context.Context, d *schema.ResourceData, m 
 
 	maintStartTmStr := d.Get(TF_FIELD_MAINT_START_TIME).(string)
 	maintStopTmStr := d.Get(TF_FIELD_MAINT_STOP_TIME).(string)
-	//maintReasonStr := d.Get(TF_FIELD_MAINT_REASON).(string)
+	maintReasonStr := d.Get(TF_FIELD_MAINT_REASON).(string)
 
 	var clusterId int32
 	if clusterId, diags = GetClusterIdFromSchema(d); diags != nil {
@@ -105,7 +105,7 @@ func resourceCreateDbMaintenance(ctx context.Context, d *schema.ResourceData, m 
 	maintOperation.SetClusterId(clusterId)
 	maintOperation.SetInitiate(maintStartTm.UTC().String())
 	maintOperation.SetDeadline(maintStopTm.UTC().String())
-	//maintOperaiton.SetReason(maintReasonStr)
+	maintOperation.SetReason(maintReasonStr)
 
 	var resp *http.Response
 	if resp, err = apiClient.MaintenanceAPI.MaintenancePost(newCtx).Maintenance(maintOperation).Execute(); err != nil {
@@ -117,7 +117,7 @@ func resourceCreateDbMaintenance(ctx context.Context, d *schema.ResourceData, m 
 		})
 		return diags
 	}
-	slog.Debug(funcName, "Resp `MaintenancePost.addMaintenance`", resp, "clusterId", clusterId)
+	slog.Info(funcName, "Resp `MaintenancePost.addMaintenance`", resp, "clusterId", clusterId)
 
 	var respBytes []byte
 	if respBytes, err = io.ReadAll(resp.Body); err != nil {
@@ -140,11 +140,11 @@ func resourceCreateDbMaintenance(ctx context.Context, d *schema.ResourceData, m 
 		})
 		return diags
 	}
-	slog.Debug(funcName, "Resp `MaintenanceOperation`", maintOperResp)
+	slog.Info(funcName, "Resp `MaintenanceOperation`", maintOperResp)
 
 	d.SetId(maintOperResp.UUID)
 	d.Set(TF_FIELD_RESOURCE_ID, maintOperResp.UUID)
-	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC850))
+	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC822))
 
 	return diags
 }
@@ -175,7 +175,7 @@ func resourceDeleteDbMaintenance(ctx context.Context, d *schema.ResourceData, m 
 		})
 		return diags
 	}
-	slog.Debug(funcName, "Resp `MaintenancePost.removeMaintenance`", resp, "maint UUID", d.Id())
+	slog.Info(funcName, "Resp `MaintenancePost.removeMaintenance`", resp, "maint UUID", d.Id())
 
 	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC822))
 	d.SetId("")

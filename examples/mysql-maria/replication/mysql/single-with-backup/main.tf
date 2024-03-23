@@ -28,7 +28,7 @@ resource "clustercontrol_db_cluster" "this" {
   ssh_key_file             = var.ssh_key_file
   ssh_port                 = var.ssh_port
   # db_tags                  = ["terra-deploy"]
-  db_tags                  = ["terra-deploy","terra-foo"]
+  db_tags = ["terra-deploy", "terra-foo"]
 
   db_host {
     hostname = "test-primary"
@@ -69,4 +69,13 @@ resource "clustercontrol_db_cluster" "this" {
 #   db_backup_compression        = var.db_backup_compression
 #   db_backup_compression_level  = var.db_backup_compression_level
 #   db_backup_retention          = var.db_backup_retention
+# }
+
+# resource "clustercontrol_db_cluster_maintenance" "server-upgrade-03232024" {
+#   depends_on = [clustercontrol_db_cluster.this]
+
+#   db_cluster_id       = clustercontrol_db_cluster.this.id
+#   db_maint_start_time = "Mar-23-2024T22:00"
+#   db_maint_stop_time  = "Mar-23-2024T23:30"
+#   db_maint_reason     = "Hardware refresh March 23, 2024"
 # }
