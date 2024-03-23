@@ -40,8 +40,10 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			RESOURCE_DB_CLUSTER:       resourceDbCluster(),
-			RESOURCE_DB_LOAD_BALANCER: resourceDbLoadBalancer(),
+			RESOURCE_DB_CLUSTER:             resourceDbCluster(),
+			RESOURCE_DB_LOAD_BALANCER:       resourceDbLoadBalancer(),
+			RESOURCE_DB_CLUSTER_MAINTENANCE: resourceDbClusterMaintenance(),
+			RESOURCE_DB_CLUSTER_BACKUP:      resourceDbClusterBackup(),
 		},
 		DataSourcesMap:       map[string]*schema.Resource{},
 		ConfigureContextFunc: providerConfigure,
@@ -95,8 +97,8 @@ func newConfiguration(url string) *openapi.Configuration {
 	cfg := &openapi.Configuration{
 		DefaultHeader: make(map[string]string),
 		UserAgent:     "OpenAPI-Generator/1.0.0/go",
-		//Debug:         true,
-		Debug: false,
+		Debug:         true,
+		//Debug: false,
 		Servers: openapi.ServerConfigurations{
 			{
 				URL:         url,

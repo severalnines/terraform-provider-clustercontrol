@@ -27,6 +27,7 @@ resource "clustercontrol_db_cluster" "this" {
   ssh_key_file           = var.ssh_key_file
   ssh_port               = var.ssh_port
   db_tags                = ["terra-deploy"]
+  db_deploy_agents       = var.db_deploy_agents
 
   db_host {
     hostname = "test-primary"
@@ -101,5 +102,21 @@ resource "clustercontrol_db_load_balancer" "this" {
     hostname = "test-primary-3"
     port     = clustercontrol_db_cluster.this.db_port
   }
+
+}
+
+resource "clustercontrol_db_cluster_backup" "03-23-2024-full-1" {
+  depends_on = [clustercontrol_db_cluster.this]
+
+  db_cluster_id                = clustercontrol_db_cluster.this.id
+  db_backup_method             = var.db_backup_method
+  db_backup_dir                = var.db_backup_dir
+  db_backup_subdir             = var.db_backup_subdir
+  db_backup_encrypt            = var.db_backup_encrypt
+  db_backup_host               = var.db_backup_hostname
+  db_backup_storage_controller = var.db_backup_storage_controller
+  db_backup_compression        = var.db_backup_compression
+  db_backup_compression_level  = var.db_backup_compression_level
+  db_backup_retention          = var.db_backup_retention
 
 }

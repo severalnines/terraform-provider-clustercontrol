@@ -118,6 +118,75 @@ var (
 )
 
 var (
+	//gDbAvailableBackupMethods = map[string]map[string]map[string]string{
+	gDbAvailableBackupMethods = map[string]map[string][]string{
+		CLUSTER_TYPE_REPLICATION: {
+			VENDOR_ORACLE: {
+				"xtrabackupfull",
+				"xtrabackupincr",
+				"mysqldump",
+			},
+			VENDOR_PERCONA: {
+				"xtrabackupfull",
+				"xtrabackupincr",
+				"mysqldump",
+			},
+			VENDOR_MARIADB: {
+				"mariabackupfull",
+				"mariabackupincr",
+				"mysqldump",
+			},
+		},
+		CLUSTER_TYPE_GALERA: {
+			VENDOR_PERCONA: {
+				"xtrabackupfull",
+				"xtrabackupincr",
+				"mysqldump",
+			},
+			VENDOR_MARIADB: {
+				"mariabackupfull",
+				"mariabackupincr",
+				"mysqldump",
+			},
+		},
+		CLUSTER_TYPE_MOGNODB: {
+			VENDOR_PERCONA: {
+				"percona-backup-mongodb",
+				"mongodump",
+			},
+			VENDOR_10GEN: {
+				"percona-backup-mongodb",
+				"mongodump",
+			},
+		},
+		CLUSTER_TYPE_MSSQL_AO_ASYNC: { // VENDOR_MICROSOFT
+			VENDOR_MICROSOFT: {
+				"mssqlfull",
+			},
+		},
+		CLUSTER_TYPE_MSSQL_SINGLE: { // VENDOR_MICROSOFT
+			VENDOR_MICROSOFT: {
+				"mssqlfull",
+			},
+		},
+		CLUSTER_TYPE_REDIS: { // VENDOR_REDIS
+			VENDOR_REDIS: {
+				"",
+			},
+		},
+		CLUSTER_TYPE_PG_SINGLE: { // VENDOR_REDIS
+			VENDOR_DEFAULT: {
+				"pgbasebackup",
+				"pgdump",
+				"pgbackrestfull",
+				"pgbackrestincr",
+				"pgbackrestdiff",
+			},
+		},
+	}
+)
+
+var (
 	CMON_CLUSTERS_OPERATION_SET_NAME        = "name"
 	CMON_CLUSTERS_OPERATION_SET_CLUSTER_TAG = "tags"
 )

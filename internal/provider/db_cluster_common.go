@@ -81,6 +81,9 @@ func (c *DbCommon) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJob
 	}
 	jobData.SetWithTags(tags)
 
+	deployAgents := d.Get(TF_FIELD_CLUSTER_DEPLOY_AGENTS).(bool)
+	jobData.SetDeployAgents(deployAgents)
+
 	// TODO: provide support for timeout configuration - galera deployment ....
 	//timeouts := d.Get("timeouts").(types.Map)
 
@@ -99,8 +102,6 @@ func (c *DbCommon) HandleRead(ctx context.Context, d *schema.ResourceData, m int
 func (c *DbCommon) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
 	funcName := "DbCommon::HandleUpdate"
 	slog.Info(funcName)
-
-	//var err error
 
 	var configChanges []openapi.ClustersConfigurationInner
 
@@ -138,27 +139,8 @@ func (c *DbCommon) HandleUpdate(ctx context.Context, d *schema.ResourceData, m i
 	if isConfigUpdated {
 		apiClient := m.(*openapi.APIClient)
 
-		/*
-		 * Get `cluster_id` to return back to Terraform
-		 */
 		clusterInfoReq := *openapi.NewClusters(CMON_CLUSTERS_OPERATION_SET_CONFIG)
 		clusterInfoReq.SetClusterId(clusterInfo.GetClusterId())
-		//if isTagsNeedUpdate {
-		//	var tags = openapi.ClustersConfigurationInner{
-		//		Name:  &CMON_CLUSTERS_OPERATION_SET_CLUSTER_TAG,
-		//		Value: &commaSeparatedTags,
-		//	}
-		//	configChanges = append(configChanges, tags)
-		//}
-
-		//if isClusterNameNeedsUpdate {
-		//	clusterInfo.SetClassName(clusterNameTf)
-		//	var tags = openapi.ClustersConfigurationInner{
-		//		Name:  &CMON_CLUSTERS_OPERATION_SET_NAME,
-		//		Value: &clusterNameTf,
-		//	}
-		//	configChanges = append(configChanges, tags)
-		//}
 
 		// Finally set the config changes
 		clusterInfoReq.SetConfiguration(configChanges)

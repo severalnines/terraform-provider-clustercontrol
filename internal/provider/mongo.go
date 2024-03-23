@@ -9,7 +9,8 @@ import (
 )
 
 type MongoDb struct {
-	common DbCommon
+	Common DbCommon
+	Backup DbBackupCommon
 }
 
 func (m *MongoDb) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
@@ -19,7 +20,7 @@ func (m *MongoDb) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 	var err error
 
 	// parent/super - get common attributes
-	if err = m.common.GetInputs(d, jobData); err != nil {
+	if err = m.Common.GetInputs(d, jobData); err != nil {
 		return err
 	}
 
@@ -34,7 +35,7 @@ func (m *MongoDb) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 
 func (c *MongoDb) HandleRead(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
 
-	if err := c.common.HandleRead(ctx, d, m, clusterInfo); err != nil {
+	if err := c.Common.HandleRead(ctx, d, m, clusterInfo); err != nil {
 		return err
 	}
 
@@ -43,7 +44,7 @@ func (c *MongoDb) HandleRead(ctx context.Context, d *schema.ResourceData, m inte
 
 func (c *MongoDb) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
 
-	if err := c.common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {
+	if err := c.Common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {
 		return err
 	}
 
@@ -152,6 +153,20 @@ func getReplicasets(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobDa
 	jobData.SetReplicaSets(replicaSets)
 
 	return nil
+}
+
+func (m *MongoDb) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
+	funcName := "MongoDb::GetBackupInputs"
+	slog.Info(funcName)
+
+	var err error
+
+	// parent/super - get common attributes
+	if err = m.Backup.GetBackupInputs(d, jobData); err != nil {
+		return err
+	}
+
+	return err
 }
 
 func NewMongo() *MongoDb {

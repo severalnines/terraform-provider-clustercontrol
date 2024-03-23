@@ -9,6 +9,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -45,25 +46,34 @@ func SendAndWaitForJobCompletion(ctx context.Context, apiClient *openapi.APIClie
 	funcName := "SendAndWaitForJobCompletion"
 	slog.Debug(funcName)
 
+	_, err := SendAndWaitForJobCompletionAndId(ctx, apiClient, job)
+
+	return err
+}
+
+func SendAndWaitForJobCompletionAndId(ctx context.Context, apiClient *openapi.APIClient, job *openapi.Jobs) (int32, error) {
+	funcName := "SendAndWaitForJobCompletionAndId"
+	slog.Debug(funcName)
+
 	var resp *http.Response
 	var err error
+	var jobResp JobResponseFields
 
 	if resp, err = apiClient.JobsAPI.JobsPost(ctx).Jobs(*job).Execute(); err != nil {
 		PrintError(err, resp)
-		return err
+		return jobResp.Job.Job_Id, err
 	}
 	slog.Debug(funcName, "Resp `Job`", resp)
 
 	var respBytes []byte
 	if respBytes, err = io.ReadAll(resp.Body); err != nil {
 		PrintError(err, resp)
-		return err
+		return jobResp.Job.Job_Id, err
 	}
 
-	var jobResp JobResponseFields
 	if err = json.Unmarshal(respBytes, &jobResp); err != nil {
 		PrintError(err, resp)
-		return err
+		return jobResp.Job.Job_Id, err
 	}
 	//slog.Debug(funcName, "Job response", jobResp)
 
@@ -75,29 +85,32 @@ func SendAndWaitForJobCompletion(ctx context.Context, apiClient *openapi.APIClie
 		checkJobStatus := NewCCJobForJobStatusCheck(jobResp.Job.Job_Id)
 		if resp, err = apiClient.JobsAPI.JobsPost(ctx).Jobs(*checkJobStatus).Execute(); err != nil {
 			PrintError(err, resp)
-			return err
+			return jobResp.Job.Job_Id, err
 		}
 
 		if respBytes, err = io.ReadAll(resp.Body); err != nil {
 			PrintError(err, resp)
-			return err
+			return jobResp.Job.Job_Id, err
 		}
 
 		if err = json.Unmarshal(respBytes, &jobResp); err != nil {
 			PrintError(err, resp)
-			return err
+			return jobResp.Job.Job_Id, err
 		}
 		slog.Debug(funcName, "Job response", jobResp)
 
-		if jobResp.Job.Status == JOB_STATUS_FINISHED {
+		if strings.Contains(jobResp.Job.Status, JOB_STATUS_FINISHED) {
 			break
 		}
 
-		if jobResp.Job.Status != JOB_STATUS_RUNNING && jobResp.Job.Status != JOB_STATUS_DEFINED {
+		//if jobResp.Job.Status != JOB_STATUS_RUNNING && jobResp.Job.Status != JOB_STATUS_DEFINED {
+		// Sometimes the job status is RUNNING3. What the heck is this? But, it is indeed the REALITY. Go figure!
+		if !strings.Contains(jobResp.Job.Status, JOB_STATUS_RUNNING) &&
+			!strings.Contains(jobResp.Job.Status, JOB_STATUS_DEFINED) {
 			err = errors.New(fmt.Sprintf("Job failed. (Status: %s)", jobResp.Job.Status))
 			break
 		}
 	}
 
-	return err
+	return jobResp.Job.Job_Id, err
 }

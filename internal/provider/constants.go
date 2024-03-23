@@ -3,8 +3,10 @@ package provider
 const (
 	//RESOURCE_DB_CLUSTER       = "cc_db_cluster"
 	//RESOURCE_DB_LOAD_BALANCER = "cc_db_load_balancer"
-	RESOURCE_DB_CLUSTER       = "clustercontrol_db_cluster"
-	RESOURCE_DB_LOAD_BALANCER = "clustercontrol_db_load_balancer"
+	RESOURCE_DB_CLUSTER             = "clustercontrol_db_cluster"
+	RESOURCE_DB_LOAD_BALANCER       = "clustercontrol_db_load_balancer"
+	RESOURCE_DB_CLUSTER_MAINTENANCE = "clustercontrol_db_cluster_maintenance"
+	RESOURCE_DB_CLUSTER_BACKUP      = "clustercontrol_db_cluster_backup"
 )
 
 const (
@@ -33,6 +35,7 @@ const (
 	VENDOR_REDIS     = "redis"
 	VENDOR_MICROSOFT = "microsoft"
 	VENDOR_DEFAULT   = "default"
+	VENDOR_EDB       = "EDB"
 	VENDOR_10GEN     = "10gen"
 )
 
@@ -127,11 +130,28 @@ const (
 	CMON_JOB_REMOVE_CLUSTER_COMMAND  = "remove_cluster"
 	CMON_JOB_CREATE_PROXYSQL_COMMAND = "proxysql"
 	CMON_JOB_CREATE_HAPROXY_COMMAND  = "haproxy"
+	CMON_JOB_CREATE_BACKUP_COMMAND   = "backup"
+	CMON_JOB_DELETE_BACKUP_COMMAND   = "delete_backup"
 )
 
 const (
 	CMON_CLUSTERS_OPERATION_GET_CLUSTERS = "getclusterinfo"
 	CMON_CLUSTERS_OPERATION_SET_CONFIG   = "setConfig"
+)
+
+const (
+	CMON_BACKUP_OPERATION_GET = "getBackups"
+)
+
+const BACKUP_RECORD_VERSION_2 = 2
+
+const (
+	BACKUP_ORDER_CREATED_DESC = "created DESC"
+)
+
+const (
+	CMON_MAINTENANCE_OPERATION_ADD_MAINT    = "addMaintenance"
+	CMON_MAINTENANCE_OPERATION_REMOVE_MAINT = "removeMaintenance"
 )
 
 const (
@@ -198,6 +218,7 @@ const (
 	TF_FIELD_CLUSTER_MONGO_CONFIG_SERVER = "db_config_server"
 	TF_FIELD_CLUSTER_MONGOS_SERVER       = "db_mongos_server"
 	TF_FIELD_CLUSTER_TIMEOUTS            = "timeouts"
+	TF_FIELD_CLUSTER_DEPLOY_AGENTS       = "db_deploy_agents"
 
 	// Load balancer fields
 	TF_FIELD_LB_CREATE           = "db_lb_create"
@@ -214,6 +235,28 @@ const (
 	TF_FIELD_LB_USE_RW_SPLITTING = "db_lb_use_rw_splitting"
 	TF_FIELD_LB_INSTALL_SW       = "db_lb_install_software"
 	TF_FIELD_LB_MY_HOST          = "db_my_host"
+
+	// Maintenance fields
+	TF_FIELD_MAINT_START_TIME = "db_maint_start_time"
+	TF_FIELD_MAINT_STOP_TIME  = "db_maint_stop_time"
+	TF_FIELD_MAINT_REASON     = "db_maint_reason"
+
+	// Backup fields
+	TF_FIELD_BACKUP_METHOD            = "db_backup_method"
+	TF_FIELD_BACKUP_DIR               = "db_backup_dir"
+	TF_FIELD_BACKUP_SUBDIR            = "db_backup_subdir"
+	TF_FIELD_BACKUP_ENCRYPT           = "db_backup_encrypt"
+	TF_FIELD_BACKUP_HOST              = "db_backup_host"
+	TF_FIELD_BACKUP_COMPRESSION       = "db_backup_compression"
+	TF_FIELD_BACKUP_COMPRESSION_LEVEL = "db_backup_compression_level"
+	TF_FIELD_BACKUP_RETENTION         = "db_backup_retention"
+	TF_FIELD_BACKUP_ON_CONTROLLER     = "db_backup_storage_controller"
+	//TF_FIELD_BACKUP_                  = "db_backup_"
+	//TF_FIELD_BACKUP_                  = "db_backup_"
+)
+
+const (
+	TIME_FORMAT = "Jan-02-2006T15:04"
 )
 
 const (

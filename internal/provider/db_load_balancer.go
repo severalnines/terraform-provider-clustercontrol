@@ -7,7 +7,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"log/slog"
-	"strconv"
 	"time"
 )
 
@@ -179,6 +178,7 @@ func resourceDbLoadBalancer() *schema.Resource {
 	}
 }
 
+// Prem
 func resourceCreateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	funcName := "resourceCreateDbLoadBalancer"
 	slog.Debug(funcName)
@@ -209,39 +209,43 @@ func resourceCreateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 	jobSpec := job.GetJobSpec()
 	jobData := jobSpec.GetJobData()
 
-	var iCid int
-	clusterId := d.Get(TF_FIELD_CLUSTER_ID).(string)
-	if clusterId == "" {
-		strErr := fmt.Sprintf("%s: %s - not declared", funcName, TF_FIELD_CLUSTER_ID)
-		slog.Error(strErr)
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  strErr,
-		})
+	var clusterId int32
+	if clusterId, diags = GetClusterIdFromSchema(d); diags != nil {
 		return diags
 	}
 
-	if iCid, err = strconv.Atoi(clusterId); err != nil {
-		strErr := fmt.Sprintf("%s: %s - non-numeric cluster-id", funcName, clusterId)
-		slog.Error(strErr)
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  strErr,
-		})
-		return diags
-	}
+	//clusterId := d.Get(TF_FIELD_CLUSTER_ID).(string)
+	//if clusterId == "" {
+	//	strErr := fmt.Sprintf("%s: %s - not declared", funcName, TF_FIELD_CLUSTER_ID)
+	//	slog.Error(strErr)
+	//	diags = append(diags, diag.Diagnostic{
+	//		Severity: diag.Error,
+	//		Summary:  strErr,
+	//	})
+	//	return diags
+	//}
+	//
+	//if iCid, err = strconv.Atoi(clusterId); err != nil {
+	//	strErr := fmt.Sprintf("%s: %s - non-numeric cluster-id", funcName, clusterId)
+	//	slog.Error(strErr)
+	//	diags = append(diags, diag.Diagnostic{
+	//		Severity: diag.Error,
+	//		Summary:  strErr,
+	//	})
+	//	return diags
+	//}
 
-	if iCid == 0 {
-		strErr := fmt.Sprintf("%s: - invalid cluster-id 0", funcName)
-		slog.Error(strErr)
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  strErr,
-		})
-		return diags
-	}
+	//if clusterId == 0 {
+	//	strErr := fmt.Sprintf("%s: - invalid cluster-id 0", funcName)
+	//	slog.Error(strErr)
+	//	diags = append(diags, diag.Diagnostic{
+	//		Severity: diag.Error,
+	//		Summary:  strErr,
+	//	})
+	//	return diags
+	//}
 
-	createLb.SetClusterId(int32(iCid))
+	createLb.SetClusterId(clusterId)
 
 	var getInputs DbLoadBalancerInterface
 	switch lbType {
@@ -288,6 +292,7 @@ func resourceCreateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 	return diags
 }
 
+// Prem
 func resourceReadDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	funcName := "resourceReadDbCluster"
 	slog.Debug(funcName)
@@ -306,6 +311,7 @@ func resourceReadDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m i
 	return diags
 }
 
+// Prem
 func resourceUpdateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	funcName := "resourceReadDbCluster"
 	slog.Debug(funcName)

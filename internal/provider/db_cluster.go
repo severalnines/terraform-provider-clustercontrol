@@ -382,6 +382,11 @@ func resourceDbCluster() *schema.Resource {
 				Description: "TODO",
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
+			TF_FIELD_CLUSTER_DEPLOY_AGENTS: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Auto deploy prometheus and other relevant agents",
+			},
 		},
 	}
 }

@@ -8,7 +8,8 @@ import (
 )
 
 type Elastic struct {
-	common DbCommon
+	Common DbCommon
+	Backup DbBackupCommon
 }
 
 func (m *Elastic) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
@@ -18,7 +19,7 @@ func (m *Elastic) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 	var err error
 
 	// parent/super - get common attributes
-	if err = m.common.GetInputs(d, jobData); err != nil {
+	if err = m.Common.GetInputs(d, jobData); err != nil {
 		return err
 	}
 
@@ -58,7 +59,7 @@ func (m *Elastic) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 
 func (c *Elastic) HandleRead(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
 
-	if err := c.common.HandleRead(ctx, d, m, clusterInfo); err != nil {
+	if err := c.Common.HandleRead(ctx, d, m, clusterInfo); err != nil {
 		return err
 	}
 
@@ -67,11 +68,25 @@ func (c *Elastic) HandleRead(ctx context.Context, d *schema.ResourceData, m inte
 
 func (c *Elastic) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
 
-	if err := c.common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {
+	if err := c.Common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (c *Elastic) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
+	funcName := "Elastic::GetBackupInputs"
+	slog.Info(funcName)
+
+	var err error
+
+	// parent/super - get common attributes
+	if err = c.Backup.GetBackupInputs(d, jobData); err != nil {
+		return err
+	}
+
+	return err
 }
 
 func NewElastic() *Elastic {

@@ -8,7 +8,8 @@ import (
 )
 
 type MsSql struct {
-	common DbCommon
+	Common DbCommon
+	Backup DbBackupCommon
 }
 
 func (m *MsSql) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
@@ -18,7 +19,7 @@ func (m *MsSql) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpe
 	var err error
 
 	// parent/super - get common attributes
-	if err = m.common.GetInputs(d, jobData); err != nil {
+	if err = m.Common.GetInputs(d, jobData); err != nil {
 		return err
 	}
 
@@ -49,7 +50,7 @@ func (m *MsSql) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpe
 
 func (c *MsSql) HandleRead(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
 
-	if err := c.common.HandleRead(ctx, d, m, clusterInfo); err != nil {
+	if err := c.Common.HandleRead(ctx, d, m, clusterInfo); err != nil {
 		return err
 	}
 
@@ -58,11 +59,25 @@ func (c *MsSql) HandleRead(ctx context.Context, d *schema.ResourceData, m interf
 
 func (c *MsSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
 
-	if err := c.common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {
+	if err := c.Common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (c *MsSql) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
+	funcName := "MsSql::GetBackupInputs"
+	slog.Info(funcName)
+
+	var err error
+
+	// parent/super - get common attributes
+	if err = c.Backup.GetBackupInputs(d, jobData); err != nil {
+		return err
+	}
+
+	return err
 }
 
 func NewMsSql() *MsSql {
