@@ -97,8 +97,8 @@ func newConfiguration(url string) *openapi.Configuration {
 	cfg := &openapi.Configuration{
 		DefaultHeader: make(map[string]string),
 		UserAgent:     "OpenAPI-Generator/1.0.0/go",
-		Debug:         true,
-		//Debug: false,
+		//Debug:         true,
+		Debug: false,
 		Servers: openapi.ServerConfigurations{
 			{
 				URL:         url,

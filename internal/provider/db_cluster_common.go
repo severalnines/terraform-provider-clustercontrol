@@ -165,6 +165,31 @@ func (c *DbCommon) HandleUpdate(ctx context.Context, d *schema.ResourceData, m i
 
 	}
 
+	if d.HasChange(TF_FIELD_CLUSTER_AUTO_RECOVERY) {
+		apiClient := m.(*openapi.APIClient)
+
+		toggleAutoRecovery := NewCCJob(CMON_JOB_CREATE_JOB)
+		toggleAutoRecovery.SetClusterId(clusterInfo.GetClusterId())
+		job := toggleAutoRecovery.GetJob()
+		jobSpec := job.GetJobSpec()
+		jobData := jobSpec.GetJobData()
+
+		isEnableClusterAutoRecovery := d.Get(TF_FIELD_CLUSTER_AUTO_RECOVERY).(bool)
+		if isEnableClusterAutoRecovery {
+			jobSpec.SetCommand(CMON_JOB_ENABLE_CLUSTER_RECOVERY_COMMAND)
+		} else {
+			jobSpec.SetCommand(CMON_JOB_DISABLE_CLUSTER_RECOVERY_COMMAND)
+		}
+
+		jobSpec.SetJobData(jobData)
+		job.SetJobSpec(jobSpec)
+		toggleAutoRecovery.SetJob(job)
+
+		if err = SendAndWaitForJobCompletion(ctx, apiClient, toggleAutoRecovery); err != nil {
+			slog.Error(err.Error())
+		}
+	}
+
 	return nil
 }
 

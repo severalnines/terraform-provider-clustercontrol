@@ -20,6 +20,7 @@ resource "clustercontrol_db_cluster" "this" {
   db_admin_user_password   = "blah%blah"
   db_port                  = var.db_port
   db_data_directory        = var.db_data_directory
+  db_auto_recovery         = true
   disable_firewall         = var.disable_firewall
   db_install_software      = var.db_install_software
   db_semi_sync_replication = var.db_semi_sync_replication

@@ -387,6 +387,11 @@ func resourceDbCluster() *schema.Resource {
 				Optional:    true,
 				Description: "Auto deploy prometheus and other relevant agents",
 			},
+			TF_FIELD_CLUSTER_AUTO_RECOVERY: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Auto deploy prometheus and other relevant agents",
+			},
 		},
 	}
 }

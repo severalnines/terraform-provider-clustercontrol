@@ -180,6 +180,12 @@ variable "db_deploy_agents" {
   default     = false
 }
 
+variable "db_auto_recovery" {
+  description = "Have cluster auto-recovery on or off"
+  type        = bool
+  default     = true
+}
+
 variable "timeouts" {
   description = "Updated Terraform resource management timeouts. Applies to permit resource management times"
   type        = map(string)

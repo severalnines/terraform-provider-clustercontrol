@@ -126,12 +126,14 @@ const (
 )
 
 const (
-	CMON_JOB_CREATE_CLUSTER_COMMAND  = "create_cluster"
-	CMON_JOB_REMOVE_CLUSTER_COMMAND  = "remove_cluster"
-	CMON_JOB_CREATE_PROXYSQL_COMMAND = "proxysql"
-	CMON_JOB_CREATE_HAPROXY_COMMAND  = "haproxy"
-	CMON_JOB_CREATE_BACKUP_COMMAND   = "backup"
-	CMON_JOB_DELETE_BACKUP_COMMAND   = "delete_backup"
+	CMON_JOB_CREATE_CLUSTER_COMMAND           = "create_cluster"
+	CMON_JOB_REMOVE_CLUSTER_COMMAND           = "remove_cluster"
+	CMON_JOB_CREATE_PROXYSQL_COMMAND          = "proxysql"
+	CMON_JOB_CREATE_HAPROXY_COMMAND           = "haproxy"
+	CMON_JOB_CREATE_BACKUP_COMMAND            = "backup"
+	CMON_JOB_DELETE_BACKUP_COMMAND            = "delete_backup"
+	CMON_JOB_ENABLE_CLUSTER_RECOVERY_COMMAND  = "enable_recovery"
+	CMON_JOB_DISABLE_CLUSTER_RECOVERY_COMMAND = "disable_recovery"
 )
 
 const (
@@ -219,6 +221,7 @@ const (
 	TF_FIELD_CLUSTER_MONGOS_SERVER       = "db_mongos_server"
 	TF_FIELD_CLUSTER_TIMEOUTS            = "timeouts"
 	TF_FIELD_CLUSTER_DEPLOY_AGENTS       = "db_deploy_agents"
+	TF_FIELD_CLUSTER_AUTO_RECOVERY       = "db_auto_recovery"
 
 	// Load balancer fields
 	TF_FIELD_LB_CREATE           = "db_lb_create"
