@@ -34,7 +34,7 @@ func (m *PostgresSql) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJob
 		var memHost = memberHosts{
 			vanillaNode: &node,
 		}
-		getCommonHostAttributes(f, iPort, clusterType, memHost)
+		m.Common.getCommonHostAttributes(f, iPort, clusterType, memHost)
 		sync_replication := f[TF_FIELD_CLUSTER_SYNC_REP].(bool)
 		node.SetSynchronous(sync_replication)
 

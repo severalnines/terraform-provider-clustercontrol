@@ -24,11 +24,11 @@ func (m *MongoDb) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 		return err
 	}
 
-	getReplicasets(d, jobData)
+	m.getReplicasets(d, jobData)
 
-	getConfigServers(d, jobData)
+	m.getConfigServers(d, jobData)
 
-	getMongosServers(d, jobData)
+	m.getMongosServers(d, jobData)
 
 	return nil
 }
@@ -61,7 +61,7 @@ func (c *MongoDb) HandleUpdate(ctx context.Context, d *schema.ResourceData, m in
 	return nil
 }
 
-func getConfigServers(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
+func (c *MongoDb) getConfigServers(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
 	clusterType := jobData.GetClusterType()
 	iPort, _ := strconv.Atoi(DEFAULT_MONGO_CONFIG_SRVR_PORT)
 
@@ -78,7 +78,7 @@ func getConfigServers(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJob
 			var memHost = memberHosts{
 				mongoCfgNode: &mem,
 			}
-			getCommonHostAttributes(memFromTF, iPort, clusterType, memHost)
+			c.Common.getCommonHostAttributes(memFromTF, iPort, clusterType, memHost)
 			members = append(members, mem)
 		}
 		var cfgSrvr = openapi.JobsJobJobSpecJobDataConfigServers{
@@ -95,7 +95,7 @@ func getConfigServers(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJob
 	return nil
 }
 
-func getMongosServers(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
+func (c *MongoDb) getMongosServers(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
 	iPort := int(jobData.GetPort())
 	clusterType := jobData.GetClusterType()
 
@@ -108,7 +108,7 @@ func getMongosServers(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJob
 		var memHost = memberHosts{
 			mongoCfgNode: &mem,
 		}
-		getCommonHostAttributes(f, iPort, clusterType, memHost)
+		c.Common.getCommonHostAttributes(f, iPort, clusterType, memHost)
 
 		mongos = append(mongos, mem)
 	}
@@ -118,7 +118,7 @@ func getMongosServers(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJob
 	return nil
 }
 
-func getReplicasets(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
+func (c *MongoDb) getReplicasets(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
 	iPort := int(jobData.GetPort())
 	clusterType := jobData.GetClusterType()
 
@@ -136,7 +136,7 @@ func getReplicasets(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobDa
 			var memHost = memberHosts{
 				mongoRsNode: &mem,
 			}
-			getCommonHostAttributes(memFromTF, iPort, clusterType, memHost)
+			c.Common.getCommonHostAttributes(memFromTF, iPort, clusterType, memHost)
 
 			if memFromTF[TF_FIELD_CLUSTER_HOST_PRIORITY] != nil {
 				priority := memFromTF[TF_FIELD_CLUSTER_HOST_PRIORITY].(int32)

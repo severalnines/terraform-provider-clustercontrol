@@ -237,7 +237,7 @@ type memberHosts struct {
 	mongoRsNode  *openapi.JobsJobJobSpecJobDataReplicaSetsInnerMembersInner
 }
 
-func getCommonHostAttributes(f map[string]any, iPort int, clusterType string, node memberHosts) {
+func (c *DbCommon) getCommonHostAttributes(f map[string]any, iPort int, clusterType string, node memberHosts) {
 	//func getCommonHostAttributes(f map[string]any, iPort int, clusterType string, node *openapi.JobsJobJobSpecJobDataNodesInner) {
 	funcName := "getCommonHostAttributes"
 
@@ -283,7 +283,7 @@ func getCommonHostAttributes(f map[string]any, iPort int, clusterType string, no
 	}
 }
 
-func findMasterNode(clusterInfo *openapi.ClusterResponse, hostClass string, masterRole string) (*openapi.ClusterResponseHostsInner, error) {
+func (c *DbCommon) findMasterNode(clusterInfo *openapi.ClusterResponse, hostClass string, masterRole string) (*openapi.ClusterResponseHostsInner, error) {
 	var node *openapi.ClusterResponseHostsInner
 	var err error
 
@@ -305,7 +305,7 @@ func findMasterNode(clusterInfo *openapi.ClusterResponse, hostClass string, mast
 	return node, err
 }
 
-func determineNodesDelta(d *schema.ResourceData, clusterInfo *openapi.ClusterResponse, hostClass string) ([]openapi.JobsJobJobSpecJobDataNodesInner, []openapi.JobsJobJobSpecJobDataNodesInner, error) {
+func (c *DbCommon) determineNodesDelta(d *schema.ResourceData, clusterInfo *openapi.ClusterResponse, hostClass string) ([]openapi.JobsJobJobSpecJobDataNodesInner, []openapi.JobsJobJobSpecJobDataNodesInner, error) {
 	funcName := "MySQL_Maria::determineNodesDelta"
 	slog.Info(funcName)
 

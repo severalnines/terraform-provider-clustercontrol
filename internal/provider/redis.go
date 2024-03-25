@@ -34,7 +34,7 @@ func (m *Redis) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpe
 		var memHost = memberHosts{
 			vanillaNode: &node,
 		}
-		getCommonHostAttributes(f, iPort, clusterType, memHost)
+		m.Common.getCommonHostAttributes(f, iPort, clusterType, memHost)
 		var node2 = node
 		node.SetClassName(CMON_CLASS_NAME_REDIS_HOST)
 		nodes = append(nodes, node)

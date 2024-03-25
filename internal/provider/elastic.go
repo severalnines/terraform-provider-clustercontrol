@@ -43,7 +43,7 @@ func (m *Elastic) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 		var memHost = memberHosts{
 			vanillaNode: &node,
 		}
-		getCommonHostAttributes(f, iPort, clusterType, memHost)
+		m.Common.getCommonHostAttributes(f, iPort, clusterType, memHost)
 		protocol := f[TF_FIELD_CLUSTER_HOST_PROTO].(string)
 		roles := f[TF_FIELD_CLUSTER_HOST_ROLES].(string)
 		node.SetClassName(CMON_CLASS_NAME_ELASTIC_HOST)

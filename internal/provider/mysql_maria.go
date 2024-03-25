@@ -67,7 +67,7 @@ func (m *MySQLMaria) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJ
 			vanillaNode: &node,
 		}
 		//var node = openapi.JobsJobJobSpecJobDataNodesInner{}
-		getCommonHostAttributes(f, iPort, clusterType, memHost)
+		m.Common.getCommonHostAttributes(f, iPort, clusterType, memHost)
 		nodes = append(nodes, node)
 	}
 	jobData.SetNodes(nodes)
@@ -151,7 +151,7 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 		var nodesToRemove []openapi.JobsJobJobSpecJobDataNodesInner
 
 		// Compare Terraform and CMON to determine whether adding node, remove node or promoting standby/slave
-		if nodesToAdd, nodesToRemove, err = determineNodesDelta(d, clusterInfo, hostClassName); err != nil {
+		if nodesToAdd, nodesToRemove, err = c.Common.determineNodesDelta(d, clusterInfo, hostClassName); err != nil {
 			return err
 		}
 
@@ -199,7 +199,7 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 
 		var primaryInCmon *openapi.ClusterResponseHostsInner
 		// Find the Primary/Master node in CMON
-		if primaryInCmon, err = findMasterNode(clusterInfo, CMON_CLASS_NAME_MYSQL_HOST, CMON_DB_HOST_ROLE_MASTER); err != nil {
+		if primaryInCmon, err = c.Common.findMasterNode(clusterInfo, CMON_CLASS_NAME_MYSQL_HOST, CMON_DB_HOST_ROLE_MASTER); err != nil {
 			// TODO
 			return err
 		}
