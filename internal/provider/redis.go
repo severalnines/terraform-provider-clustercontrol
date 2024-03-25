@@ -57,6 +57,16 @@ func (c *Redis) HandleRead(ctx context.Context, d *schema.ResourceData, m interf
 	return nil
 }
 
+func (c *Redis) IsUpdateBatchAllowed(d *schema.ResourceData) error {
+	var err error
+
+	if err = c.Common.IsUpdateBatchAllowed(d); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c *Redis) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
 
 	if err := c.Common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {

@@ -77,6 +77,9 @@ func GetClusterByClusterIntId(ctx context.Context, apiClient *openapi.APIClient,
 	 */
 	clusterInfoReq := *openapi.NewClusters(CMON_CLUSTERS_OPERATION_GET_CLUSTERS)
 	clusterInfoReq.SetClusterId(clusterId)
+	clusterInfoReq.SetWithHosts(true)
+	clusterInfoReq.SetOffset(0)
+	clusterInfoReq.SetLimit(100)
 	if resp, err = apiClient.ClustersAPI.ClustersPost(ctx).Clusters(clusterInfoReq).Execute(); err != nil {
 		PrintError(err, resp)
 		return &clusterInfoResp.Cluster, err
@@ -209,6 +212,15 @@ func GetBackupIdForCluster(ctx context.Context, apiClient *openapi.APIClient, cl
 	}
 
 	return backupId, err
+}
+
+func convertPortToInt(strPort string, useAsDefaultPort int32) int32 {
+	var iP int
+	var err error
+	if iP, err = strconv.Atoi(strPort); err != nil {
+		return useAsDefaultPort
+	}
+	return int32(iP)
 }
 
 //func ConvertTimeToZulu(in string, tmFmt string) (time.Time, error) {

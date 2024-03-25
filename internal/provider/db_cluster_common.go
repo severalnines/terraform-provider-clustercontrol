@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"io"
@@ -99,6 +100,43 @@ func (c *DbCommon) HandleRead(ctx context.Context, d *schema.ResourceData, m int
 	return nil
 }
 
+// *******************************************************************************
+// Method: IsUpdateBatchAllowed()
+//
+// NOTE - check if a given update batch is allowed or not. For, e.g. updates to
+// Name and/or Tags should not be compbined with updates to other fields such as -
+// cluster-auto-recovery, add-node, remove-node, etc. This needs to be kept in mind!
+// The check is handled in this method.
+// *******************************************************************************
+func (c *DbCommon) IsUpdateBatchAllowed(d *schema.ResourceData) error {
+	var err error
+
+	updateClassA := d.HasChange(TF_FIELD_CLUSTER_NAME) || d.HasChange(TF_FIELD_CLUSTER_TAGS)
+	updateClassAprime := d.HasChangesExcept(TF_FIELD_CLUSTER_NAME, TF_FIELD_CLUSTER_TAGS)
+	if updateClassA && updateClassAprime {
+		err = errors.New("You are not allowed to update Cluster (Name or Tags) along with any other fields." +
+			"Update Name/Tags in one batch and any other allowed fileds in a separate batch.")
+		return err
+	}
+
+	updateClassB := d.HasChange(TF_FIELD_CLUSTER_AUTO_RECOVERY)
+	updateClassBprime := d.HasChangeExcept(TF_FIELD_CLUSTER_AUTO_RECOVERY)
+	if updateClassB && updateClassBprime {
+		err = errors.New("You are not allowed to update cluster auto-recovery along with any other fields." +
+			"Update cluster auto-recovery in one batch and any other allowed fileds in a separate batch.")
+		return err
+	}
+
+	return nil
+}
+
+// *******************************************************************************
+// Method: HandleUpdate()
+//
+// Prerequisite: The caller of this method has already called IsUpdateBatchAllowed()
+// to check whether the allowed batch of updates is allowed or now. If disallowed,
+// the caller should NOT call this method.
+// *******************************************************************************
 func (c *DbCommon) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
 	funcName := "DbCommon::HandleUpdate"
 	slog.Info(funcName)
@@ -243,4 +281,98 @@ func getCommonHostAttributes(f map[string]any, iPort int, clusterType string, no
 	} else {
 		slog.Warn(funcName, "Unknown node", "")
 	}
+}
+
+func findMasterNode(clusterInfo *openapi.ClusterResponse, hostClass string, masterRole string) (*openapi.ClusterResponseHostsInner, error) {
+	var node *openapi.ClusterResponseHostsInner
+	var err error
+
+	isFound := false
+	hosts := clusterInfo.GetHosts()
+	for i := 0; i < len(hosts) && !isFound; i++ {
+		node = &hosts[i]
+		if strings.EqualFold(node.GetClassName(), hostClass) &&
+			strings.EqualFold(node.GetRole(), masterRole) {
+			isFound = true
+		}
+	}
+
+	if !isFound {
+		err = errors.New("Master/Primary not found in CMON")
+		node = nil
+	}
+
+	return node, err
+}
+
+func determineNodesDelta(d *schema.ResourceData, clusterInfo *openapi.ClusterResponse, hostClass string) ([]openapi.JobsJobJobSpecJobDataNodesInner, []openapi.JobsJobJobSpecJobDataNodesInner, error) {
+	funcName := "MySQL_Maria::determineNodesDelta"
+	slog.Info(funcName)
+
+	var nodesToAdd []openapi.JobsJobJobSpecJobDataNodesInner
+	var nodesToRemove []openapi.JobsJobJobSpecJobDataNodesInner
+
+	hosts := d.Get(TF_FIELD_CLUSTER_HOST)
+	nodes := []openapi.JobsJobJobSpecJobDataNodesInner{}
+	for _, ff := range hosts.([]any) {
+		f := ff.(map[string]any)
+		// Capturing hostname only as this is only used for comparison purposes.
+		hostname := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
+
+		//hostname_data := f[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
+		//hostname_internal := f[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
+		//port := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
+
+		var node = openapi.JobsJobJobSpecJobDataNodesInner{
+			Hostname: &hostname,
+			//HostnameData:     &hostname_data,
+			//HostnameInternal: &hostname_internal,
+			//Port:             &port,
+		}
+		nodes = append(nodes, node)
+	}
+	for i := 0; i < len(nodes); i++ {
+		node := nodes[i]
+		isFound := false
+		hosts := clusterInfo.GetHosts()
+		slog.Info(funcName, "Num hosts returned from CMON", len(hosts))
+		for j := 0; j < len(hosts); j++ {
+			if !strings.EqualFold(hosts[j].GetClassName(), hostClass) {
+				continue
+			}
+			if strings.EqualFold(node.GetHostname(), hosts[j].GetHostname()) {
+				isFound = true
+				break
+			}
+		}
+		if !isFound {
+			// Need to add this node to the cluster
+			nodesToAdd = append(nodesToAdd, node)
+		}
+	}
+
+	h := clusterInfo.GetHosts()
+	for i := 0; i < len(h); i++ {
+		//host := h[i]
+		if !strings.EqualFold(h[i].GetClassName(), hostClass) {
+			continue
+		}
+		isFound := false
+		for j := 0; j < len(nodes); j++ {
+			if strings.EqualFold(nodes[j].GetHostname(), h[i].GetHostname()) {
+				isFound = true
+				break
+			}
+		}
+		if !isFound {
+			// Need to remove this node from the cluster
+			var n = openapi.JobsJobJobSpecJobDataNodesInner{}
+			n.SetHostname(h[i].GetHostname())
+			n.SetHostnameInternal(h[i].GetHostnameInternal())
+			n.SetHostnameData(h[i].GetHostnameData())
+			nodesToRemove = append(nodesToRemove, n)
+		}
+	}
+
+	return nodesToAdd, nodesToRemove, nil
 }

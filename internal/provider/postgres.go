@@ -56,6 +56,16 @@ func (c *PostgresSql) HandleRead(ctx context.Context, d *schema.ResourceData, m 
 	return nil
 }
 
+func (c *PostgresSql) IsUpdateBatchAllowed(d *schema.ResourceData) error {
+	var err error
+
+	if err = c.Common.IsUpdateBatchAllowed(d); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c *PostgresSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
 
 	if err := c.Common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {

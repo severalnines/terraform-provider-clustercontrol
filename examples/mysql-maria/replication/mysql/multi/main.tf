@@ -41,10 +41,20 @@ resource "clustercontrol_db_cluster" "this" {
     # hostname_internal = "hni-foo"
     # port              = "p-foo"
   }
+  db_host {
+    hostname          = "test-primary-3"
+    # hostname_data     = "hnd-foo"
+    # hostname_internal = "hni-foo"
+    # port              = "p-foo"
+  }
 
   db_topology {
     primary = "test-primary"
     replica = "test-primary-2"
+  }
+  db_topology {
+    primary = "test-primary-2"
+    replica = "test-primary-3"
   }
 
   # timeouts = {

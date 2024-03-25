@@ -14,6 +14,7 @@ import (
 type DbClusterInterface interface {
 	GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error
 	HandleRead(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error
+	IsUpdateBatchAllowed(d *schema.ResourceData) error
 	HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error
 }
 
@@ -620,11 +621,22 @@ func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	}
 
 	if updateHandler != nil {
+		// NOTE: Must always check of the allowed batch of updates is allowed or not.
+		if err = updateHandler.IsUpdateBatchAllowed(d); err != nil {
+			slog.Error(err.Error())
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error in DB cluster update handler",
+			})
+			return diags
+		}
+
+		// The allowed batch of updates is Good. Therefore, tt is a GO for update. Do it...
 		if err = updateHandler.HandleUpdate(newCtx, d, m, clusterInfo); err != nil {
 			slog.Error(err.Error())
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,
-				Summary:  "Error in DB cluster Read handler",
+				Summary:  "Error in DB cluster update handler",
 			})
 			return diags
 		}

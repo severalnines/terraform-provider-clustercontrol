@@ -66,6 +66,16 @@ func (c *Elastic) HandleRead(ctx context.Context, d *schema.ResourceData, m inte
 	return nil
 }
 
+func (c *Elastic) IsUpdateBatchAllowed(d *schema.ResourceData) error {
+	var err error
+
+	if err = c.Common.IsUpdateBatchAllowed(d); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c *Elastic) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
 
 	if err := c.Common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {

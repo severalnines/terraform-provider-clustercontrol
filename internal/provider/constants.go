@@ -123,6 +123,29 @@ const (
 	CMON_CLASS_NAME_REDIS_SENTNEL_HOST = "CmonRedisSentinelHost"
 	CMON_CLASS_NAME_MSSQL_HOST         = "CmonMsSqlHost"
 	CMON_CLASS_NAME_ELASTIC_HOST       = "CmonElasticHost"
+	CMON_CLASS_NAME_CMON_HOST          = "CmonHost"
+	CMON_CLASS_NAME_PROMETHEUS_HOST    = "CmonPrometheusHost"
+	CMON_CLASS_NAME_MYSQL_HOST         = "CmonMySqlHost"
+	CMON_CLASS_NAME_PROXYSQL_HOST      = "CmonProxySqlHost"
+	CMON_CLASS_NAME_PROXYSQL_SRVR_HOST = "CmonProxySqlServer"
+	CMON_CLASS_NAME_CMON_AGEN_HOST     = "CmonAgentHost"
+	CMON_CLASS_NAME_GALERA_HOST        = "CmonGaleraHost"
+	CMON_CLASS_NAME_PROSGRESQL_HOST    = "CmonPostgreSqlHost"
+	CMON_CLASS_NAME_HAPROXY_HOST       = "CmonHaProxyHost"
+	CMON_CLASS_NAME_PGBACKREST_HOST    = "CmonPgBackRestHost"
+	CMON_CLASS_NAME_MONGO_HOST         = "CmonMongoHost"
+	CMON_CLASS_NAME_PBM_AGENT_HOST     = "CmonPBMAgentHost"
+)
+
+const (
+	CMON_DB_HOST_ROLE_MASTER              = "master"
+	CMON_DB_HOST_ROLE_SLAVE               = "slave"
+	CMON_DB_HOST_ROLE_MULI                = "multi" // Master->IntermediateSlave(multi)->Slave
+	CMON_DB_HOST_ROLE_MONGO_CFG_SERVER    = "configsvr"
+	CMON_DB_HOST_ROLE_MONGO_SHARD_SERVER  = "shardsvr"
+	CMON_DB_HOST_ROLE_MONGO_MONGOS_SERVER = "mongos"
+	CMON_DB_HOST_ROLE_PRIMARY             = "PRIMARY"
+	CMON_DB_HOST_ROLE_SECONDARY           = "SECONDARY"
 )
 
 const (
@@ -134,6 +157,12 @@ const (
 	CMON_JOB_DELETE_BACKUP_COMMAND            = "delete_backup"
 	CMON_JOB_ENABLE_CLUSTER_RECOVERY_COMMAND  = "enable_recovery"
 	CMON_JOB_DISABLE_CLUSTER_RECOVERY_COMMAND = "disable_recovery"
+	CMON_JOB_ADD_REPLICATION_SLAVE_COMMAND    = "add_replication_slave"
+	CMON_JOB_ADD_NODE_COMMAND                 = "addnode"
+	CMON_JOB_REMOVE_NODE_COMMAND              = "removenode"
+	CMON_JOB_REGISTER_NODE_COMMAND            = "registernode"
+	CMON_JOB_ADD_SHARD_COMMAND                = "add_shard"
+	CMON_JOB_PROMOTE_REPLICAION_SLAVE_COMMAND = "promote_replication_slave"
 )
 
 const (
@@ -165,12 +194,6 @@ const (
 	JOB_ACTION_SETUP_PROXYSQL = "setupProxySql"
 	JOB_ACTION_SETUP_HAPROXY  = "setupHaProxy"
 )
-
-// TODO: doesn't seem to be use anymore (03/07/2024)
-//const (
-//	MYSQL_DATA_DIR           = "/var/lib/mysql"
-//	MySQL_DB_ADMIN_USER_NAME = "root"
-//)
 
 const (
 	TF_FIELD_RESOURCE_ID                 = "db_resource_id"

@@ -57,6 +57,16 @@ func (c *MsSql) HandleRead(ctx context.Context, d *schema.ResourceData, m interf
 	return nil
 }
 
+func (c *MsSql) IsUpdateBatchAllowed(d *schema.ResourceData) error {
+	var err error
+
+	if err = c.Common.IsUpdateBatchAllowed(d); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c *MsSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
 
 	if err := c.Common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {
