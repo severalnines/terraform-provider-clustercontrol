@@ -2,9 +2,12 @@ package provider
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"log/slog"
+	"strings"
 )
 
 type Redis struct {
@@ -24,6 +27,13 @@ func (m *Redis) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpe
 	}
 
 	clusterType := jobData.GetClusterType()
+
+	dataDirectory := d.Get(TF_FIELD_CLUSTER_DATA_DIR).(string)
+	if err = CheckForEmptyAndSetDefault(&dataDirectory, gDefultDataDir, clusterType); err != nil {
+		return err
+	}
+	jobData.SetDatadir(dataDirectory)
+
 	iPort := int(jobData.GetPort())
 	hosts := d.Get(TF_FIELD_CLUSTER_HOST)
 	nodes := []openapi.JobsJobJobSpecJobDataNodesInner{}
@@ -64,13 +74,148 @@ func (c *Redis) IsUpdateBatchAllowed(d *schema.ResourceData) error {
 		return err
 	}
 
+	updateClassA := d.HasChange(TF_FIELD_CLUSTER_HOST)
+	updateClassAprime := d.HasChangeExcept(TF_FIELD_CLUSTER_HOST)
+	if updateClassA && updateClassAprime {
+		return errors.New(fmt.Sprintf("You are not allowed to update %s along with any other fields.", TF_FIELD_CLUSTER_HOST))
+	}
+
 	return nil
 }
 
 func (c *Redis) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+	funcName := "Redis::HandleUpdate"
+	slog.Info(funcName)
 
+	var err error
+
+	// handle things like cluster-name, tags, and toggling cluster-auto-covery in base ...
 	if err := c.Common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {
 		return err
+	}
+
+	// handle other big updates such as add-replication-slave, remove-node, etc
+	tmpJobData := openapi.NewJobsJobJobSpecJobData()
+	if err = c.GetInputs(d, tmpJobData); err != nil {
+		return err
+	}
+
+	if d.HasChange(TF_FIELD_CLUSTER_HOST) {
+		var nodesToAdd []openapi.JobsJobJobSpecJobDataNodesInner
+		var nodesToRemove []openapi.JobsJobJobSpecJobDataNodesInner
+
+		hostClassName := CMON_CLASS_NAME_REDIS_HOST
+		command := CMON_JOB_ADD_NODE_COMMAND
+
+		// Compare Terraform and CMON to determine whether adding node, remove node or promoting standby/slave
+		if nodesToAdd, nodesToRemove, err = c.Common.determineNodesDelta(d, clusterInfo, hostClassName); err != nil {
+			return err
+		}
+
+		isAddNode := len(nodesToAdd) > 0
+		isRemoveNode := len(nodesToRemove) > 0
+
+		if isAddNode && len(nodesToAdd) > 1 {
+			return errors.New("Can't add more than one node at a time")
+		}
+
+		if isRemoveNode && len(nodesToRemove) > 1 {
+			return errors.New("Can't remove more than one node at a time")
+		}
+
+		var nodeToAddOrRemove *openapi.JobsJobJobSpecJobDataNodesInner
+		if isAddNode {
+			nodeToAddOrRemove = &nodesToAdd[0]
+		} else if isRemoveNode {
+			nodeToAddOrRemove = &nodesToRemove[0]
+			command = CMON_JOB_REMOVE_NODE_COMMAND
+		} else {
+			//command = CMON_JOB_PROMOTE_REPLICAION_SLAVE_COMMAND
+			// Here we are dealing with a Role change (slave promotion to master)
+			return errors.New("Standby promotion is is not supported for Redis")
+		}
+
+		// From Terraform
+		tmpJobDataNodes := tmpJobData.GetNodes()
+		var nodeFromTf *openapi.JobsJobJobSpecJobDataNodesInner
+		for i := 1; i < len(tmpJobDataNodes) && nodeToAddOrRemove != nil; i++ {
+			tmpJobDataNode := tmpJobDataNodes[i]
+			if strings.EqualFold(tmpJobDataNode.GetHostname(), nodeToAddOrRemove.GetHostname()) {
+				nodeFromTf = &tmpJobDataNode
+				break
+			}
+		}
+		// No need to error check as the node must be in the list
+
+		// variables at this point
+		// tmpJobData: clustercontrol_db_cluster TF resource data
+		// tmpJobDataNodes: the db_hosts portion of TF resource data
+		// nodeFromTf: "the" node from the resource data. It is this node which is to be added or removed to the cluster
+		// nodeToAddOrRemove: contains hostname of the node to be added or removed. Use it in the remove case
+
+		apiClient := m.(*openapi.APIClient)
+		addOrRemoveNodeJob := NewCCJob(CMON_JOB_CREATE_JOB)
+		addOrRemoveNodeJob.SetClusterId(clusterInfo.GetClusterId())
+		job := addOrRemoveNodeJob.GetJob()
+		jobSpec := job.GetJobSpec()
+		jobData := jobSpec.GetJobData()
+		jobSpec.SetCommand(command)
+
+		var primaryInCmon *openapi.ClusterResponseHostsInner
+		// Find the Primary/Master node in CMON
+		if primaryInCmon, err = c.Common.findMasterNode(clusterInfo, hostClassName, CMON_DB_HOST_ROLE_MASTER); err != nil {
+			return err
+		}
+		slog.Debug(funcName, "Master:", primaryInCmon.GetHostname())
+
+		// Set job data fields
+		//jobData.SetConfigTemplate(tmpJobData.GetConfigTemplate())
+		//jobData.SetMasterAddress(fmt.Sprintf("%s:%v", primaryInCmon.GetHostname(), tmpJobData.GetPort()))
+		jobData.SetInstallSoftware(tmpJobData.GetInstallSoftware())
+		jobData.SetDisableSelinux(tmpJobData.GetDisableSelinux())
+		jobData.SetEnableUninstall(true /*tmpJobData.GetEnableUninstall()*/)
+		jobData.SetDisableFirewall(tmpJobData.GetDisableFirewall())
+		//jobData.SetDataDir(tmpJobData.GetDataDir())
+
+		if isAddNode {
+			var node openapi.JobsJobJobSpecJobDataNodesInner
+			var node2 openapi.JobsJobJobSpecJobDataNodesInner
+			var nodes []openapi.JobsJobJobSpecJobDataNodesInner
+			node.SetClassName(hostClassName)
+			node.SetHostname(nodeFromTf.GetHostname())
+			node.SetHostnameData(nodeFromTf.GetHostnameData())
+			node.SetHostnameInternal(nodeFromTf.GetHostnameInternal())
+			node.SetPort(nodeFromTf.GetPort())
+			//node.SetDatadir(jobData.GetDataDir())
+			//node.SetDatadir(nodeFromTf.GetDatadir())
+			//node.SetSynchronous(nodeFromTf.GetSynchronous())
+
+			node2.SetClassName(CMON_CLASS_NAME_REDIS_SENTNEL_HOST)
+			node2.SetHostname(nodeFromTf.GetHostname())
+			node2.SetHostnameData(nodeFromTf.GetHostnameData())
+			node2.SetHostnameInternal(nodeFromTf.GetHostnameInternal())
+			node2.SetPort(DEFAULT_MONGO_REDIS_SENTINEL_PORT)
+
+			nodes = append(nodes, node, node2)
+			jobData.SetNodes(nodes)
+		} else if isRemoveNode {
+			var nd openapi.JobsJobJobSpecJobDataNode
+			nd.SetHostname(nodeToAddOrRemove.GetHostname())
+			nd.SetPort(tmpJobData.GetPort())
+			jobData.SetEnableUninstall(true)
+			jobData.SetUnregisterOnly(false)
+			jobData.SetNode(nd)
+		}
+
+		jobSpec.SetJobData(jobData)
+		job.SetJobSpec(jobSpec)
+		addOrRemoveNodeJob.SetJob(job)
+
+		if err = SendAndWaitForJobCompletion(ctx, apiClient, addOrRemoveNodeJob); err != nil {
+			slog.Error(err.Error())
+			return err
+		}
+
 	}
 
 	return nil

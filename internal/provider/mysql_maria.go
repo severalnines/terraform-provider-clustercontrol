@@ -53,7 +53,7 @@ func (m *MySQLMaria) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJ
 	if err = CheckForEmptyAndSetDefault(&dataDirectory, gDefultDataDir, clusterType); err != nil {
 		return err
 	}
-	jobData.SetDataDir(dataDirectory)
+	jobData.SetDatadir(dataDirectory)
 
 	semiSyncReplication := d.Get(TF_FIELD_CLUSTER_SEMISYNC_REP).(bool)
 	jobData.SetMysqlSemiSync(semiSyncReplication)
@@ -217,7 +217,7 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 		jobData.SetDisableSelinux(tmpJobData.GetDisableSelinux())
 		jobData.SetDisableFirewall(tmpJobData.GetDisableFirewall())
 		jobData.SetUpdateLb(true)
-		jobData.SetDataDir(tmpJobData.GetDataDir())
+		jobData.SetDatadir(tmpJobData.GetDatadir())
 		//jobData.SetVersion("")
 
 		var node openapi.JobsJobJobSpecJobDataNode

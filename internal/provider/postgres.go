@@ -163,7 +163,7 @@ func (c *PostgresSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, 
 		jobData.SetDisableSelinux(tmpJobData.GetDisableSelinux())
 		jobData.SetDisableFirewall(tmpJobData.GetDisableFirewall())
 		jobData.SetUpdateLb(true)
-		jobData.SetDataDir(tmpJobData.GetDataDir())
+		jobData.SetDatadir(tmpJobData.GetDatadir())
 		jobData.SetUsePackageForDataDir(true) // for PG
 		//jobData.SetVersion("")
 
