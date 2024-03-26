@@ -673,6 +673,7 @@ func resourceDeleteDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	jobSpec := job.GetJobSpec()
 	jobSpec.SetCommand(CMON_JOB_REMOVE_CLUSTER_COMMAND)
 	jobData := jobSpec.GetJobData()
+	jobData.SetRemoveBackups(true)
 
 	var err error
 	var clusterId int = -1
