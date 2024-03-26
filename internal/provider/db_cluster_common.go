@@ -18,7 +18,6 @@ type DbCommon struct{}
 func (c *DbCommon) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
 	funcName := "DbCommon::GetInputs"
 	slog.Info(funcName)
-	//fmt.Fprintf(os.Stderr, "%s", funcName)
 
 	var err error
 
@@ -57,10 +56,15 @@ func (c *DbCommon) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJob
 	disableFirewall := d.Get(TF_FIELD_CLUSTER_DISABLE_FW).(bool)
 	jobData.SetDisableFirewall(disableFirewall)
 
+	disableSelinux := d.Get(TF_FIELD_CLUSTER_DISABLE_SELINUX).(bool)
+	jobData.SetDisableSelinux(disableSelinux)
+
 	installSoftware := d.Get(TF_FIELD_CLUSTER_INSTALL_SW).(bool)
 	jobData.SetInstallSoftware(installSoftware)
 
-	jobData.SetDisableSelinux(true)
+	uninstallSoftware := d.Get(TF_FIELD_CLUSTER_ENABLE_UNINSTALL).(bool)
+	jobData.SetEnableUninstall(uninstallSoftware)
+
 	jobData.SetGenerateToken(true)
 
 	sshUser := d.Get(TF_FIELD_CLUSTER_SSH_USER).(string)
@@ -84,9 +88,6 @@ func (c *DbCommon) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJob
 
 	deployAgents := d.Get(TF_FIELD_CLUSTER_DEPLOY_AGENTS).(bool)
 	jobData.SetDeployAgents(deployAgents)
-
-	// TODO: provide support for timeout configuration - galera deployment ....
-	//timeouts := d.Get("timeouts").(types.Map)
 
 	return nil
 }

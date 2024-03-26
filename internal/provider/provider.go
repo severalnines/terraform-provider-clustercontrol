@@ -20,22 +20,22 @@ func Provider() *schema.Provider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			API_USER: &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				//Optional:    true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "ClusterControl API user",
 				DefaultFunc: schema.EnvDefaultFunc(API_USER, nil),
 			},
 			API_USER_PW: &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				//Optional:    true,
+				Type:        schema.TypeString,
+				Required:    true,
 				Sensitive:   true,
+				Description: "ClusterControl API user's password",
 				DefaultFunc: schema.EnvDefaultFunc(API_USER_PW, nil),
 			},
 			CONTROLLER_URL: &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				//Optional:    true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "ClusterControl controller url e.g. (https://cc-host:9501/v2)",
 				DefaultFunc: schema.EnvDefaultFunc(CONTROLLER_URL, nil),
 			},
 		},
@@ -76,8 +76,8 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		PrintError(err, resp)
 		return nil, diag.FromErr(err)
 	}
-	//slog.Debug("providerConfigure", "Resp `AuthApi.AuthPost`", resp)
-	slog.Info("providerConfigure", "Resp `AuthApi.AuthPost`", resp)
+	slog.Debug("providerConfigure", "Resp `AuthApi.AuthPost`", resp)
+	//slog.Info("providerConfigure", "Resp `AuthApi.AuthPost`", resp)
 
 	// fmt.Println("#Cookies: ", len(resp.Cookies()))
 	slog.Debug("providerConfigure", "Num cookies", len(resp.Cookies()))

@@ -42,157 +42,152 @@ func resourceDbCluster() *schema.Resource {
 			TF_FIELD_CLUSTER_CREATE: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "TODO",
+				Description: "Whether to create this resource or not?",
 			},
 			TF_FIELD_CLUSTER_IMPORT: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "TODO",
+				Description: "Whether to import this resource or not?",
 			},
 			TF_FIELD_CLUSTER_NAME: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "TODO: The name of the resource, also acts as it's unique ID",
+				Description: "The name of the database cluster.",
 			},
 			TF_FIELD_CLUSTER_TYPE: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "TODO",
+				Description: "Type of cluster - replication, galera, postgresql_single (single is a misnomer), etc",
 			},
 			TF_FIELD_CLUSTER_VENDOR: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "TODO",
+				Description: "Database vendor - oracle, percona, mariadb, 10gen, microsoft, redis, elasticsearch, for postgresql it is `default` etc",
 			},
 			TF_FIELD_CLUSTER_VERSION: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "TODO",
+				Description: "The database version",
 			},
 			TF_FIELD_CLUSTER_ADMIN_USER: {
-				Type: schema.TypeString,
-				//Required:    true,
+				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "TODO",
+				Description: "Name for the admin/root user for the database",
 			},
 			TF_FIELD_CLUSTER_ADMIN_PW: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "TODO",
+				Description: "Password for the admin/root user for the database. Note that this may show up in logs, and it will be stored in the state file",
 				Sensitive:   true,
 			},
 			TF_FIELD_CLUSTER_PORT: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "TODO",
+				Description: "The port on which the DB will accepts connections",
 			},
 			TF_FIELD_CLUSTER_DATA_DIR: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "TODO",
+				Description: "The data directory for the database data files. If not set explicily, the default for the respective DB vendor will be chosen",
 			},
-			// TODO: perhaps can be removed later
-			//TF_FIELD_CLUSTER_CFG_TEMPLATE: {
-			//	Type:        schema.TypeString,
-			//	Optional:    true,
-			//	Description: "TODO",
-			//},
 			TF_FIELD_CLUSTER_DISABLE_FW: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "TODO",
+				Description: "Disable firewall on the host OS when installing DB packages.",
+			},
+			TF_FIELD_CLUSTER_DISABLE_SELINUX: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Disable SELinux on the host OS when installing DB packages.",
 			},
 			TF_FIELD_CLUSTER_INSTALL_SW: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "TODO",
+				Description: "Install DB packages from respective repos",
 			},
-			// TODO: need to remove from here. Moved inside `host` sub-section
-			//TF_FIELD_CLUSTER_SYNC_REP: {
-			//	Type:        schema.TypeBool,
-			//	Optional:    true,
-			//	Description: "TODO",
-			//},
+			TF_FIELD_CLUSTER_ENABLE_UNINSTALL: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "When removing DB cluster from ClusterControl, enable uinstalling DB packages.",
+			},
 			TF_FIELD_CLUSTER_SEMISYNC_REP: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "TODO",
+				Description: "Semi-synchronous replication for MySQL and MariaDB non-galera clusters",
 			},
 			TF_FIELD_CLUSTER_SSH_USER: {
-				Type: schema.TypeString,
-				//Optional:    true,
+				Type:        schema.TypeString,
 				Required:    true,
-				Description: "TODO",
+				Description: "The SSH user ClusterControl will use to SSH to the DB host from the ClusterControl host",
 			},
 			TF_FIELD_CLUSTER_SSH_PW: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "TODO",
+				Description: "Sudo user's password. If sudo user doesn't have a password, leave this field blank",
 				Sensitive:   true,
 			},
 			TF_FIELD_CLUSTER_SSH_KEY_FILE: {
-				Type: schema.TypeString,
-				//Required:    true,
+				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "SSH Key file.",
+				Description: "SSH Key file. The path to the private key file for the Sudo user on the ClusterControl host",
 			},
 			TF_FIELD_CLUSTER_SSH_PORT: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "TODO",
+				Description: "The ssh port.",
 			},
 			TF_FIELD_CLUSTER_SNAPSHOT_LOC: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "TODO",
+				Description: "Elasticsearch snapshot location",
 			},
 			TF_FIELD_CLUSTER_SNAPSHOT_REPO: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "TODO",
+				Description: "Elasticsearch snapshot repository",
 			},
 			TF_FIELD_CLUSTER_SNAPSHOT_HOST: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "TODO",
+				Description: "Elasticsearch snapshot host",
 			},
 			TF_FIELD_CLUSTER_HOST: {
-				Type: schema.TypeList,
-				//Required: true,
+				Type:        schema.TypeList,
 				Optional:    true,
-				Description: "The hosts that make up the cluster.",
+				Description: "The list of nodes/hosts that make up the cluster",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						TF_FIELD_CLUSTER_HOSTNAME: {
-							Type:     schema.TypeString,
-							Required: true,
-							//Optional:    true,
-							Description: "TODO.",
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Hostname of the DB host. Can be IP address as well",
 						},
 						TF_FIELD_CLUSTER_HOSTNAME_DATA: {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "TODO.",
+							Description: "Hostname/IP used for data comms (may be legacy ClusterControl).",
 						},
 						TF_FIELD_CLUSTER_HOSTNAME_INT: {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "TODO.",
+							Description: "If there's a private net that all DB hosts can communicate, use it here.",
 						},
 						TF_FIELD_CLUSTER_HOST_PORT: {
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "TODO.",
+							Type:     schema.TypeString,
+							Optional: true,
+							Description: "The port on which the DB server will listen for connections. If one is not provided, " +
+								"default for the DB type will be used, or inherited from earlier/top-level specification.",
 						},
 						TF_FIELD_CLUSTER_SYNC_REP: {
 							Type:        schema.TypeBool,
 							Optional:    true,
-							Description: "TODO",
+							Description: "Applicable to PostgreSQL hot-standby nodes only. Use synchronous replication (or  not)",
 						},
-						TF_FIELD_CLUSTER_HOSTNAME_DD: {
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "TODO.",
+						TF_FIELD_CLUSTER_HOST_DD: {
+							Type:     schema.TypeString,
+							Optional: true,
+							Description: "The data directory for the database data files. If not set explicily, default " +
+								"for the DB type will be used, or inherited from earlier/top-level specification.",
 						},
 						TF_FIELD_CLUSTER_HOST_PROTO: {
 							Type:        schema.TypeString,
@@ -200,73 +195,76 @@ func resourceDbCluster() *schema.Resource {
 							Description: "TODO.",
 						},
 						TF_FIELD_CLUSTER_HOST_ROLES: {
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "TODO.",
+							Type:     schema.TypeString,
+							Optional: true,
+							Description: "Applicable to Elasticsearch - the role of this host (master-data: host will " +
+								"be designated as the master node and a data node, etc)",
 						},
 					},
 				},
 			},
+			// ****************************
+			// MongoDB Replicaset specific attributes
+			// ****************************
 			TF_FIELD_CLUSTER_REPLICA_SET: {
-				Type: schema.TypeList,
-				//Required: true,
+				Type:        schema.TypeList,
 				Optional:    true,
 				Description: "The hosts that make up the cluster.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						TF_FIELD_CLUSTER_REPLICA_SET_RS: {
-							Type:     schema.TypeString,
-							Required: true,
-							//Optional:    true,
-							Description: "TODO.",
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The replicaset's name.",
 						},
 						TF_FIELD_CLUSTER_REPLICA_MEMBER: {
-							Type:     schema.TypeList,
-							Required: true,
-							//Optional:    true,
-							Description: "The hosts that make up the cluster.",
+							Type:        schema.TypeList,
+							Required:    true,
+							Description: "The hosts that make up the replicaset HA nodes.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									TF_FIELD_CLUSTER_HOSTNAME: {
 										Type:     schema.TypeString,
 										Required: true,
 										//Optional:    true,
-										Description: "TODO.",
+										Description: "Hostname of the DB host. Can be IP address as well",
 									},
 									TF_FIELD_CLUSTER_HOSTNAME_DATA: {
 										Type:        schema.TypeString,
 										Optional:    true,
-										Description: "TODO.",
+										Description: "Hostname/IP used for data comms (may be legacy ClusterControl).",
 									},
 									TF_FIELD_CLUSTER_HOSTNAME_INT: {
 										Type:        schema.TypeString,
 										Optional:    true,
-										Description: "TODO.",
+										Description: "If there's a private net that all DB hosts can communicate, use it here.",
 									},
 									TF_FIELD_CLUSTER_HOST_PORT: {
-										Type:        schema.TypeString,
-										Optional:    true,
-										Description: "TODO.",
-									},
-									TF_FIELD_CLUSTER_HOST_SLAVE_DELAY: {
-										Type:        schema.TypeString,
-										Optional:    true,
-										Description: "TODO.",
+										Type:     schema.TypeString,
+										Optional: true,
+										Description: "The port on which the DB server will listen for connections. If " +
+											"one is not provided, the default for the DB type will be used.",
 									},
 									TF_FIELD_CLUSTER_HOST_ARBITER_ONLY: {
 										Type:        schema.TypeBool,
 										Optional:    true,
-										Description: "TODO.",
+										Description: "The host is acting as an arbiter only.",
+									},
+									TF_FIELD_CLUSTER_HOST_PRIORITY: {
+										Type:        schema.TypeInt,
+										Optional:    true,
+										Description: "Priority of the host in the mongo replication setup.",
 									},
 									TF_FIELD_CLUSTER_HOST_HIDDEN: {
 										Type:        schema.TypeBool,
 										Optional:    true,
 										Description: "TODO.",
 									},
-									TF_FIELD_CLUSTER_HOST_PRIORITY: {
-										Type:        schema.TypeInt,
-										Optional:    true,
-										Description: "TODO.",
+									TF_FIELD_CLUSTER_HOST_SLAVE_DELAY: {
+										Type:     schema.TypeString,
+										Optional: true,
+										Description: "Used in non-galera MySQL/MariaDB standby setup. Specifies the lag " +
+											"for the slave.",
 									},
 								},
 							},
@@ -274,46 +272,45 @@ func resourceDbCluster() *schema.Resource {
 					},
 				},
 			},
+			// ****************************
+			// MongoDB Config Server specific attributes
+			// ****************************
 			TF_FIELD_CLUSTER_MONGO_CONFIG_SERVER: {
-				Type: schema.TypeList,
-				//Required: true,
+				Type:        schema.TypeList,
 				Optional:    true,
-				Description: "The hosts that make up the cluster.",
+				Description: "Specification for the MongoDB Configuration Server.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						TF_FIELD_CLUSTER_REPLICA_SET_RS: {
-							Type:     schema.TypeString,
-							Required: true,
-							//Optional:    true,
-							Description: "TODO.",
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The replicaset's name.",
 						},
 						TF_FIELD_CLUSTER_REPLICA_MEMBER: {
-							Type:     schema.TypeList,
-							Required: true,
-							//Optional:    true,
-							Description: "The hosts that make up the cluster.",
+							Type:        schema.TypeList,
+							Required:    true,
+							Description: "The host that make up the replicaset member.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									TF_FIELD_CLUSTER_HOSTNAME: {
-										Type:     schema.TypeString,
-										Required: true,
-										//Optional:    true,
-										Description: "TODO.",
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "Hostname of the DB host. Can be IP address as well.",
 									},
 									TF_FIELD_CLUSTER_HOSTNAME_DATA: {
 										Type:        schema.TypeString,
 										Optional:    true,
-										Description: "TODO.",
+										Description: "Hostname/IP used for data comms (may be legacy ClusterControl).",
 									},
 									TF_FIELD_CLUSTER_HOSTNAME_INT: {
 										Type:        schema.TypeString,
 										Optional:    true,
-										Description: "TODO.",
+										Description: "If there's a private net that all DB hosts can communicate, use it here.",
 									},
 									TF_FIELD_CLUSTER_HOST_PORT: {
 										Type:        schema.TypeString,
 										Optional:    true,
-										Description: "TODO.",
+										Description: "Port for the config server. If one is not provided, the default will be used.",
 									},
 								},
 							},
@@ -321,33 +318,34 @@ func resourceDbCluster() *schema.Resource {
 					},
 				},
 			},
+			// ****************************
+			// MongoDB Mongos Server specific attributes
+			// ****************************
 			TF_FIELD_CLUSTER_MONGOS_SERVER: {
-				Type: schema.TypeList,
-				//Required: true,
+				Type:        schema.TypeList,
 				Optional:    true,
-				Description: "The hosts that make up the cluster.",
+				Description: "Specification for the MongoDB mongos Server.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						TF_FIELD_CLUSTER_HOSTNAME: {
-							Type:     schema.TypeString,
-							Required: true,
-							//Optional:    true,
-							Description: "TODO.",
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Hostname of the DB host. Can be IP address as well.",
 						},
 						TF_FIELD_CLUSTER_HOSTNAME_DATA: {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "TODO.",
+							Description: "Hostname/IP used for data comms (may be legacy ClusterControl).",
 						},
 						TF_FIELD_CLUSTER_HOSTNAME_INT: {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "TODO.",
+							Description: "If there's a private net that all DB hosts can communicate, use it here.",
 						},
 						TF_FIELD_CLUSTER_HOST_PORT: {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "TODO.",
+							Description: "Port for the config server. If one is not provided, the default will be used.",
 						},
 					},
 				},
@@ -355,18 +353,18 @@ func resourceDbCluster() *schema.Resource {
 			TF_FIELD_CLUSTER_TOPOLOGY: {
 				Type:        schema.TypeList,
 				Optional:    true,
-				Description: "TODO",
+				Description: "Only applicable to MySQL/MariaDB non-galera clusters. A way to specify Master and Slave(s).",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						TF_FIELD_CLUSTER_PRIMARY: {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "TODO.",
+							Description: "The Master host",
 						},
 						TF_FIELD_CLUSTER_REPLICA: {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "TODO.",
+							Description: "The Slave host.",
 						},
 					},
 				},
@@ -374,37 +372,23 @@ func resourceDbCluster() *schema.Resource {
 			TF_FIELD_CLUSTER_TAGS: {
 				Type:        schema.TypeSet,
 				Optional:    true,
-				Description: "An optional list of tags, represented as a key, value pair",
-				Elem:        &schema.Schema{Type: schema.TypeString},
-			},
-			TF_FIELD_CLUSTER_TIMEOUTS: {
-				Type:        schema.TypeMap,
-				Optional:    true,
-				Description: "TODO",
+				Description: "Tags to associate with a DB cluster. The tags are only relevant in the ClusterControl domain.",
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 			TF_FIELD_CLUSTER_DEPLOY_AGENTS: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "Auto deploy prometheus and other relevant agents",
+				Description: "Automatically deploy prometheus and other relevant agents after setting up the intial DB cluster.",
 			},
 			TF_FIELD_CLUSTER_AUTO_RECOVERY: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "Auto deploy prometheus and other relevant agents",
+				Description: "Have cluster auto-recovery on (or off)",
 			},
 		},
 	}
 }
 
-// TODO: remove after adding support timeout in the provider plugin - galera deployment takes for ever ... !
-//
-//	//create_timeout := d.Timeout("create").(string)
-//	//import_timeout := d.Timeout("import").(string)
-//	//slog.Debug("Create timeout: %s", create_timeout)
-//	//slog.Debug("Import timeout: %s", import_timeout)
-//
-// Prem
 func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	funcName := "resourceCreateDbCluster"
 	slog.Debug(funcName)
@@ -419,10 +403,21 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	isCreate := d.Get(TF_FIELD_CLUSTER_CREATE).(bool)
 	isImport := d.Get(TF_FIELD_CLUSTER_IMPORT).(bool)
 	if !isCreate && !isImport {
-		slog.Info(fmt.Sprintf("%s: No work to be done. Create and Import are disabled.", funcName))
+		str := fmt.Sprintf("%s: No work to be done. Create and Import are disabled.", funcName)
+		slog.Info(str)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Neither ClueterCreate nor ClusterImport!",
+			Summary:  str,
+		})
+		return diags
+	}
+
+	if isImport && !isCreate {
+		str := "Importing a cluster into ClusterControl is not supported at this time."
+		slog.Info(str)
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  str,
 		})
 		return diags
 	}
@@ -501,7 +496,6 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	return diags
 }
 
-// Prem
 func resourceReadDbCluster(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	funcName := "resourceReadDbCluster"
 	slog.Debug(funcName)
@@ -568,14 +562,12 @@ func resourceReadDbCluster(ctx context.Context, d *schema.ResourceData, m interf
 	return diags
 }
 
-// Prem
 func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	funcName := "resourceReadDbCluster"
+	funcName := "resourceUpdateDbCluster"
 	slog.Debug(funcName)
-	// Warning or errors can be collected in a slice type
-	var diags diag.Diagnostics
 
 	// Warning or errors can be collected in a slice type
+	var diags diag.Diagnostics
 	var clusterInfo *openapi.ClusterResponse
 	var err error
 
@@ -631,7 +623,7 @@ func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 			return diags
 		}
 
-		// The allowed batch of updates is Good. Therefore, tt is a GO for update. Do it...
+		// The allowed batch of updates is Good. Therefore, it is a GO for update. Do it...
 		if err = updateHandler.HandleUpdate(newCtx, d, m, clusterInfo); err != nil {
 			slog.Error(err.Error())
 			diags = append(diags, diag.Diagnostic{

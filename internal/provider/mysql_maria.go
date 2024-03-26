@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"log/slog"
+	"strconv"
 	"strings"
 )
 
@@ -18,7 +19,6 @@ type MySQLMaria struct {
 func (m *MySQLMaria) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
 	funcName := "MySQLMaria::GetInputs"
 	slog.Info(funcName)
-	//fmt.Fprintf(os.Stderr, "%s", funcName)
 
 	var err error
 
@@ -30,7 +30,7 @@ func (m *MySQLMaria) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJ
 	clusterType := jobData.GetClusterType()
 	dbVendor := jobData.GetVendor()
 	dbVersion := jobData.GetVersion()
-	iPort := int(jobData.GetPort())
+	topLevelPort := jobData.GetPort()
 
 	vendorMap, ok := gDbConfigTemplate[dbVendor]
 	if !ok {
@@ -44,9 +44,6 @@ func (m *MySQLMaria) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJ
 	if !ok {
 		return errors.New(fmt.Sprintf("Map doesn't support DB vendor: %s, ClusterType: %s, DbVersion: %s", dbVendor, clusterTypeMap, dbVendor))
 	}
-	// TODO remove commented code later
-	//configTemplate := d.Get("db_config_template").(string)
-	//CheckForEmptyAndSet(&configTemplate, cfgTemplate)
 	jobData.SetConfigTemplate(cfgTemplate)
 
 	dataDirectory := d.Get(TF_FIELD_CLUSTER_DATA_DIR).(string)
@@ -63,11 +60,31 @@ func (m *MySQLMaria) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJ
 	for _, ff := range hosts.([]any) {
 		f := ff.(map[string]any)
 		var node = openapi.JobsJobJobSpecJobDataNodesInner{}
-		var memHost = memberHosts{
-			vanillaNode: &node,
+
+		hostname := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
+		hostname_data := f[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
+		hostname_internal := f[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
+		port := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
+		datadir := f[TF_FIELD_CLUSTER_HOST_DD].(string)
+
+		if hostname == "" {
+			return errors.New("Hostname cannot be empty")
 		}
-		//var node = openapi.JobsJobJobSpecJobDataNodesInner{}
-		m.Common.getCommonHostAttributes(f, iPort, clusterType, memHost)
+		node.SetHostname(hostname)
+		if hostname_data != "" {
+			node.SetHostnameData(hostname_data)
+		}
+		if hostname_internal != "" {
+			node.SetHostnameInternal(hostname_internal)
+		}
+		if port == "" {
+			node.SetPort(strconv.Itoa(int(topLevelPort)))
+		} else {
+			node.SetPort(strconv.Itoa(int(convertPortToInt(port, topLevelPort))))
+		}
+		if datadir != "" {
+			node.SetDatadir(datadir)
+		}
 		nodes = append(nodes, node)
 	}
 	jobData.SetNodes(nodes)
@@ -119,7 +136,7 @@ func (c *MySQLMaria) IsUpdateBatchAllowed(d *schema.ResourceData) error {
 }
 
 func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
-	funcName := "MySQL_Maria::HandleUpdate"
+	funcName := "MySQLMaria::HandleUpdate"
 	slog.Info(funcName)
 
 	var err error
@@ -135,7 +152,6 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 		return err
 	}
 
-	//clusterType := d.Get(TF_FIELD_CLUSTER_TYPE)
 	clusterType := clusterInfo.GetClusterType()
 
 	isReplicationType := true
@@ -147,7 +163,6 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 		command = CMON_JOB_ADD_NODE_COMMAND
 	}
 
-	//isHostChanged := false
 	if d.HasChange(TF_FIELD_CLUSTER_HOST) {
 		var nodesToAdd []openapi.JobsJobJobSpecJobDataNodesInner
 		var nodesToRemove []openapi.JobsJobJobSpecJobDataNodesInner
@@ -231,10 +246,25 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 			}
 
 			node.SetHostname(nodeFromTf.GetHostname())
-			node.SetHostnameData(nodeFromTf.GetHostnameData())
-			node.SetHostnameInternal(nodeFromTf.GetHostnameInternal())
-			node.SetPort(convertPortToInt(nodeFromTf.GetPort(), tmpJobData.GetPort()))
-			node.SetDatadir(nodeFromTf.GetDatadir())
+
+			tmpS := nodeFromTf.GetHostnameData()
+			if tmpS != "" {
+				node.SetHostnameData(tmpS)
+			}
+			tmpS = nodeFromTf.GetHostnameInternal()
+			if tmpS != "" {
+				node.SetHostnameInternal(tmpS)
+			}
+			tmpS = nodeFromTf.GetPort()
+			if tmpS != "" {
+				node.SetPort(convertPortToInt(tmpS, tmpJobData.GetPort()))
+			} else {
+				node.SetPort(tmpJobData.GetPort())
+			}
+			tmpS = nodeFromTf.GetDatadir()
+			if tmpS != "" {
+				node.SetDatadir(tmpS)
+			}
 
 		} else if isRemoveNode {
 
@@ -259,6 +289,9 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 
 	}
 
+	// ************************
+	// NOTE: don't remove this block of code
+	// ************************
 	//if d.HasChange(TF_FIELD_CLUSTER_TOPOLOGY) {
 	//	// Could be one of a few scenarios...
 	//
