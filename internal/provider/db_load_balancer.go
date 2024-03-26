@@ -38,12 +38,12 @@ func resourceDbLoadBalancer() *schema.Resource {
 			TF_FIELD_LB_CREATE: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "TODO",
+				Description: "Whether to create this resource or not?",
 			},
 			TF_FIELD_LB_IMPORT: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "TODO",
+				Description: "Whether to import this resource or not?",
 			},
 			TF_FIELD_CLUSTER_ID: {
 				Type:        schema.TypeString,
@@ -53,123 +53,125 @@ func resourceDbLoadBalancer() *schema.Resource {
 			TF_FIELD_LB_TYPE: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "TODO",
+				Description: "The load balancer type (e.g., proxysql, haproxy, etc)",
 			},
 			TF_FIELD_LB_VERSION: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "TODO",
+				Description: "Software version",
 			},
 			TF_FIELD_LB_ADMIN_USER: {
-				Type: schema.TypeString,
-				//Required:    true,
+				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "TODO",
+				Description: "The load balancer admin user",
 			},
 			TF_FIELD_LB_ADMIN_USER_PW: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "TODO",
+				Description: "The load balancer admin user's password",
 				Sensitive:   true,
 			},
 			TF_FIELD_LB_MONITOR_USER: {
-				Type: schema.TypeString,
-				//Required:    true,
+				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "TODO",
+				Description: "The load balancer monitor user (only applicable to proxysql)",
 			},
 			TF_FIELD_LB_MONITOR_USER_PW: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "TODO",
+				Description: "The load balancer monitor user's password",
 				Sensitive:   true,
 			},
 			TF_FIELD_LB_PORT: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "TODO",
+				Description: "The load balancer port that it will accept connections on behalf of the database it is front-ending.",
 			},
 			TF_FIELD_LB_USE_CLUSTERING: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "TODO",
+				Description: "Whether to use ProxySQL clustering or not. Only applicable to ProxySQL at this time",
 			},
 			TF_FIELD_LB_USE_RW_SPLITTING: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "TODO",
+				Description: "Whether to Read/Write splitting for queries or not?",
 			},
 			TF_FIELD_CLUSTER_DISABLE_FW: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "TODO",
+				Description: "Disable firewall on the host OS when installing DB packages.",
+			},
+			TF_FIELD_CLUSTER_DISABLE_SELINUX: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Disable SELinux on the host OS when installing DB packages.",
 			},
 			TF_FIELD_LB_INSTALL_SW: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "TODO",
+				Description: "Install DB packages from respective repos",
+			},
+			TF_FIELD_LB_ENABLE_UNINSTALL: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "When removing DB cluster from ClusterControl, enable uinstalling DB packages.",
 			},
 			TF_FIELD_CLUSTER_SSH_USER: {
-				Type: schema.TypeString,
-				//Optional:    true,
+				Type:        schema.TypeString,
 				Required:    true,
-				Description: "TODO",
+				Description: "The SSH user ClusterControl will use to SSH to the DB host from the ClusterControl host",
 			},
 			TF_FIELD_CLUSTER_SSH_PW: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "TODO",
+				Description: "Sudo user's password. If sudo user doesn't have a password, leave this field blank",
 				Sensitive:   true,
 			},
 			TF_FIELD_CLUSTER_SSH_KEY_FILE: {
-				Type: schema.TypeString,
-				//Required:    true,
+				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "SSH Key file.",
+				Description: "SSH Key file. The path to the private key file for the Sudo user on the ClusterControl host.",
 			},
 			TF_FIELD_CLUSTER_SSH_PORT: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "TODO",
+				Description: "The ssh port.",
 			},
 			TF_FIELD_CLUSTER_HOST: {
-				Type: schema.TypeList,
-				//Required: true,
+				Type:        schema.TypeList,
 				Optional:    true,
-				Description: "The hosts that make up the cluster.",
+				Description: "The Database hosts that make up the cluster.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						TF_FIELD_CLUSTER_HOSTNAME: {
-							Type:     schema.TypeString,
-							Required: true,
-							//Optional:    true,
-							Description: "TODO.",
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Hostname/IP of the DB host behind this load balancer. Can be IP address as well.",
 						},
 						TF_FIELD_CLUSTER_HOST_PORT: {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "TODO.",
+							Description: "The port the DB host behind this load balancer.",
 						},
 					},
 				},
 			},
 			TF_FIELD_LB_MY_HOST: {
-				Type: schema.TypeList,
-				//Required: true,
+				Type:        schema.TypeList,
 				Optional:    true,
-				Description: "The hosts that make up the cluster.",
+				Description: "The load balancer host in question (i.e, self)",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						TF_FIELD_CLUSTER_HOSTNAME: {
-							Type:     schema.TypeString,
-							Required: true,
-							//Optional:    true,
-							Description: "TODO.",
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Hostname/IP of this load balancer. Can be IP address as well.",
 						},
 						TF_FIELD_CLUSTER_HOST_PORT: {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "TODO.",
+							Description: "The port of this load balancer.",
 						},
 					},
 				},
@@ -178,7 +180,6 @@ func resourceDbLoadBalancer() *schema.Resource {
 	}
 }
 
-// Prem
 func resourceCreateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	funcName := "resourceCreateDbLoadBalancer"
 	slog.Debug(funcName)
@@ -225,37 +226,6 @@ func resourceCreateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 		return diags
 	}
 
-	//clusterId := d.Get(TF_FIELD_CLUSTER_ID).(string)
-	//if clusterId == "" {
-	//	strErr := fmt.Sprintf("%s: %s - not declared", funcName, TF_FIELD_CLUSTER_ID)
-	//	slog.Error(strErr)
-	//	diags = append(diags, diag.Diagnostic{
-	//		Severity: diag.Error,
-	//		Summary:  strErr,
-	//	})
-	//	return diags
-	//}
-	//
-	//if iCid, err = strconv.Atoi(clusterId); err != nil {
-	//	strErr := fmt.Sprintf("%s: %s - non-numeric cluster-id", funcName, clusterId)
-	//	slog.Error(strErr)
-	//	diags = append(diags, diag.Diagnostic{
-	//		Severity: diag.Error,
-	//		Summary:  strErr,
-	//	})
-	//	return diags
-	//}
-
-	//if clusterId == 0 {
-	//	strErr := fmt.Sprintf("%s: - invalid cluster-id 0", funcName)
-	//	slog.Error(strErr)
-	//	diags = append(diags, diag.Diagnostic{
-	//		Severity: diag.Error,
-	//		Summary:  strErr,
-	//	})
-	//	return diags
-	//}
-
 	createLb.SetClusterId(clusterId)
 
 	var getInputs DbLoadBalancerInterface
@@ -267,7 +237,13 @@ func resourceCreateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 		jobSpec.SetCommand(CMON_JOB_CREATE_HAPROXY_COMMAND)
 		getInputs = NewHAProxy()
 	default:
-		slog.Warn(funcName, "Unsupported LB type", lbType)
+		str := fmt.Sprintf("%s - Unknown load balancer type: %s", funcName, lbType)
+		slog.Warn(str)
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  str,
+		})
+		return diags
 	}
 
 	if getInputs != nil {
@@ -303,7 +279,6 @@ func resourceCreateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 	return diags
 }
 
-// Prem
 func resourceReadDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	funcName := "resourceReadDbCluster"
 	slog.Debug(funcName)
@@ -322,7 +297,6 @@ func resourceReadDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m i
 	return diags
 }
 
-// Prem
 func resourceUpdateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	funcName := "resourceReadDbCluster"
 	slog.Debug(funcName)
@@ -340,7 +314,6 @@ func resourceUpdateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 	return resourceReadDbCluster(ctx, d, m)
 }
 
-// Prem
 func resourceDeleteDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	funcName := "resourceDeleteDbCluster"
 	slog.Debug(funcName)

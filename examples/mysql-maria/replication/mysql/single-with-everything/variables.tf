@@ -215,13 +215,13 @@ variable "db_cluster_id" {
 }
 
 variable "db_lb_type" {
-  description = "The load balancer type (e.g., proxysql, haproxy, keepalive)"
+  description = "The load balancer type (e.g., proxysql, haproxy, etc)"
   type        = string
   default     = "proxysql"
 }
 
 variable "db_lb_version" {
-  description = "The database version to use"
+  description = "The load balancer version to use"
   type        = string
   default     = "2"
 }
@@ -281,6 +281,14 @@ variable "db_lb_install_software" {
   type        = bool
   default     = true
 }
+
+variable "db_lb_enable_uninstall" {
+  description = "When removing load balancer from ClusterControl, enable uinstalling its packages."
+  type        = bool
+  nullable    = false
+  default     = true
+}
+
 
 variable "db_my_host" {
   description = "Details regarding the load balancer host"

@@ -90,9 +90,8 @@ func resourceDbClusterBackup() *schema.Resource {
 	}
 }
 
-// Prem
 func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	funcName := "resourceCreateDbLoadBalancer"
+	funcName := "resourceCreateDbClusterBackup"
 	slog.Debug(funcName)
 
 	var diags diag.Diagnostics
@@ -193,9 +192,8 @@ func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 	return diags
 }
 
-// Prem
 func resourceDeleteDbClusterBackup(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	funcName := "resourceDeleteDbCluster"
+	funcName := "resourceDeleteDbClusterBackup"
 	slog.Debug(funcName)
 
 	// Warning or errors can be collected in a slice type
@@ -258,7 +256,6 @@ func resourceDeleteDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 	return diags
 }
 
-// Prem
 func resourceReadDbClusterBackup(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	funcName := "resourceReadDbClusterBackup"
 	slog.Debug(funcName)
@@ -270,7 +267,6 @@ func resourceReadDbClusterBackup(ctx context.Context, d *schema.ResourceData, m 
 	return diags
 }
 
-// Prem
 func resourceUpdateDbClusterBackup(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	funcName := "resourceUpdateDbClusterBackup"
 	slog.Debug(funcName)

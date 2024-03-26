@@ -74,9 +74,9 @@ func (m *ProxySql) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJob
 		node.SetPort(int32(iPort))
 		nodeAddresses = append(nodeAddresses, node)
 		isAtleastOneNodeAddressDeclared = true
-
 	}
 	jobData.SetNodeAdresses(nodeAddresses)
+
 	if !isAtleastOneNodeAddressDeclared {
 		err = errors.New(fmt.Sprintf("ERROR: At lease one %s block must be specified", TF_FIELD_CLUSTER_HOST))
 		return err

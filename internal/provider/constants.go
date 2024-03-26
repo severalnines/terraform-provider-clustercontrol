@@ -263,6 +263,7 @@ const (
 	TF_FIELD_LB_USE_RW_SPLITTING = "db_lb_use_rw_splitting"
 	TF_FIELD_LB_INSTALL_SW       = "db_lb_install_software"
 	TF_FIELD_LB_MY_HOST          = "db_my_host"
+	TF_FIELD_LB_ENABLE_UNINSTALL = "db_lb_enable_uninstall"
 
 	// Maintenance fields
 	TF_FIELD_MAINT_START_TIME = "db_maint_start_time"

@@ -451,7 +451,13 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	case CLUSTER_TYPE_ELASTIC:
 		getInputs = NewElastic()
 	default:
-		slog.Warn(funcName, "Unknown cluster type", clusterType)
+		str := fmt.Sprintf("%s - Unknown cluster type: %s", funcName, clusterType)
+		slog.Warn(str)
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  str,
+		})
+		return diags
 	}
 
 	if getInputs != nil {
@@ -543,7 +549,13 @@ func resourceReadDbCluster(ctx context.Context, d *schema.ResourceData, m interf
 	case CLUSTER_TYPE_ELASTIC:
 		readHandler = NewElastic()
 	default:
-		slog.Warn(funcName, "Unknown cluster type", clusterType)
+		str := fmt.Sprintf("%s - Unknown cluster type: %s", funcName, clusterType)
+		slog.Warn(str)
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  str,
+		})
+		return diags
 	}
 
 	if readHandler != nil {
@@ -609,7 +621,13 @@ func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	case CLUSTER_TYPE_ELASTIC:
 		updateHandler = NewElastic()
 	default:
-		slog.Warn(funcName, "Unknown cluster type", clusterType)
+		str := fmt.Sprintf("%s - Unknown cluster type: %s", funcName, clusterType)
+		slog.Warn(str)
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  str,
+		})
+		return diags
 	}
 
 	if updateHandler != nil {
@@ -639,7 +657,6 @@ func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	return resourceReadDbCluster(ctx, d, m)
 }
 
-// Prem
 func resourceDeleteDbCluster(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	funcName := "resourceDeleteDbCluster"
 	slog.Debug(funcName)
