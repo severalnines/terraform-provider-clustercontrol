@@ -140,9 +140,11 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 
 	isReplicationType := true
 	hostClassName := CMON_CLASS_NAME_MYSQL_HOST
+	command := CMON_JOB_ADD_REPLICATION_SLAVE_COMMAND
 	if strings.EqualFold(clusterType, CLUSTER_TYPE_GALERA) {
 		isReplicationType = false
 		hostClassName = CMON_CLASS_NAME_GALERA_HOST
+		command = CMON_JOB_ADD_NODE_COMMAND
 	}
 
 	//isHostChanged := false
@@ -171,6 +173,9 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 			nodeToAddOrRemove = &nodesToAdd[0]
 		} else if isRemoveNode {
 			nodeToAddOrRemove = &nodesToRemove[0]
+			command = CMON_JOB_REMOVE_NODE_COMMAND
+		} else {
+			command = CMON_JOB_PROMOTE_REPLICAION_SLAVE_COMMAND
 		}
 
 		// From Terraform
@@ -190,17 +195,18 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 		// tmpJobDataNodes: the db_hosts portion of TF resource data
 		// nodeFromTf: "the" node from the resource data. It is this node which is to be added or removed to the cluster
 		// nodeToAddOrRemove: contains hostname of the node to be added or removed. Use it in the remove case
+
 		apiClient := m.(*openapi.APIClient)
 		addOrRemoveNodeJob := NewCCJob(CMON_JOB_CREATE_JOB)
 		addOrRemoveNodeJob.SetClusterId(clusterInfo.GetClusterId())
 		job := addOrRemoveNodeJob.GetJob()
 		jobSpec := job.GetJobSpec()
 		jobData := jobSpec.GetJobData()
+		jobSpec.SetCommand(command)
 
 		var primaryInCmon *openapi.ClusterResponseHostsInner
 		// Find the Primary/Master node in CMON
-		if primaryInCmon, err = c.Common.findMasterNode(clusterInfo, CMON_CLASS_NAME_MYSQL_HOST, CMON_DB_HOST_ROLE_MASTER); err != nil {
-			// TODO
+		if primaryInCmon, err = c.Common.findMasterNode(clusterInfo, hostClassName, CMON_DB_HOST_ROLE_MASTER); err != nil {
 			return err
 		}
 
@@ -212,18 +218,16 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 		jobData.SetDisableFirewall(tmpJobData.GetDisableFirewall())
 		jobData.SetUpdateLb(true)
 		jobData.SetDataDir(tmpJobData.GetDataDir())
-		//jobData.SetUsePackageForDataDir(true) // for PG
 		//jobData.SetVersion("")
+
 		var node openapi.JobsJobJobSpecJobDataNode
-		//node.SetSynchronous(tmpJobData.Ge) // PG
 
 		if isAddNode {
+
 			if isReplicationType {
-				jobSpec.SetCommand(CMON_JOB_ADD_REPLICATION_SLAVE_COMMAND)
 				jobData.SetMysqlSemiSync(true)
 			} else {
-				jobSpec.SetCommand(CMON_JOB_ADD_NODE_COMMAND)
-				//jobSpec.SetGaleraSegment(nodeFromTf.GetGaleraSegment())
+				jobData.SetGaleraSegment("0")
 			}
 
 			node.SetHostname(nodeFromTf.GetHostname())
@@ -231,19 +235,19 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 			node.SetHostnameInternal(nodeFromTf.GetHostnameInternal())
 			node.SetPort(convertPortToInt(nodeFromTf.GetPort(), tmpJobData.GetPort()))
 			node.SetDatadir(nodeFromTf.GetDatadir())
-			jobData.SetNode(node)
+
 		} else if isRemoveNode {
-			jobSpec.SetCommand(CMON_JOB_REMOVE_NODE_COMMAND)
+
 			node.SetHostname(nodeToAddOrRemove.GetHostname())
-			jobData.SetNode(node)
 			jobData.SetEnableUninstall(true)
 			jobData.SetUnregisterOnly(false)
+
 		} else {
 			// Here we are dealing with a Role change (slave promotion to master)
-			jobSpec.SetCommand(CMON_JOB_PROMOTE_REPLICAION_SLAVE_COMMAND)
 			return errors.New("Standby promotion is yet to be supported")
 		}
 
+		jobData.SetNode(node)
 		jobSpec.SetJobData(jobData)
 		job.SetJobSpec(jobSpec)
 		addOrRemoveNodeJob.SetJob(job)
