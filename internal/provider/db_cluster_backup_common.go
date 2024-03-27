@@ -24,10 +24,14 @@ func (c *DbBackupCommon) GetBackupInputs(d *schema.ResourceData, jobData *openap
 	}
 
 	backupDir := d.Get(TF_FIELD_BACKUP_DIR).(string)
-	jobData.SetBackupDir(backupDir)
+	if backupMethod != "" {
+		jobData.SetBackupDir(backupDir)
+	}
 
 	backupSubdir := d.Get(TF_FIELD_BACKUP_SUBDIR).(string)
-	jobData.SetBackupsubdir(backupSubdir)
+	if backupSubdir != "" {
+		jobData.SetBackupsubdir(backupSubdir)
+	}
 
 	isEncrypt := d.Get(TF_FIELD_BACKUP_ENCRYPT).(bool)
 	jobData.SetEncryptBackup(isEncrypt)

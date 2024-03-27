@@ -49,7 +49,7 @@ func resourceDbClusterBackup() *schema.Resource {
 			},
 			TF_FIELD_BACKUP_DIR: {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true, // PBM for mongo doesn't require a backupdir ...
 				Description: "Base direcory where backups is to be stored",
 			},
 			TF_FIELD_BACKUP_SUBDIR: {
