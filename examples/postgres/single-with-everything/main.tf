@@ -27,6 +27,7 @@ resource "clustercontrol_db_cluster" "this" {
   db_enable_uninstall    = var.db_enable_uninstall
   db_install_software    = var.db_install_software
   db_deploy_agents       = var.db_deploy_agents
+  db_enable_timescale    = true
   ssh_user               = var.ssh_user
   ssh_user_password      = var.ssh_user_password
   ssh_key_file           = var.ssh_key_file
