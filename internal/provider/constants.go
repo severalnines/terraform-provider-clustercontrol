@@ -268,6 +268,7 @@ const (
 	TF_FIELD_CLUSTER_AUTO_RECOVERY       = "db_auto_recovery"
 	TF_FIELD_CLUSTER_SSL                 = "db_enable_ssl"
 	TF_FIELD_CLUSTER_MONGO_AUTH_DB       = "db_mongo_auth_db"
+	TF_FIELD_CLUSTER_SENTINEL_PORT       = "db_sentinel_port"
 
 	// Load balancer fields
 	TF_FIELD_LB_CREATE           = "db_lb_create"

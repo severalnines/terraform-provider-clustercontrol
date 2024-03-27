@@ -200,33 +200,32 @@ func (c *PostgresSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, 
 		if isAddNode {
 			node.SetHostname(nodeFromTf.GetHostname())
 
-			tmpS := nodeFromTf.GetHostnameData()
-			if tmpS != "" {
-				node.SetHostnameData(tmpS)
-			}
-			//node.SetHostnameData(nodeFromTf.GetHostnameData())
+			// NOTE: host is guaranteed to be non-nil.
+			h := c.Common.findHost(nodeFromTf.GetHostname(), d.Get(TF_FIELD_CLUSTER_HOST))
+			hostname_data := h[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
+			hostname_internal := h[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
+			port := h[TF_FIELD_CLUSTER_HOST_PORT].(string)
+			datadir := h[TF_FIELD_CLUSTER_HOST_DD].(string)
+			syncReplication := h[TF_FIELD_CLUSTER_SYNC_REP].(bool)
 
-			tmpS = nodeFromTf.GetHostnameInternal()
-			if tmpS != "" {
-				node.SetHostnameInternal(tmpS)
+			if hostname_data != "" {
+				node.SetHostnameData(hostname_data)
+			} else {
+				node.SetHostnameData(node.GetHostname())
 			}
-			//node.SetHostnameInternal(nodeFromTf.GetHostnameInternal())
-
-			tmpS = nodeFromTf.GetPort()
-			if tmpS != "" {
-				node.SetPort(convertPortToInt(tmpS, tmpJobData.GetPort()))
+			if hostname_internal != "" {
+				node.SetHostnameInternal(hostname_internal)
+			}
+			if port != "" {
+				node.SetPort(convertPortToInt(port, tmpJobData.GetPort()))
 			} else {
 				node.SetPort(tmpJobData.GetPort())
 			}
-			//node.SetPort(convertPortToInt(nodeFromTf.GetPort(), tmpJobData.GetPort()))
-
-			tmpS = nodeFromTf.GetDatadir()
-			if tmpS != "" {
-				node.SetDatadir(tmpS)
+			if datadir != "" {
+				node.SetDatadir(datadir)
 			}
-			//node.SetDatadir(nodeFromTf.GetDatadir())
 
-			node.SetSynchronous(nodeFromTf.GetSynchronous())
+			node.SetSynchronous(syncReplication)
 
 		} else if isRemoveNode {
 

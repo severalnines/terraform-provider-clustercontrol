@@ -85,6 +85,11 @@ func resourceDbCluster() *schema.Resource {
 				Optional:    true,
 				Description: "The port on which the DB will accepts connections",
 			},
+			TF_FIELD_CLUSTER_SENTINEL_PORT: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The port Redis Sentinel uses to communicate",
+			},
 			TF_FIELD_CLUSTER_DATA_DIR: {
 				Type:        schema.TypeString,
 				Optional:    true,

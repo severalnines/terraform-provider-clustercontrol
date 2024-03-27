@@ -12,6 +12,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 func GetClusterIdByClusterName(ctx context.Context, apiClient *openapi.APIClient, clusterName string) (int32, error) {
@@ -221,6 +222,29 @@ func convertPortToInt(strPort string, useAsDefaultPort int32) int32 {
 		return useAsDefaultPort
 	}
 	return int32(iP)
+}
+
+func convertPortToInt2(strPort string, useAsDefaultPort string) (int, error) {
+	var iP int
+	var err error
+	if iP, err = strconv.Atoi(strPort); err != nil {
+		iP, err = strconv.Atoi(useAsDefaultPort)
+	}
+	return iP, err
+}
+
+func findHostInClusterInfo(hostname string, classname string, clusterInfo *openapi.ClusterResponse) {
+
+	hosts := clusterInfo.GetHosts()
+	for i := 0; i < len(hosts); i++ {
+		host := hosts[i]
+		if strings.EqualFold(hostname, host.GetHostname()) &&
+			strings.EqualFold(classname, host.GetClassName()) {
+
+			break
+		}
+
+	}
 }
 
 //func ConvertTimeToZulu(in string, tmFmt string) (time.Time, error) {

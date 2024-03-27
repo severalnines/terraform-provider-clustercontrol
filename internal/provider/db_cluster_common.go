@@ -311,13 +311,23 @@ func (c *DbCommon) findMasterNode(clusterInfo *openapi.ClusterResponse, hostClas
 	return node, err
 }
 
+func (c *DbCommon) findHost(hostname string, hosts interface{}) map[string]any {
+	for _, ff := range hosts.([]any) {
+		f := ff.(map[string]any)
+		hn := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
+		if strings.EqualFold(hostname, hn) {
+			return f
+		}
+	}
+	return nil
+}
+
 func (c *DbCommon) determineNodesDelta(d *schema.ResourceData, clusterInfo *openapi.ClusterResponse, hostClass string) ([]openapi.JobsJobJobSpecJobDataNodesInner, []openapi.JobsJobJobSpecJobDataNodesInner, error) {
 	funcName := "DbCommon::determineNodesDelta"
 	slog.Info(funcName)
 
 	var nodesToAdd []openapi.JobsJobJobSpecJobDataNodesInner
 	var nodesToRemove []openapi.JobsJobJobSpecJobDataNodesInner
-
 	hosts := d.Get(TF_FIELD_CLUSTER_HOST)
 	nodes := []openapi.JobsJobJobSpecJobDataNodesInner{}
 	for _, ff := range hosts.([]any) {
@@ -325,15 +335,11 @@ func (c *DbCommon) determineNodesDelta(d *schema.ResourceData, clusterInfo *open
 		// Capturing hostname only as this is only used for comparison purposes.
 		hostname := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
 
-		//hostname_data := f[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
-		//hostname_internal := f[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
-		//port := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
-
+		if hostname == "" {
+			return nil, nil, errors.New("Hostname cannot be empty")
+		}
 		var node = openapi.JobsJobJobSpecJobDataNodesInner{
 			Hostname: &hostname,
-			//HostnameData:     &hostname_data,
-			//HostnameInternal: &hostname_internal,
-			//Port:             &port,
 		}
 		nodes = append(nodes, node)
 	}
@@ -343,7 +349,6 @@ func (c *DbCommon) determineNodesDelta(d *schema.ResourceData, clusterInfo *open
 		node := nodes[i]
 		isFound := false
 		hosts := clusterInfo.GetHosts()
-		//slog.Info(funcName, "Num hosts returned from CMON", len(hosts))
 		for j := 0; j < len(hosts); j++ {
 			if !strings.EqualFold(hosts[j].GetClassName(), hostClass) {
 				continue

@@ -24,7 +24,7 @@ func (c *DbBackupCommon) GetBackupInputs(d *schema.ResourceData, jobData *openap
 	}
 
 	backupDir := d.Get(TF_FIELD_BACKUP_DIR).(string)
-	if backupMethod != "" {
+	if backupDir != "" {
 		jobData.SetBackupDir(backupDir)
 	}
 

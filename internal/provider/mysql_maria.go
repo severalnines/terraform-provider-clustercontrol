@@ -59,7 +59,6 @@ func (m *MySQLMaria) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJ
 	nodes := []openapi.JobsJobJobSpecJobDataNodesInner{}
 	for _, ff := range hosts.([]any) {
 		f := ff.(map[string]any)
-		var node = openapi.JobsJobJobSpecJobDataNodesInner{}
 
 		hostname := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
 		hostname_data := f[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
@@ -70,7 +69,9 @@ func (m *MySQLMaria) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJ
 		if hostname == "" {
 			return errors.New("Hostname cannot be empty")
 		}
-		node.SetHostname(hostname)
+		var node = openapi.JobsJobJobSpecJobDataNodesInner{
+			Hostname: &hostname,
+		}
 		if hostname_data != "" {
 			node.SetHostnameData(hostname_data)
 		}
@@ -247,23 +248,28 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 
 			node.SetHostname(nodeFromTf.GetHostname())
 
-			tmpS := nodeFromTf.GetHostnameData()
-			if tmpS != "" {
-				node.SetHostnameData(tmpS)
+			// NOTE: host is guaranteed to be non-nil.
+			h := c.Common.findHost(nodeFromTf.GetHostname(), d.Get(TF_FIELD_CLUSTER_HOST))
+			hostname_data := h[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
+			hostname_internal := h[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
+			port := h[TF_FIELD_CLUSTER_HOST_PORT].(string)
+			datadir := h[TF_FIELD_CLUSTER_HOST_DD].(string)
+
+			if hostname_data != "" {
+				node.SetHostnameData(hostname_data)
+			} else {
+				node.SetHostnameData(node.GetHostname())
 			}
-			tmpS = nodeFromTf.GetHostnameInternal()
-			if tmpS != "" {
-				node.SetHostnameInternal(tmpS)
+			if hostname_internal != "" {
+				node.SetHostnameInternal(hostname_internal)
 			}
-			tmpS = nodeFromTf.GetPort()
-			if tmpS != "" {
-				node.SetPort(convertPortToInt(tmpS, tmpJobData.GetPort()))
+			if port != "" {
+				node.SetPort(convertPortToInt(port, tmpJobData.GetPort()))
 			} else {
 				node.SetPort(tmpJobData.GetPort())
 			}
-			tmpS = nodeFromTf.GetDatadir()
-			if tmpS != "" {
-				node.SetDatadir(tmpS)
+			if datadir != "" {
+				node.SetDatadir(datadir)
 			}
 
 		} else if isRemoveNode {

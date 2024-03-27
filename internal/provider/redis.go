@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"log/slog"
+	"strconv"
 	"strings"
 )
 
@@ -27,6 +28,7 @@ func (m *Redis) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpe
 	}
 
 	clusterType := jobData.GetClusterType()
+	topLevelPort := jobData.GetPort()
 
 	dataDirectory := d.Get(TF_FIELD_CLUSTER_DATA_DIR).(string)
 	if err = CheckForEmptyAndSetDefault(&dataDirectory, gDefultDataDir, clusterType); err != nil {
@@ -34,23 +36,51 @@ func (m *Redis) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpe
 	}
 	jobData.SetDatadir(dataDirectory)
 
-	iPort := int(jobData.GetPort())
+	sentinelPort := d.Get(TF_FIELD_CLUSTER_SENTINEL_PORT).(string)
+	if sentinelPort == "" {
+		sentinelPort = DEFAULT_MONGO_REDIS_SENTINEL_PORT
+	}
+	jobData.SetSentinelPort(sentinelPort)
+
 	hosts := d.Get(TF_FIELD_CLUSTER_HOST)
 	nodes := []openapi.JobsJobJobSpecJobDataNodesInner{}
 	for _, ff := range hosts.([]any) {
 		f := ff.(map[string]any)
+		hostname := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
+		hostname_data := f[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
+		hostname_internal := f[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
+		port := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
+		datadir := f[TF_FIELD_CLUSTER_HOST_DD].(string)
 
-		var node = openapi.JobsJobJobSpecJobDataNodesInner{}
-		var memHost = memberHosts{
-			vanillaNode: &node,
+		if hostname == "" {
+			return errors.New("Hostname cannot be empty")
 		}
-		m.Common.getCommonHostAttributes(f, iPort, clusterType, memHost)
-		var node2 = node
+		var node = openapi.JobsJobJobSpecJobDataNodesInner{
+			Hostname: &hostname,
+		}
+
 		node.SetClassName(CMON_CLASS_NAME_REDIS_HOST)
+
+		if hostname_data != "" {
+			node.SetHostnameData(hostname_data)
+		}
+		if hostname_internal != "" {
+			node.SetHostnameInternal(hostname_internal)
+		}
+		if port == "" {
+			node.SetPort(strconv.Itoa(int(topLevelPort)))
+		} else {
+			node.SetPort(strconv.Itoa(int(convertPortToInt(port, topLevelPort))))
+		}
+		if datadir != "" {
+			node.SetDatadir(datadir)
+		}
 		nodes = append(nodes, node)
 
+		var node2 = node
 		node2.SetClassName(CMON_CLASS_NAME_REDIS_SENTNEL_HOST)
-		node2.SetPort(DEFAULT_MONGO_REDIS_SENTINEL_PORT)
+		node2.SetPort(sentinelPort)
+
 		nodes = append(nodes, node2)
 	}
 	jobData.SetNodes(nodes)
@@ -168,14 +198,10 @@ func (c *Redis) HandleUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		}
 		slog.Debug(funcName, "Master:", primaryInCmon.GetHostname())
 
-		// Set job data fields
-		//jobData.SetConfigTemplate(tmpJobData.GetConfigTemplate())
-		//jobData.SetMasterAddress(fmt.Sprintf("%s:%v", primaryInCmon.GetHostname(), tmpJobData.GetPort()))
 		jobData.SetInstallSoftware(tmpJobData.GetInstallSoftware())
 		jobData.SetDisableSelinux(tmpJobData.GetDisableSelinux())
 		jobData.SetEnableUninstall(true /*tmpJobData.GetEnableUninstall()*/)
 		jobData.SetDisableFirewall(tmpJobData.GetDisableFirewall())
-		//jobData.SetDataDir(tmpJobData.GetDataDir())
 
 		if isAddNode {
 			var node openapi.JobsJobJobSpecJobDataNodesInner
@@ -183,28 +209,56 @@ func (c *Redis) HandleUpdate(ctx context.Context, d *schema.ResourceData, m inte
 			var nodes []openapi.JobsJobJobSpecJobDataNodesInner
 			node.SetClassName(hostClassName)
 			node.SetHostname(nodeFromTf.GetHostname())
-			node.SetHostnameData(nodeFromTf.GetHostnameData())
-			node.SetHostnameInternal(nodeFromTf.GetHostnameInternal())
-			node.SetPort(nodeFromTf.GetPort())
-			//node.SetDatadir(jobData.GetDataDir())
-			//node.SetDatadir(nodeFromTf.GetDatadir())
-			//node.SetSynchronous(nodeFromTf.GetSynchronous())
-
 			node2.SetClassName(CMON_CLASS_NAME_REDIS_SENTNEL_HOST)
 			node2.SetHostname(nodeFromTf.GetHostname())
-			node2.SetHostnameData(nodeFromTf.GetHostnameData())
-			node2.SetHostnameInternal(nodeFromTf.GetHostnameInternal())
-			node2.SetPort(DEFAULT_MONGO_REDIS_SENTINEL_PORT)
+
+			h := c.Common.findHost(nodeFromTf.GetHostname(), d.Get(TF_FIELD_CLUSTER_HOST))
+			hostname_data := h[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
+			hostname_internal := h[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
+			port := h[TF_FIELD_CLUSTER_HOST_PORT].(string)
+			datadir := h[TF_FIELD_CLUSTER_HOST_DD].(string)
+
+			if hostname_data != "" {
+				node.SetHostnameData(hostname_data)
+			} else {
+				node.SetHostnameData(node.GetHostname())
+			}
+			node2.SetHostnameData(node.GetHostnameData())
+
+			if hostname_internal != "" {
+				node.SetHostnameInternal(hostname_internal)
+				node2.SetHostnameInternal(node.GetHostnameInternal())
+			}
+			if port != "" {
+				node.SetPort(strconv.Itoa(int(convertPortToInt(port, tmpJobData.GetPort()))))
+			} else {
+				node.SetPort(strconv.Itoa(int(tmpJobData.GetPort())))
+			}
+			if datadir != "" {
+				node.SetDatadir(datadir)
+			}
+
+			node2.SetPort(tmpJobData.GetSentinelPort())
 
 			nodes = append(nodes, node, node2)
 			jobData.SetNodes(nodes)
 		} else if isRemoveNode {
-			var nd openapi.JobsJobJobSpecJobDataNode
-			nd.SetHostname(nodeToAddOrRemove.GetHostname())
-			nd.SetPort(tmpJobData.GetPort())
+			var node openapi.JobsJobJobSpecJobDataNodesInner
+			var node2 openapi.JobsJobJobSpecJobDataNodesInner
+			var nodes []openapi.JobsJobJobSpecJobDataNodesInner
+
+			node.SetHostname(nodeToAddOrRemove.GetHostname())
+			node.SetPort(strconv.Itoa(int(tmpJobData.GetPort())))
+
+			node2.SetHostname(nodeToAddOrRemove.GetHostname())
+			node2.SetPort(tmpJobData.GetSentinelPort())
+
 			jobData.SetEnableUninstall(true)
 			jobData.SetUnregisterOnly(false)
-			jobData.SetNode(nd)
+
+			nodes = append(nodes, node, node2)
+			
+			jobData.SetNodes(nodes)
 		}
 
 		jobSpec.SetJobData(jobData)
@@ -231,6 +285,8 @@ func (c *Redis) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJob
 	if err = c.Backup.GetBackupInputs(d, jobData); err != nil {
 		return err
 	}
+
+	jobData.SetHostname(STINRG_AUTO)
 
 	return err
 }
