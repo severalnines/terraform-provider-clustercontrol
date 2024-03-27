@@ -2,6 +2,7 @@ package provider
 
 import (
 	"errors"
+	"fmt"
 	"log/slog"
 	"strings"
 )
@@ -24,13 +25,14 @@ func CheckForEmptyAndSetDefault(chkVal *string, someMap map[string]string, mapKe
 	funcName := "CheckForEmptyAndSet"
 	slog.Debug(funcName)
 
-	if strings.EqualFold(*chkVal, "") {
+	if *chkVal == "" {
 		defaultVal, ok := someMap[mapKey]
 		if ok {
 			*chkVal = defaultVal
 		} else {
-			slog.Debug(funcName, "Unsupported key", mapKey, "attribute", *chkVal)
-			return errors.New("Default DB admin user not set in config.")
+			errStr := fmt.Sprintf("%s: Unsupported key: %s", *chkVal)
+			slog.Warn(errStr)
+			return errors.New(errStr)
 		}
 	}
 

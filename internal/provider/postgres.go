@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"log/slog"
+	"strconv"
 	"strings"
 )
 
@@ -16,7 +17,7 @@ type PostgresSql struct {
 }
 
 func (m *PostgresSql) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
-	funcName := "Postgres::GetInputs"
+	funcName := "PostgresSql::GetInputs"
 	slog.Debug(funcName)
 
 	var err error
@@ -26,22 +27,49 @@ func (m *PostgresSql) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJob
 		return err
 	}
 
-	iPort := int(jobData.GetPort())
-	clusterType := jobData.GetClusterType()
+	topLevelPort := jobData.GetPort()
+
+	dataDirectory := d.Get(TF_FIELD_CLUSTER_DATA_DIR).(string)
+	if dataDirectory != "" {
+		jobData.SetDatadir(dataDirectory)
+	}
+
+	timescaleExt := d.Get(TF_FIELD_CLUSTER_PG_TIMESALE_EXT).(bool)
+	jobData.SetInstallTimescaledb(timescaleExt)
+
 	hosts := d.Get(TF_FIELD_CLUSTER_HOST)
 	nodes := []openapi.JobsJobJobSpecJobDataNodesInner{}
 	for _, ff := range hosts.([]any) {
 		f := ff.(map[string]any)
 
 		var node = openapi.JobsJobJobSpecJobDataNodesInner{}
-		var memHost = memberHosts{
-			vanillaNode: &node,
-		}
-		m.Common.getCommonHostAttributes(f, iPort, clusterType, memHost)
-		sync_replication := f[TF_FIELD_CLUSTER_SYNC_REP].(bool)
-		node.SetSynchronous(sync_replication)
 
-		slog.Debug(funcName, TF_FIELD_CLUSTER_SYNC_REP, sync_replication)
+		hostname := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
+		hostname_data := f[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
+		hostname_internal := f[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
+		port := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
+		datadir := f[TF_FIELD_CLUSTER_HOST_DD].(string)
+		sync_replication := f[TF_FIELD_CLUSTER_SYNC_REP].(bool)
+
+		if hostname == "" {
+			return errors.New("Hostname cannot be empty")
+		}
+		node.SetHostname(hostname)
+		if hostname_data != "" {
+			node.SetHostnameData(hostname_data)
+		}
+		if hostname_internal != "" {
+			node.SetHostnameInternal(hostname_internal)
+		}
+		if port == "" {
+			node.SetPort(strconv.Itoa(int(topLevelPort)))
+		} else {
+			node.SetPort(strconv.Itoa(int(convertPortToInt(port, topLevelPort))))
+		}
+		if datadir != "" {
+			node.SetDatadir(datadir)
+		}
+		node.SetSynchronous(sync_replication)
 
 		nodes = append(nodes, node)
 	}
@@ -171,15 +199,41 @@ func (c *PostgresSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, 
 
 		if isAddNode {
 			node.SetHostname(nodeFromTf.GetHostname())
-			node.SetHostnameData(nodeFromTf.GetHostnameData())
-			node.SetHostnameInternal(nodeFromTf.GetHostnameInternal())
-			node.SetPort(convertPortToInt(nodeFromTf.GetPort(), tmpJobData.GetPort()))
-			node.SetDatadir(nodeFromTf.GetDatadir())
+
+			tmpS := nodeFromTf.GetHostnameData()
+			if tmpS != "" {
+				node.SetHostnameData(tmpS)
+			}
+			//node.SetHostnameData(nodeFromTf.GetHostnameData())
+
+			tmpS = nodeFromTf.GetHostnameInternal()
+			if tmpS != "" {
+				node.SetHostnameInternal(tmpS)
+			}
+			//node.SetHostnameInternal(nodeFromTf.GetHostnameInternal())
+
+			tmpS = nodeFromTf.GetPort()
+			if tmpS != "" {
+				node.SetPort(convertPortToInt(tmpS, tmpJobData.GetPort()))
+			} else {
+				node.SetPort(tmpJobData.GetPort())
+			}
+			//node.SetPort(convertPortToInt(nodeFromTf.GetPort(), tmpJobData.GetPort()))
+
+			tmpS = nodeFromTf.GetDatadir()
+			if tmpS != "" {
+				node.SetDatadir(tmpS)
+			}
+			//node.SetDatadir(nodeFromTf.GetDatadir())
+
 			node.SetSynchronous(nodeFromTf.GetSynchronous())
+
 		} else if isRemoveNode {
+
 			node.SetHostname(nodeToAddOrRemove.GetHostname())
 			jobData.SetEnableUninstall(true)
 			jobData.SetUnregisterOnly(false)
+
 		} else {
 			// Here we are dealing with a Role change (slave promotion to master)
 			return errors.New("Standby promotion is yet to be supported")
@@ -201,7 +255,7 @@ func (c *PostgresSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, 
 }
 
 func (c *PostgresSql) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
-	funcName := "PG::GetBackupInputs"
+	funcName := "PostgresSql::GetBackupInputs"
 	slog.Info(funcName)
 
 	var err error

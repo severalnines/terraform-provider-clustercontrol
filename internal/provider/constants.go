@@ -216,6 +216,7 @@ const (
 	TF_FIELD_CLUSTER_ENABLE_UNINSTALL    = "db_enable_uninstall"
 	TF_FIELD_CLUSTER_SYNC_REP            = "sync_replication"
 	TF_FIELD_CLUSTER_SEMISYNC_REP        = "db_semi_sync_replication"
+	TF_FIELD_CLUSTER_PG_TIMESALE_EXT     = "db_enable_timescale"
 	TF_FIELD_CLUSTER_SSH_USER            = "ssh_user"
 	TF_FIELD_CLUSTER_SSH_PW              = "ssh_user_password"
 	TF_FIELD_CLUSTER_SSH_KEY_FILE        = "ssh_key_file"

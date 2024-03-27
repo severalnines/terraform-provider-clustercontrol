@@ -115,6 +115,11 @@ func resourceDbCluster() *schema.Resource {
 				Optional:    true,
 				Description: "Semi-synchronous replication for MySQL and MariaDB non-galera clusters",
 			},
+			TF_FIELD_CLUSTER_PG_TIMESALE_EXT: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Whether to setup TimescaleDB extension or not",
+			},
 			TF_FIELD_CLUSTER_SSH_USER: {
 				Type:        schema.TypeString,
 				Required:    true,
