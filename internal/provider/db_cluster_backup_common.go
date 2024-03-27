@@ -33,7 +33,9 @@ func (c *DbBackupCommon) GetBackupInputs(d *schema.ResourceData, jobData *openap
 	jobData.SetEncryptBackup(isEncrypt)
 
 	backupHost := d.Get(TF_FIELD_BACKUP_HOST).(string)
-	jobData.SetHostname(backupHost)
+	if backupHost != "" {
+		jobData.SetHostname(backupHost)
+	}
 
 	isCompressBackup := d.Get(TF_FIELD_BACKUP_COMPRESSION).(bool)
 	jobData.SetCompression(isCompressBackup)

@@ -64,7 +64,7 @@ func resourceDbClusterBackup() *schema.Resource {
 			},
 			TF_FIELD_BACKUP_HOST: {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "Where there are multiple hosts, which host to choose to create backup from.",
 			},
 			TF_FIELD_BACKUP_COMPRESSION: {
@@ -86,6 +86,21 @@ func resourceDbClusterBackup() *schema.Resource {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "Whether to store the backup on CMON controller host or not",
+			},
+			TF_FIELD_BACKUP_FAILOVER: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Whether to enable backup failover to another host in case the host crashes",
+			},
+			TF_FIELD_BACKUP_FAILOVER_HOST: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "If backup failover is enabled, which host to use as backup host in the event of failure of first choice host.",
+			},
+			TF_FIELD_BACKUP_STORAGE_HOST: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Which host to store the backup on. Typically, used with mongodump backup method.",
 			},
 		},
 	}

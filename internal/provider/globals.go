@@ -56,6 +56,12 @@ var (
 		CLUSTER_TYPE_MSSQL_AO_ASYNC: "/var/opt/mssql/mssql.conf",
 	}
 )
+var (
+	gDbMongosConfigTemplate = map[string]string{
+		VENDOR_PERCONA: "mongos.conf.org",
+		VENDOR_10GEN:   "",
+	}
+)
 
 var (
 	gDbConfigTemplate = map[string]map[string]map[string]string{

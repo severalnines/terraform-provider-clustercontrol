@@ -37,7 +37,9 @@ func (c *DbCommon) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJob
 	if err = CheckForEmptyAndSetDefault(&dbAdminUsername, gDefultDbAdminUser, clusterType); err != nil {
 		return err
 	}
-	jobData.SetDbUser(dbAdminUsername)
+	if dbAdminUsername != "" {
+		jobData.SetDbUser(dbAdminUsername)
+	}
 
 	dbAdminUserPassword := d.Get(TF_FIELD_CLUSTER_ADMIN_PW).(string)
 	jobData.SetAdminPassword(dbAdminUserPassword)
@@ -88,6 +90,9 @@ func (c *DbCommon) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJob
 
 	deployAgents := d.Get(TF_FIELD_CLUSTER_DEPLOY_AGENTS).(bool)
 	jobData.SetDeployAgents(deployAgents)
+
+	enableSsl := d.Get(TF_FIELD_CLUSTER_SSL).(bool)
+	jobData.SetEnableSsl(enableSsl)
 
 	return nil
 }

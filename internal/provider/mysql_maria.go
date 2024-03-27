@@ -42,7 +42,7 @@ func (m *MySQLMaria) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJ
 	}
 	cfgTemplate, ok := clusterTypeMap[dbVersion]
 	if !ok {
-		return errors.New(fmt.Sprintf("Map doesn't support DB vendor: %s, ClusterType: %s, DbVersion: %s", dbVendor, clusterType, dbVendor))
+		return errors.New(fmt.Sprintf("Map doesn't support DB vendor: %s, ClusterType: %s, DbVersion: %s", dbVendor, clusterType, dbVersion))
 	}
 	jobData.SetConfigTemplate(cfgTemplate)
 
@@ -317,6 +317,20 @@ func (m *MySQLMaria) GetBackupInputs(d *schema.ResourceData, jobData *openapi.Jo
 	// parent/super - get common attributes
 	if err = m.Backup.GetBackupInputs(d, jobData); err != nil {
 		return err
+	}
+
+	backupFailChoice := d.Get(TF_FIELD_BACKUP_FAILOVER).(bool)
+	jobData.SetBackupFailover(backupFailChoice)
+
+	failoverHost := d.Get(TF_FIELD_BACKUP_FAILOVER_HOST).(string)
+	if failoverHost == "" {
+		failoverHost = STINRG_AUTO
+	}
+	jobData.SetBackupFailoverHost(failoverHost)
+
+	backupStorageHost := d.Get(TF_FIELD_BACKUP_STORAGE_HOST).(string)
+	if backupStorageHost != "" {
+		jobData.SetStorageHost(backupStorageHost)
 	}
 
 	return err

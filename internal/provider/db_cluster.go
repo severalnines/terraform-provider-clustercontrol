@@ -156,6 +156,11 @@ func resourceDbCluster() *schema.Resource {
 				Optional:    true,
 				Description: "Elasticsearch snapshot host",
 			},
+			TF_FIELD_CLUSTER_MONGO_AUTH_DB: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The mongodb database to use for authentication purposes",
+			},
 			TF_FIELD_CLUSTER_HOST: {
 				Type:        schema.TypeList,
 				Optional:    true,
@@ -389,6 +394,11 @@ func resourceDbCluster() *schema.Resource {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "Have cluster auto-recovery on (or off)",
+			},
+			TF_FIELD_CLUSTER_SSL: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Enable SSL based comms between the cluster nodes and client access to node.",
 			},
 		},
 	}

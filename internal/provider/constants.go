@@ -266,6 +266,8 @@ const (
 	TF_FIELD_CLUSTER_TIMEOUTS            = "timeouts"
 	TF_FIELD_CLUSTER_DEPLOY_AGENTS       = "db_deploy_agents"
 	TF_FIELD_CLUSTER_AUTO_RECOVERY       = "db_auto_recovery"
+	TF_FIELD_CLUSTER_SSL                 = "db_enable_ssl"
+	TF_FIELD_CLUSTER_MONGO_AUTH_DB       = "db_mongo_auth_db"
 
 	// Load balancer fields
 	TF_FIELD_LB_CREATE           = "db_lb_create"
@@ -299,8 +301,18 @@ const (
 	TF_FIELD_BACKUP_COMPRESSION_LEVEL = "db_backup_compression_level"
 	TF_FIELD_BACKUP_RETENTION         = "db_backup_retention"
 	TF_FIELD_BACKUP_ON_CONTROLLER     = "db_backup_storage_controller"
+	TF_FIELD_BACKUP_FAILOVER_HOST     = "db_backup_failover_host"   // MONGODUMP only
+	TF_FIELD_BACKUP_FAILOVER          = "db_enable_backup_failover" // MONGODUMP only
+	TF_FIELD_BACKUP_STORAGE_HOST      = "db_backup_storage_host"
 	//TF_FIELD_BACKUP_                  = "db_backup_"
-	//TF_FIELD_BACKUP_                  = "db_backup_"
+)
+
+const (
+	MONGO_DEFAULT_AUTH_DB = "admin"
+)
+
+const (
+	STINRG_AUTO = "auto"
 )
 
 const (

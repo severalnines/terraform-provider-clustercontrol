@@ -198,6 +198,18 @@ variable "db_auto_recovery" {
   default     = true
 }
 
+variable "db_enable_ssl" {
+  description = "Enable SSL based comms between the cluster nodes and client access to node."
+  type        = bool
+  default     = true
+}
+
+variable "db_mongo_auth_db" {
+  description = "The mongodb database to use for authentication purposes"
+  type        = string
+  default     = "admin"
+}
+
 # --------------------------
 # Load balancer variables ...
 # --------------------------
@@ -365,6 +377,24 @@ variable "db_backup_host" {
   description = "Which host to take backup on. Primary, Standby, Auto - meaning let ClusterControl decide which host to select"
   type        = string
   default     = "auto"
+}
+
+variable "db_enable_backup_failover" {
+  description = "If the host on which backup is attempted fails, try it on another host"
+  type        = bool
+  default     = true
+}
+
+variable "db_backup_failover_host" {
+  description = "When backup failover takes place, which host to swith to"
+  type        = string
+  default     = "auto"
+}
+
+variable "db_backup_storage_host" {
+  description = "Which host to store the backup on. Typically, used with mongodump backup method."
+  type        = string
+  default     = null
 }
 
 variable "db_backup_compression" {
