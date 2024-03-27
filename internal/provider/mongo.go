@@ -179,6 +179,10 @@ func (m *MongoDb) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJ
 	return err
 }
 
+func (c *MongoDb) IsValidBackupOptions(vendor string, clusterType string, jobData *openapi.JobsJobJobSpecJobData) error {
+	return c.Backup.IsValidBackupOptions(vendor, clusterType, jobData)
+}
+
 func NewMongo() *MongoDb {
 	return &MongoDb{}
 }

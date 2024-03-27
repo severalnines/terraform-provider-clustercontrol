@@ -90,6 +90,10 @@ func (c *MsSql) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJob
 	return err
 }
 
+func (c *MsSql) IsValidBackupOptions(vendor string, clusterType string, jobData *openapi.JobsJobJobSpecJobData) error {
+	return c.Backup.IsValidBackupOptions(vendor, clusterType, jobData)
+}
+
 func NewMsSql() *MsSql {
 	return &MsSql{}
 }

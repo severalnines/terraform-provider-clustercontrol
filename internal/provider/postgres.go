@@ -268,6 +268,10 @@ func (c *PostgresSql) GetBackupInputs(d *schema.ResourceData, jobData *openapi.J
 	return err
 }
 
+func (c *PostgresSql) IsValidBackupOptions(vendor string, clusterType string, jobData *openapi.JobsJobJobSpecJobData) error {
+	return c.Backup.IsValidBackupOptions(vendor, clusterType, jobData)
+}
+
 func NewPostgres() *PostgresSql {
 	return &PostgresSql{}
 }

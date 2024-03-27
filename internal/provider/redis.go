@@ -235,6 +235,10 @@ func (c *Redis) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJob
 	return err
 }
 
+func (c *Redis) IsValidBackupOptions(vendor string, clusterType string, jobData *openapi.JobsJobJobSpecJobData) error {
+	return c.Backup.IsValidBackupOptions(vendor, clusterType, jobData)
+}
+
 func NewRedis() *Redis {
 	return &Redis{}
 }

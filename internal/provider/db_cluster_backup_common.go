@@ -1,9 +1,12 @@
 package provider
 
 import (
+	"errors"
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"log/slog"
+	"slices"
 )
 
 type DbBackupCommon struct{}
@@ -14,8 +17,11 @@ func (c *DbBackupCommon) GetBackupInputs(d *schema.ResourceData, jobData *openap
 
 	var err error
 
+	// NOTE: backup_method is/should-be "" for Redis
 	backupMethod := d.Get(TF_FIELD_BACKUP_METHOD).(string)
-	jobData.SetBackupMethod(backupMethod)
+	if backupMethod != "" {
+		jobData.SetBackupMethod(backupMethod)
+	}
 
 	backupDir := d.Get(TF_FIELD_BACKUP_DIR).(string)
 	jobData.SetBackupDir(backupDir)
@@ -42,4 +48,21 @@ func (c *DbBackupCommon) GetBackupInputs(d *schema.ResourceData, jobData *openap
 	jobData.SetCcStorage(isStoreOnCtlr)
 
 	return err
+}
+
+func (c *DbBackupCommon) IsValidBackupOptions(vendor string, clusterType string, jobData *openapi.JobsJobJobSpecJobData) error {
+
+	clusterTypeMap, ok := gDbAvailableBackupMethods[clusterType]
+	if !ok {
+		return errors.New(fmt.Sprintf("Backup method map doesn't support DB cluster-type: %s", clusterTypeMap))
+	}
+	vendorMap, ok := clusterTypeMap[vendor]
+	if !ok {
+		return errors.New(fmt.Sprintf("Backup method map doesn't support DB vendor: %s, ClusterType: %s", vendor, clusterType))
+	}
+	if !slices.Contains(vendorMap, jobData.GetBackupMethod()) {
+		return errors.New(fmt.Sprintf("Backup method map doesn't support DB vendor: %s, ClusterType: %s, BackupMethod: %s", vendor, clusterType, jobData.GetBackupMethod()))
+	}
+
+	return nil
 }

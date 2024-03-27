@@ -99,6 +99,10 @@ func (c *Elastic) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJ
 	return err
 }
 
+func (c *Elastic) IsValidBackupOptions(vendor string, clusterType string, jobData *openapi.JobsJobJobSpecJobData) error {
+	return c.Backup.IsValidBackupOptions(vendor, clusterType, jobData)
+}
+
 func NewElastic() *Elastic {
 	return &Elastic{}
 }

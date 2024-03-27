@@ -58,9 +58,8 @@ func resourceDbClusterMaintenance() *schema.Resource {
 	}
 }
 
-// Prem
 func resourceCreateDbMaintenance(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	funcName := "resourceCreateDbLoadBalancer"
+	funcName := "resourceCreateDbMaintenance"
 	slog.Debug(funcName)
 
 	var diags diag.Diagnostics
@@ -140,7 +139,7 @@ func resourceCreateDbMaintenance(ctx context.Context, d *schema.ResourceData, m 
 		})
 		return diags
 	}
-	slog.Info(funcName, "Resp `MaintenanceOperation`", maintOperResp)
+	slog.Debug(funcName, "Resp `MaintenanceOperation`", maintOperResp)
 
 	d.SetId(maintOperResp.UUID)
 	d.Set(TF_FIELD_RESOURCE_ID, maintOperResp.UUID)
@@ -149,9 +148,8 @@ func resourceCreateDbMaintenance(ctx context.Context, d *schema.ResourceData, m 
 	return diags
 }
 
-// Prem
 func resourceDeleteDbMaintenance(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	funcName := "resourceDeleteDbCluster"
+	funcName := "resourceDeleteDbMaintenance"
 	slog.Debug(funcName)
 
 	// Warning or errors can be collected in a slice type
@@ -183,7 +181,6 @@ func resourceDeleteDbMaintenance(ctx context.Context, d *schema.ResourceData, m 
 	return diags
 }
 
-// Prem
 func resourceReadDbMaintenance(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	funcName := "resourceReadDbMaintenance"
 	slog.Debug(funcName)
@@ -194,7 +191,6 @@ func resourceReadDbMaintenance(ctx context.Context, d *schema.ResourceData, m in
 	return diags
 }
 
-// Prem
 func resourceUpdateDbMaintenance(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	funcName := "resourceUpdateDbMaintenance"
 	slog.Debug(funcName)

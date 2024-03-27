@@ -13,6 +13,7 @@ import (
 
 type DbClusterBackupInterface interface {
 	GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error
+	IsValidBackupOptions(vendor string, clusterType string, jobData *openapi.JobsJobJobSpecJobData) error
 }
 
 func resourceDbClusterBackup() *schema.Resource {
@@ -122,6 +123,7 @@ func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 	createBackup.SetClusterId(clusterInfo.GetClusterId())
 
 	clusterType := clusterInfo.GetClusterType()
+	vendor := clusterInfo.GetVendor()
 	slog.Debug(funcName, "ClusterType", clusterType)
 	clusterType = strings.ToLower(clusterType)
 
@@ -153,10 +155,19 @@ func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 			slog.Error(err.Error())
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,
-				Summary:  "Error in DB cluster Read handler",
+				Summary:  "Error in DB cluster backup create handler.",
 			})
 			return diags
 		}
+	}
+
+	if err = backupHandler.IsValidBackupOptions(vendor, clusterType, &jobData); err != nil {
+		slog.Error(err.Error())
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error in DB cluster backup create handler.",
+		})
+		return diags
 	}
 
 	jobSpec.SetJobData(jobData)
@@ -168,7 +179,7 @@ func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 		slog.Error(err.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Job Failed for ClusterCreate",
+			Summary:  "Job Failed for BackupCreate",
 		})
 		return diags
 	}
@@ -179,7 +190,7 @@ func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 		slog.Error(err.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Job Failed for ClusterCreate",
+			Summary:  "Job Failed for BackupCreate.",
 		})
 		return diags
 	}

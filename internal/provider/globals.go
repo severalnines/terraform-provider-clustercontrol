@@ -122,51 +122,55 @@ var (
 	gDbAvailableBackupMethods = map[string]map[string][]string{
 		CLUSTER_TYPE_REPLICATION: {
 			VENDOR_ORACLE: {
-				"xtrabackupfull",
-				"xtrabackupincr",
-				"mysqldump",
+				BACKUP_METHOD_XTRABACKUP_FULL,
+				BACKUP_METHOD_XTRABACKUP_INCR,
+				BACKUP_METHOD_MYSQLDUMP,
 			},
 			VENDOR_PERCONA: {
-				"xtrabackupfull",
-				"xtrabackupincr",
-				"mysqldump",
+				BACKUP_METHOD_XTRABACKUP_FULL,
+				BACKUP_METHOD_XTRABACKUP_INCR,
+				BACKUP_METHOD_MYSQLDUMP,
 			},
 			VENDOR_MARIADB: {
-				"mariabackupfull",
-				"mariabackupincr",
-				"mysqldump",
+				BACKUP_METHOD_MARIABACKUP_FULL,
+				BACKUP_METHOD_MARIABACKUP_INCR,
+				BACKUP_METHOD_MYSQLDUMP,
 			},
 		},
 		CLUSTER_TYPE_GALERA: {
 			VENDOR_PERCONA: {
-				"xtrabackupfull",
-				"xtrabackupincr",
-				"mysqldump",
+				BACKUP_METHOD_XTRABACKUP_FULL,
+				BACKUP_METHOD_XTRABACKUP_INCR,
+				BACKUP_METHOD_MYSQLDUMP,
 			},
 			VENDOR_MARIADB: {
-				"mariabackupfull",
-				"mariabackupincr",
-				"mysqldump",
+				BACKUP_METHOD_MARIABACKUP_FULL,
+				BACKUP_METHOD_MARIABACKUP_INCR,
+				BACKUP_METHOD_MYSQLDUMP,
 			},
 		},
 		CLUSTER_TYPE_MOGNODB: {
 			VENDOR_PERCONA: {
-				"percona-backup-mongodb",
-				"mongodump",
+				BACKUP_METHOD_PBM,
+				BACKUP_METHOD_MONGODUMP,
 			},
 			VENDOR_10GEN: {
-				"percona-backup-mongodb",
-				"mongodump",
+				BACKUP_METHOD_PBM,
+				BACKUP_METHOD_MONGODUMP,
 			},
 		},
 		CLUSTER_TYPE_MSSQL_AO_ASYNC: { // VENDOR_MICROSOFT
 			VENDOR_MICROSOFT: {
-				"mssqlfull",
+				BACKUP_MSSQL_FULL,
+				BACKUP_MSSQL_DIFF,
+				BACKUP_MSSQL_TRANSACTION_LOG,
 			},
 		},
 		CLUSTER_TYPE_MSSQL_SINGLE: { // VENDOR_MICROSOFT
 			VENDOR_MICROSOFT: {
-				"mssqlfull",
+				BACKUP_MSSQL_FULL,
+				BACKUP_MSSQL_DIFF,
+				BACKUP_MSSQL_TRANSACTION_LOG,
 			},
 		},
 		CLUSTER_TYPE_REDIS: { // VENDOR_REDIS
@@ -176,11 +180,11 @@ var (
 		},
 		CLUSTER_TYPE_PG_SINGLE: { // VENDOR_REDIS
 			VENDOR_DEFAULT: {
-				"pgbasebackup",
-				"pgdump",
-				"pgbackrestfull",
-				"pgbackrestincr",
-				"pgbackrestdiff",
+				BACKUP_METHOD_PG_BASEBACKUP,
+				BACKUP_METHOD_PGDUMPALL,
+				BACKUP_METHOD_PG_BACKREST_FULL,
+				BACKUP_METHOD_PG_BACKREST_INCR,
+				BACKUP_METHOD_PG_BACKREST_DIRR,
 			},
 		},
 	}

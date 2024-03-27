@@ -38,11 +38,11 @@ func (m *MySQLMaria) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJ
 	}
 	clusterTypeMap, ok := vendorMap[clusterType]
 	if !ok {
-		return errors.New(fmt.Sprintf("Map doesn't support DB vendor: %s, ClusterType: %s", dbVendor, clusterTypeMap))
+		return errors.New(fmt.Sprintf("Map doesn't support DB vendor: %s, ClusterType: %s", dbVendor, clusterType))
 	}
 	cfgTemplate, ok := clusterTypeMap[dbVersion]
 	if !ok {
-		return errors.New(fmt.Sprintf("Map doesn't support DB vendor: %s, ClusterType: %s, DbVersion: %s", dbVendor, clusterTypeMap, dbVendor))
+		return errors.New(fmt.Sprintf("Map doesn't support DB vendor: %s, ClusterType: %s, DbVersion: %s", dbVendor, clusterType, dbVendor))
 	}
 	jobData.SetConfigTemplate(cfgTemplate)
 
@@ -320,6 +320,10 @@ func (m *MySQLMaria) GetBackupInputs(d *schema.ResourceData, jobData *openapi.Jo
 	}
 
 	return err
+}
+
+func (c *MySQLMaria) IsValidBackupOptions(vendor string, clusterType string, jobData *openapi.JobsJobJobSpecJobData) error {
+	return c.Backup.IsValidBackupOptions(vendor, clusterType, jobData)
 }
 
 func NewMySQLMaria() *MySQLMaria {

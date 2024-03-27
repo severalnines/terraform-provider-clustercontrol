@@ -196,6 +196,24 @@ const (
 )
 
 const (
+	BACKUP_METHOD_XTRABACKUP_FULL  = "xtrabackupfull"
+	BACKUP_METHOD_XTRABACKUP_INCR  = "xtrabackupincr"
+	BACKUP_METHOD_MARIABACKUP_FULL = "mariabackupfull"
+	BACKUP_METHOD_MARIABACKUP_INCR = "mariabackupincr"
+	BACKUP_METHOD_MYSQLDUMP        = "mysqldump"
+	BACKUP_METHOD_PG_BASEBACKUP    = "pg_basebackup"
+	BACKUP_METHOD_PG_BACKREST_FULL = "pgbackrestfull"
+	BACKUP_METHOD_PG_BACKREST_INCR = "pgbackrestincr"
+	BACKUP_METHOD_PG_BACKREST_DIRR = "pgbackrestdiff"
+	BACKUP_METHOD_PGDUMPALL        = "pgdumpall"
+	BACKUP_METHOD_MONGODUMP        = "mongodump"
+	BACKUP_METHOD_PBM              = "percona-backup-mongodb"
+	BACKUP_MSSQL_FULL              = "mssqlfull"
+	BACKUP_MSSQL_DIFF              = "mssqldiff"
+	BACKUP_MSSQL_TRANSACTION_LOG   = "mssqllog"
+)
+
+const (
 	TF_FIELD_RESOURCE_ID                 = "db_resource_id"
 	TF_FIELD_LAST_UPDATED                = "last_updated"
 	TF_FIELD_CLUSTER_CREATE              = "db_cluster_create"
