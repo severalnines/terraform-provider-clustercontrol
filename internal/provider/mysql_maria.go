@@ -363,8 +363,15 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 			err = getInputs.GetInputs(theTfRecord, &jobData)
 
 		} else if isRemoveNode {
-			nodeToAddOrRemove = &nodesToRemove[0]
 			jobSpec.SetCommand(CMON_JOB_REMOVE_NODE_COMMAND)
+			nodeToAddOrRemove = &nodesToRemove[0]
+			var node openapi.JobsJobJobSpecJobDataNode
+			node.SetHostname(nodeToAddOrRemove.GetHostname())
+			jobData.SetNode(node)
+			//node.SetPort("6033")
+			jobData.SetEnableUninstall(true)
+			jobData.SetUnregisterOnly(false)
+			slog.Info(funcName, "Removing hostname", node.GetHostname())
 		} else {
 			return nil
 		}
