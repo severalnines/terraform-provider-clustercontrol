@@ -1,10 +1,11 @@
 package provider
 
 const (
-	RESOURCE_DB_CLUSTER             = "clustercontrol_db_cluster"
-	RESOURCE_DB_LOAD_BALANCER       = "clustercontrol_db_load_balancer"
-	RESOURCE_DB_CLUSTER_MAINTENANCE = "clustercontrol_db_cluster_maintenance"
-	RESOURCE_DB_CLUSTER_BACKUP      = "clustercontrol_db_cluster_backup"
+	RESOURCE_DB_CLUSTER                 = "clustercontrol_db_cluster"
+	RESOURCE_DB_LOAD_BALANCER           = "clustercontrol_db_load_balancer"
+	RESOURCE_DB_CLUSTER_MAINTENANCE     = "clustercontrol_db_cluster_maintenance"
+	RESOURCE_DB_CLUSTER_BACKUP          = "clustercontrol_db_cluster_backup"
+	RESOURCE_DB_CLUSTER_BACKUP_SCHEDULE = "clustercontrol_db_cluster_backup_schedule"
 )
 
 const (
@@ -136,6 +137,7 @@ const (
 
 const (
 	CMON_JOB_CREATE_JOB = "createJobInstance"
+	CMON_JOB_DELETE_JOB = "deleteJobInstance"
 	CMON_JOB_GET_JOB    = "getJobInstance"
 )
 
@@ -338,6 +340,12 @@ const (
 	TF_FIELD_BACKUP_STORAGE_HOST      = "db_backup_storage_host"
 	TF_FIELD_BACKUP_SYSTEM_DB         = "db_backup_system_db"
 	//TF_FIELD_BACKUP_                  = "db_backup_"
+
+	// Backup schedule fields
+	TF_FIELD_BACKUP_SCHED_TITLE = "db_backup_sched_title"
+	TF_FIELD_BACKUP_SCHED_TIME  = "db_backup_sched_time"
+	//TF_FIELD_BACKUP_SCHED_                  = "db_backup_"
+
 )
 
 const (
@@ -353,9 +361,10 @@ const (
 )
 
 const (
-	JOB_STATUS_DEFINED  = "DEFINED"
-	JOB_STATUS_RUNNING  = "RUNNING"
-	JOB_STATUS_FINISHED = "FINISHED"
+	JOB_STATUS_DEFINED   = "DEFINED"
+	JOB_STATUS_RUNNING   = "RUNNING"
+	JOB_STATUS_FINISHED  = "FINISHED"
+	JOB_STATUS_SCHEDULED = "SCHEDULED"
 )
 
 //const (

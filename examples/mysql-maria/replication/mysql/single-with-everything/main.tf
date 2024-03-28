@@ -13,8 +13,8 @@ locals {
 resource "clustercontrol_db_cluster" "this" {
   db_cluster_create        = true
   db_cluster_import        = false
-  db_cluster_name          = "mydbcluster-1"
-  db_cluster_type          = "replication"
+  db_cluster_name          = "mydbcluster-4"
+  db_cluster_type          = "mysql-replication"
   db_vendor                = "percona"
   db_version               = "8.0"
   db_admin_user_password   = "blah%blah"
@@ -34,7 +34,7 @@ resource "clustercontrol_db_cluster" "this" {
   db_tags                  = ["terra-deploy"]
 
   db_host {
-    hostname = "test-primary"
+    hostname = "test-primary-4"
     # hostname_data = "foo"
     # hostname_internal = "foo"
     # port = "foo"
@@ -52,6 +52,22 @@ resource "clustercontrol_db_cluster" "this" {
   # }
 
 }
+
+# resource "clustercontrol_db_cluster_backup_schedule" "full-1" {
+#   depends_on                   = [clustercontrol_db_cluster.this]
+#   db_backup_sched_title        = "Daily full"
+#   db_backup_sched_time         = "TZ=UTC 0 0 * * *"
+#   db_cluster_id                = clustercontrol_db_cluster.this.id
+#   db_backup_method             = "xtrabackupfull"
+#   db_backup_dir                = var.db_backup_dir
+#   db_backup_subdir             = var.db_backup_subdir
+#   db_backup_encrypt            = var.db_backup_encrypt
+#   db_backup_host               = var.db_backup_host
+#   db_backup_storage_controller = var.db_backup_storage_controller
+#   db_backup_compression        = var.db_backup_compression
+#   db_backup_compression_level  = var.db_backup_compression_level
+#   db_backup_retention          = var.db_backup_retention
+# }
 
 # resource "clustercontrol_db_cluster_backup" "full-03-26-2024_1" {
 #   depends_on = [clustercontrol_db_cluster.this]

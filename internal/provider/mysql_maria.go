@@ -154,11 +154,12 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 	}
 
 	clusterType := clusterInfo.GetClusterType()
+	clusterType = strings.ToLower(clusterType)
 
 	isReplicationType := true
 	hostClassName := CMON_CLASS_NAME_MYSQL_HOST
 	command := CMON_JOB_ADD_REPLICATION_SLAVE_COMMAND
-	if strings.EqualFold(clusterType, CLUSTER_TYPE_GALERA) {
+	if clusterType == CLUSTER_TYPE_GALERA {
 		isReplicationType = false
 		hostClassName = CMON_CLASS_NAME_GALERA_HOST
 		command = CMON_JOB_ADD_NODE_COMMAND

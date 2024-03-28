@@ -379,6 +379,22 @@ variable "db_backup_retention" {
   default     = 7
 }
 
+# --------------------------------------------
+# Backup schedule variables ...
+# --------------------------------------------
+
+variable "db_backup_sched_title" {
+  description = "A title for the backup schedule (e.g., Daily full, Hourly incremental, etc)"
+  type        = string
+  default     = "Sample backup schedule title"
+}
+
+variable "db_backup_sched_time" {
+  description = "The time to kick off a backup (e.g. 'TZ=UTC 0 0 * * *')"
+  type        = string
+  default     = null
+}
+
 # --------------------------
 # Future stuff ...
 # --------------------------

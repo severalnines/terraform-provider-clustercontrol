@@ -8,6 +8,7 @@ import (
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"log/slog"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -463,8 +464,18 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	jobSpec.SetCommand(CMON_JOB_CREATE_CLUSTER_COMMAND)
 	jobData := jobSpec.GetJobData()
 
-	clusterType := d.Get(TF_FIELD_CLUSTER_TYPE).(string)
-	slog.Debug(clusterType)
+	extClusterType := d.Get(TF_FIELD_CLUSTER_TYPE).(string)
+	clusterType, ok := gExtClusterTypeToIntClusterTypeMap[extClusterType]
+	if !ok {
+		str := fmt.Sprintf("Unsupported cluster-type: %s", extClusterType)
+		slog.Info(str)
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  str,
+		})
+		return diags
+	}
+	slog.Info(clusterType)
 
 	var getInputs DbClusterInterface = nil
 
@@ -561,7 +572,9 @@ func resourceReadDbCluster(ctx context.Context, d *schema.ResourceData, m interf
 		return diags
 	}
 
-	clusterType := d.Get(TF_FIELD_CLUSTER_TYPE).(string)
+	//clusterType := d.Get(TF_FIELD_CLUSTER_TYPE).(string)
+	clusterType := clusterInfo.GetClusterType()
+	clusterType = strings.ToLower(clusterType)
 	slog.Debug(clusterType)
 
 	var readHandler DbClusterInterface = nil
@@ -633,7 +646,9 @@ func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 		return diags
 	}
 
-	clusterType := d.Get(TF_FIELD_CLUSTER_TYPE).(string)
+	//clusterType := d.Get(TF_FIELD_CLUSTER_TYPE).(string)
+	clusterType := clusterInfo.GetClusterType()
+	clusterType = strings.ToLower(clusterType)
 	slog.Debug(clusterType)
 
 	var updateHandler DbClusterInterface = nil

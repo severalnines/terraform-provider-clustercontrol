@@ -2,30 +2,27 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
+	"io"
 	"log/slog"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
 )
 
-type DbClusterBackupInterface interface {
-	GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error
-	IsValidBackupOptions(vendor string, clusterType string, jobData *openapi.JobsJobJobSpecJobData) error
-	SetBackupJobData(jobData *openapi.JobsJobJobSpecJobData) error
-}
-
-func resourceDbClusterBackup() *schema.Resource {
-	funcName := "resourceDbLoadBalancer"
+func resourceDbClusterBackupSchedule() *schema.Resource {
+	funcName := "resourceDbClusterBackupSchedule"
 	slog.Debug(funcName)
 
 	return &schema.Resource{
-		CreateContext: resourceCreateDbClusterBackup,
-		ReadContext:   resourceReadDbClusterBackup,
-		UpdateContext: resourceUpdateDbClusterBackup,
-		DeleteContext: resourceDeleteDbClusterBackup,
+		CreateContext: resourceCreateDbClusterBackupSched,
+		ReadContext:   resourceReadDbClusterBackupSched,
+		UpdateContext: resourceUpdateDbClusterBackupSched,
+		DeleteContext: resourceDeleteDbClusterBackupSched,
 		Importer:      &schema.ResourceImporter{},
 		Schema: map[string]*schema.Schema{
 			TF_FIELD_RESOURCE_ID: {
@@ -42,6 +39,16 @@ func resourceDbClusterBackup() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The database cluster ID for which this LB is being deployed to.",
+			},
+			TF_FIELD_BACKUP_SCHED_TITLE: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "A title for the backup schedule (e.g., Daily full, Hourly incremental, etc)",
+			},
+			TF_FIELD_BACKUP_SCHED_TIME: {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The time to kick off a backup (e.g. 'TZ=UTC 0 0 * * *')",
 			},
 			TF_FIELD_BACKUP_METHOD: {
 				Type:        schema.TypeString,
@@ -112,8 +119,8 @@ func resourceDbClusterBackup() *schema.Resource {
 	}
 }
 
-func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	funcName := "resourceCreateDbClusterBackup"
+func resourceCreateDbClusterBackupSched(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	funcName := "resourceCreateDbClusterBackupSched"
 	slog.Debug(funcName)
 
 	var diags diag.Diagnostics
@@ -123,8 +130,9 @@ func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 
 	apiClient := m.(*openapi.APIClient)
 
-	createBackup := NewCCJob(CMON_JOB_CREATE_JOB)
-	job := createBackup.GetJob()
+	createBackupSched := NewCCJob(CMON_JOB_CREATE_JOB)
+	job := createBackupSched.GetJob()
+	job.SetStatus(JOB_STATUS_SCHEDULED)
 	jobSpec := job.GetJobSpec()
 	jobSpec.SetCommand(CMON_JOB_CREATE_BACKUP_COMMAND)
 	jobData := jobSpec.GetJobData()
@@ -141,14 +149,21 @@ func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 		})
 		return diags
 	}
-	createBackup.SetClusterId(clusterInfo.GetClusterId())
-	// clusterInfo.GetPort() // No port field due to json unmarshall issues - many types for port !!
+	createBackupSched.SetClusterId(clusterInfo.GetClusterId())
+
+	title := d.Get(TF_FIELD_BACKUP_SCHED_TITLE).(string)
+	if title != "" {
+		job.SetTitle(title)
+	}
+	sched := d.Get(TF_FIELD_BACKUP_SCHED_TIME).(string)
+	// sched will never be empty string as it is a required param
+	job.SetRecurrence(sched)
 
 	clusterType := clusterInfo.GetClusterType()
 	vendor := clusterInfo.GetVendor()
+	slog.Debug(funcName, "ClusterType", clusterType)
 	clusterType = strings.ToLower(clusterType)
 	vendor = strings.ToLower(vendor)
-	slog.Debug(funcName, "ClusterType", clusterType, "Vendor", vendor)
 
 	var backupHandler DbClusterBackupInterface = nil
 
@@ -178,7 +193,7 @@ func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 			slog.Error(err.Error())
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,
-				Summary:  "Error in DB cluster backup create handler.",
+				Summary:  err.Error(),
 			})
 			return diags
 		}
@@ -188,7 +203,7 @@ func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 		slog.Error(err.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error in DB cluster backup create handler.",
+			Summary:  err.Error(),
 		})
 		return diags
 	}
@@ -197,30 +212,41 @@ func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 
 	jobSpec.SetJobData(jobData)
 	job.SetJobSpec(jobSpec)
-	createBackup.SetJob(job)
+	createBackupSched.SetJob(job)
 
-	var jobId int32
-	if jobId, err = SendAndWaitForJobCompletionAndId(newCtx, apiClient, createBackup); err != nil {
+	var resp *http.Response
+	if resp, err = apiClient.JobsAPI.JobsPost(newCtx).Jobs(*createBackupSched).Execute(); err != nil {
 		slog.Error(err.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Job Failed for BackupCreate",
+			Summary:  err.Error(),
 		})
 		return diags
 	}
-	slog.Debug(funcName, "Job completed", jobId)
+	slog.Debug(funcName, "Resp `Job`", resp)
 
-	var backupId int32
-	if backupId, err = GetBackupIdForCluster(newCtx, apiClient, clusterInfo.GetClusterId(), jobId); err != nil {
+	var respBytes []byte
+	if respBytes, err = io.ReadAll(resp.Body); err != nil {
 		slog.Error(err.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Job Failed for BackupCreate.",
+			Summary:  err.Error(),
 		})
 		return diags
 	}
 
-	backupIdStr := strconv.Itoa(int(backupId))
+	var jobResp JobResponseFields
+	if err = json.Unmarshal(respBytes, &jobResp); err != nil {
+		slog.Error(err.Error())
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  err.Error(),
+		})
+		return diags
+	}
+	slog.Debug(funcName, "Job completed", jobResp.Job.Job_Id)
+
+	backupIdStr := strconv.Itoa(int(jobResp.Job.Job_Id))
 	d.SetId(backupIdStr)
 	d.Set(TF_FIELD_RESOURCE_ID, backupIdStr)
 	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC850))
@@ -228,8 +254,28 @@ func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 	return diags
 }
 
-func resourceDeleteDbClusterBackup(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	funcName := "resourceDeleteDbClusterBackup"
+func resourceReadDbClusterBackupSched(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	funcName := "resourceReadDbClusterBackupSched"
+	slog.Debug(funcName)
+
+	var diags diag.Diagnostics
+	//var err error
+
+	return diags
+}
+
+func resourceUpdateDbClusterBackupSched(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	funcName := "resourceUpdateDbClusterBackupSched"
+	slog.Debug(funcName)
+
+	var diags diag.Diagnostics
+	//var err error
+
+	return diags
+}
+
+func resourceDeleteDbClusterBackupSched(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	funcName := "resourceDeleteDbClusterBackupSched"
 	slog.Debug(funcName)
 
 	// Warning or errors can be collected in a slice type
@@ -240,18 +286,10 @@ func resourceDeleteDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 
 	apiClient := m.(*openapi.APIClient)
 
-	deleteBackup := NewCCJob(CMON_JOB_CREATE_JOB)
-	job := deleteBackup.GetJob()
-	jobSpec := job.GetJobSpec()
-	jobSpec.SetCommand(CMON_JOB_DELETE_BACKUP_COMMAND)
-	jobData := jobSpec.GetJobData()
-
-	backupId := d.Id()
-	clusterId := d.Get(TF_FIELD_CLUSTER_ID).(string)
-	slog.Info(funcName, "Deleting backup-Id", backupId, "cluster-Id", clusterId)
-
-	var clusterInfo *openapi.ClusterResponse
-	if clusterInfo, err = GetClusterByClusterStrId(newCtx, apiClient, clusterId); err != nil {
+	deleteBackupSched := NewCCJob(CMON_JOB_DELETE_JOB)
+	backupSchedId := d.Id()
+	var schedId int
+	if schedId, err = strconv.Atoi(backupSchedId); err != nil {
 		slog.Error(err.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -259,10 +297,9 @@ func resourceDeleteDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 		})
 		return diags
 	}
-	deleteBackup.SetClusterId(clusterInfo.GetClusterId())
+	deleteBackupSched.SetJobId(int32(schedId))
 
-	var iBkpId int
-	if iBkpId, err = strconv.Atoi(backupId); err != nil {
+	if _, err = apiClient.JobsAPI.JobsPost(newCtx).Jobs(*deleteBackupSched).Execute(); err != nil {
 		slog.Error(err.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -270,46 +307,7 @@ func resourceDeleteDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 		})
 		return diags
 	}
-	jobData.SetBackupid(int32(iBkpId))
-	jobData.SetClusterid(clusterInfo.GetClusterId())
-
-	jobSpec.SetJobData(jobData)
-	job.SetJobSpec(jobSpec)
-	deleteBackup.SetJob(job)
-
-	if err = SendAndWaitForJobCompletion(newCtx, apiClient, deleteBackup); err != nil {
-		slog.Error(err.Error())
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Job Failed for Delete Backup",
-		})
-		return diags
-	}
-
-	d.SetId("")
-	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC822))
-
-	return diags
-}
-
-func resourceReadDbClusterBackup(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	funcName := "resourceReadDbClusterBackup"
-	slog.Debug(funcName)
-
-	// Warning or errors can be collected in a slice type
-	var diags diag.Diagnostics
-	//var err error
-
-	return diags
-}
-
-func resourceUpdateDbClusterBackup(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	funcName := "resourceUpdateDbClusterBackup"
-	slog.Debug(funcName)
-
-	// Warning or errors can be collected in a slice type
-	var diags diag.Diagnostics
-	//var err error
+	slog.Info(funcName, "Backup schedule successfully deleted", backupSchedId)
 
 	return diags
 }
