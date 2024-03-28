@@ -2,9 +2,11 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"log/slog"
+	"strconv"
 )
 
 type MsSql struct {
@@ -23,22 +25,46 @@ func (m *MsSql) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpe
 		return err
 	}
 
-	iPort := int(jobData.GetPort())
+	//iPort := int(jobData.GetPort())
 	clusterType := jobData.GetClusterType()
+	topLevelPort := jobData.GetPort()
+
 	hosts := d.Get(TF_FIELD_CLUSTER_HOST)
 	nodes := []openapi.JobsJobJobSpecJobDataNodesInner{}
 	for _, ff := range hosts.([]any) {
 		f := ff.(map[string]any)
+		hostname := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
+		hostname_data := f[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
+		hostname_internal := f[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
+		port := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
+		datadir := f[TF_FIELD_CLUSTER_HOST_DD].(string)
 
-		var node = openapi.JobsJobJobSpecJobDataNodesInner{}
-		var memHost = memberHosts{
-			vanillaNode: &node,
+		if hostname == "" {
+			return errors.New("Hostname cannot be empty")
 		}
-		m.Common.getCommonHostAttributes(f, iPort, clusterType, memHost)
+		var node = openapi.JobsJobJobSpecJobDataNodesInner{
+			Hostname: &hostname,
+		}
 		node.SetClassName(CMON_CLASS_NAME_MSSQL_HOST)
-		dataDir := gDefultDataDir[clusterType]
+		if hostname_data != "" {
+			node.SetHostnameData(hostname_data)
+		}
+		if hostname_internal != "" {
+			node.SetHostnameInternal(hostname_internal)
+		}
+		if port == "" {
+			node.SetPort(strconv.Itoa(int(topLevelPort)))
+		} else {
+			node.SetPort(strconv.Itoa(int(convertPortToInt(port, topLevelPort))))
+		}
+		if datadir != "" {
+			node.SetDatadir(datadir)
+		} else {
+			dataDir := gDefultDataDir[clusterType]
+			node.SetDatadir(dataDir)
+		}
+
 		configFile := gDefaultHostConfigFile[clusterType]
-		node.SetDatadir(dataDir)
 		node.SetConfigfile(configFile)
 
 		nodes = append(nodes, node)
@@ -86,6 +112,11 @@ func (c *MsSql) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJob
 	if err = c.Backup.GetBackupInputs(d, jobData); err != nil {
 		return err
 	}
+
+	jobData.SetHostname(STINRG_AUTO)
+
+	backupSystemDb := d.Get(TF_FIELD_BACKUP_SYSTEM_DB).(bool)
+	jobData.SetBackupSystemDb(backupSystemDb)
 
 	return err
 }

@@ -237,58 +237,6 @@ func (c *DbCommon) HandleUpdate(ctx context.Context, d *schema.ResourceData, m i
 	return nil
 }
 
-type memberHosts struct {
-	vanillaNode  *openapi.JobsJobJobSpecJobDataNodesInner
-	mongoCfgNode *openapi.JobsJobJobSpecJobDataConfigServersMembersInner
-	mongoRsNode  *openapi.JobsJobJobSpecJobDataReplicaSetsInnerMembersInner
-}
-
-func (c *DbCommon) getCommonHostAttributes(f map[string]any, iPort int, clusterType string, node memberHosts) {
-	//func getCommonHostAttributes(f map[string]any, iPort int, clusterType string, node *openapi.JobsJobJobSpecJobDataNodesInner) {
-	funcName := "getCommonHostAttributes"
-
-	hostname := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
-	hostname_data := f[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
-	hostname_internal := f[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
-	port := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
-
-	if len(hostname_data) == 0 {
-		hostname_data = hostname
-	}
-
-	if port == "" {
-		if iPort > 1024 {
-			port = strconv.Itoa(iPort)
-		} else {
-			port = gDefultDbPortMap[clusterType]
-		}
-	}
-
-	slog.Debug(funcName, TF_FIELD_CLUSTER_HOSTNAME, hostname,
-		TF_FIELD_CLUSTER_HOSTNAME_DATA, hostname_data,
-		TF_FIELD_CLUSTER_HOSTNAME_INT, hostname_internal,
-		TF_FIELD_CLUSTER_HOST_PORT, port)
-
-	if node.vanillaNode != nil {
-		node.vanillaNode.SetHostname(hostname)
-		node.vanillaNode.SetHostnameData(hostname_data)
-		node.vanillaNode.SetHostnameInternal(hostname_internal)
-		node.vanillaNode.SetPort(port)
-	} else if node.mongoCfgNode != nil {
-		node.mongoCfgNode.SetHostname(hostname)
-		node.mongoCfgNode.SetHostnameData(hostname_data)
-		node.mongoCfgNode.SetHostnameInternal(hostname_internal)
-		node.mongoCfgNode.SetPort(port)
-	} else if node.mongoRsNode != nil {
-		node.mongoRsNode.SetHostname(hostname)
-		node.mongoRsNode.SetHostnameData(hostname_data)
-		node.mongoRsNode.SetHostnameInternal(hostname_internal)
-		node.mongoRsNode.SetPort(port)
-	} else {
-		slog.Warn(funcName, "Unknown node", "")
-	}
-}
-
 func (c *DbCommon) findMasterNode(clusterInfo *openapi.ClusterResponse, hostClass string, masterRole string) (*openapi.ClusterResponseHostsInner, error) {
 	var node *openapi.ClusterResponseHostsInner
 	var err error

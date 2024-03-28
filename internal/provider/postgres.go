@@ -42,8 +42,6 @@ func (m *PostgresSql) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJob
 	for _, ff := range hosts.([]any) {
 		f := ff.(map[string]any)
 
-		var node = openapi.JobsJobJobSpecJobDataNodesInner{}
-
 		hostname := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
 		hostname_data := f[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
 		hostname_internal := f[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
@@ -54,7 +52,9 @@ func (m *PostgresSql) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJob
 		if hostname == "" {
 			return errors.New("Hostname cannot be empty")
 		}
-		node.SetHostname(hostname)
+		var node = openapi.JobsJobJobSpecJobDataNodesInner{
+			Hostname: &hostname,
+		}
 		if hostname_data != "" {
 			node.SetHostnameData(hostname_data)
 		}
@@ -230,6 +230,7 @@ func (c *PostgresSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, 
 		} else if isRemoveNode {
 
 			node.SetHostname(nodeToAddOrRemove.GetHostname())
+			node.SetPort(tmpJobData.GetPort())
 			jobData.SetEnableUninstall(true)
 			jobData.SetUnregisterOnly(false)
 

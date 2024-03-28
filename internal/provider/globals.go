@@ -24,6 +24,13 @@ var (
 	}
 )
 
+var ( // TODO: have to think about this one....
+	gExtClusterTypeToIntClusterTypeMap = map[string]string{
+		CLUSTER_TYPE_REPLICATION: CLUSTER_TYPE_REPLICATION,
+		CLUSTER_TYPE_GALERA:      CLUSTER_TYPE_GALERA,
+	}
+)
+
 var (
 	gDefultDbAdminUser = map[string]string{
 		CLUSTER_TYPE_REPLICATION:    "root",

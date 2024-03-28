@@ -102,6 +102,11 @@ func resourceDbClusterBackup() *schema.Resource {
 				Optional:    true,
 				Description: "Which host to store the backup on. Typically, used with mongodump backup method.",
 			},
+			TF_FIELD_BACKUP_SYSTEM_DB: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Whether to enable backup failover to another host in case the host crashes",
+			},
 		},
 	}
 }

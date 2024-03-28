@@ -2,9 +2,11 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"log/slog"
+	"strconv"
 )
 
 type Elastic struct {
@@ -24,32 +26,57 @@ func (m *Elastic) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 	}
 
 	snapshotLocation := d.Get(TF_FIELD_CLUSTER_SNAPSHOT_LOC).(string)
-	jobData.SetSnapshotLocation(snapshotLocation)
+	if snapshotLocation != "" {
+		jobData.SetSnapshotLocation(snapshotLocation)
+	}
 
 	snapshotRepo := d.Get(TF_FIELD_CLUSTER_SNAPSHOT_REPO).(string)
-	jobData.SetSnapshotRepository(snapshotRepo)
+	if snapshotRepo != "" {
+		jobData.SetSnapshotRepository(snapshotRepo)
+	}
 
-	//snapshotHost := d.Get(TF_FIELD_CLUSTER_SNAPSHOT_HOST).(string)
-	//jobData.SetSn(snapshotHost)
+	snapshotHost := d.Get(TF_FIELD_CLUSTER_SNAPSHOT_HOST).(string)
+	if snapshotHost != "" {
+		jobData.SetSnapshotHost(snapshotHost)
+	}
 
-	iPort := int(jobData.GetPort())
-	clusterType := jobData.GetClusterType()
+	topLevelPort := jobData.GetPort()
+	//clusterType := jobData.GetClusterType()
 	hosts := d.Get(TF_FIELD_CLUSTER_HOST)
 	nodes := []openapi.JobsJobJobSpecJobDataNodesInner{}
 	for _, ff := range hosts.([]any) {
 		f := ff.(map[string]any)
-
-		var node = openapi.JobsJobJobSpecJobDataNodesInner{}
-		var memHost = memberHosts{
-			vanillaNode: &node,
-		}
-		m.Common.getCommonHostAttributes(f, iPort, clusterType, memHost)
+		hostname := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
+		hostname_data := f[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
+		hostname_internal := f[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
+		port := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
 		protocol := f[TF_FIELD_CLUSTER_HOST_PROTO].(string)
 		roles := f[TF_FIELD_CLUSTER_HOST_ROLES].(string)
-		node.SetClassName(CMON_CLASS_NAME_ELASTIC_HOST)
-		node.SetProtocol(protocol)
-		node.SetRoles(roles)
 
+		if hostname == "" {
+			return errors.New("Hostname cannot be empty")
+		}
+		var node = openapi.JobsJobJobSpecJobDataNodesInner{
+			Hostname: &hostname,
+		}
+		node.SetClassName(CMON_CLASS_NAME_ELASTIC_HOST)
+		if hostname_data != "" {
+			node.SetHostnameData(hostname_data)
+		}
+		if hostname_internal != "" {
+			node.SetHostnameInternal(hostname_internal)
+		}
+		if port == "" {
+			node.SetPort(strconv.Itoa(int(topLevelPort)))
+		} else {
+			node.SetPort(strconv.Itoa(int(convertPortToInt(port, topLevelPort))))
+		}
+		if protocol != "" {
+			node.SetProtocol(protocol)
+		}
+		if roles != "" {
+			node.SetRoles(roles)
+		}
 		nodes = append(nodes, node)
 	}
 	jobData.SetNodes(nodes)
@@ -95,6 +122,8 @@ func (c *Elastic) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJ
 	if err = c.Backup.GetBackupInputs(d, jobData); err != nil {
 		return err
 	}
+
+	jobData.SetHostname(STINRG_AUTO)
 
 	return err
 }

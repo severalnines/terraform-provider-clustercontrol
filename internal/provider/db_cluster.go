@@ -138,7 +138,7 @@ func resourceDbCluster() *schema.Resource {
 			},
 			TF_FIELD_CLUSTER_SSH_KEY_FILE: {
 				Type:        schema.TypeString,
-				Optional:    true,
+				Required:    true,
 				Description: "SSH Key file. The path to the private key file for the Sudo user on the ClusterControl host",
 			},
 			TF_FIELD_CLUSTER_SSH_PORT: {
@@ -404,6 +404,16 @@ func resourceDbCluster() *schema.Resource {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "Enable SSL based comms between the cluster nodes and client access to node.",
+			},
+			TF_FIELD_CLUSTER_ENABLE_PGM_AGENT: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Enable percona backup for mongodb.",
+			},
+			TF_FIELD_CLUSTER_PBM_BACKUP_DIR: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Backup dir, nfs mounted directory / path for PBM backup.",
 			},
 		},
 	}

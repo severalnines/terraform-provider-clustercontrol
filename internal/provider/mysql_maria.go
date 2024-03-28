@@ -275,6 +275,7 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 		} else if isRemoveNode {
 
 			node.SetHostname(nodeToAddOrRemove.GetHostname())
+			node.SetPort(tmpJobData.GetPort())
 			jobData.SetEnableUninstall(true)
 			jobData.SetUnregisterOnly(false)
 

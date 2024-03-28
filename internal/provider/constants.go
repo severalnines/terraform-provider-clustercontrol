@@ -1,8 +1,6 @@
 package provider
 
 const (
-	//RESOURCE_DB_CLUSTER       = "cc_db_cluster"
-	//RESOURCE_DB_LOAD_BALANCER = "cc_db_load_balancer"
 	RESOURCE_DB_CLUSTER             = "clustercontrol_db_cluster"
 	RESOURCE_DB_LOAD_BALANCER       = "clustercontrol_db_load_balancer"
 	RESOURCE_DB_CLUSTER_MAINTENANCE = "clustercontrol_db_cluster_maintenance"
@@ -163,6 +161,7 @@ const (
 	CMON_JOB_REGISTER_NODE_COMMAND            = "registernode"
 	CMON_JOB_ADD_SHARD_COMMAND                = "add_shard"
 	CMON_JOB_PROMOTE_REPLICAION_SLAVE_COMMAND = "promote_replication_slave"
+	CMON_JOB_PBM_AGENT_COMMAND                = "pbmagent"
 )
 
 const (
@@ -193,6 +192,7 @@ const (
 const (
 	JOB_ACTION_SETUP_PROXYSQL = "setupProxySql"
 	JOB_ACTION_SETUP_HAPROXY  = "setupHaProxy"
+	JOB_ACTION_SETUP          = "setup"
 )
 
 const (
@@ -269,6 +269,8 @@ const (
 	TF_FIELD_CLUSTER_SSL                 = "db_enable_ssl"
 	TF_FIELD_CLUSTER_MONGO_AUTH_DB       = "db_mongo_auth_db"
 	TF_FIELD_CLUSTER_SENTINEL_PORT       = "db_sentinel_port"
+	TF_FIELD_CLUSTER_ENABLE_PGM_AGENT    = "db_enable_pbm_agent"
+	TF_FIELD_CLUSTER_PBM_BACKUP_DIR      = "db_pbm_backup_dir"
 
 	// Load balancer fields
 	TF_FIELD_LB_CREATE           = "db_lb_create"
@@ -305,6 +307,7 @@ const (
 	TF_FIELD_BACKUP_FAILOVER_HOST     = "db_backup_failover_host"   // MONGODUMP only
 	TF_FIELD_BACKUP_FAILOVER          = "db_enable_backup_failover" // MONGODUMP only
 	TF_FIELD_BACKUP_STORAGE_HOST      = "db_backup_storage_host"
+	TF_FIELD_BACKUP_SYSTEM_DB         = "db_backup_system_db"
 	//TF_FIELD_BACKUP_                  = "db_backup_"
 )
 

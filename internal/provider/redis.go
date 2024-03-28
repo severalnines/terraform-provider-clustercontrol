@@ -75,13 +75,12 @@ func (m *Redis) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpe
 		if datadir != "" {
 			node.SetDatadir(datadir)
 		}
-		nodes = append(nodes, node)
 
 		var node2 = node
 		node2.SetClassName(CMON_CLASS_NAME_REDIS_SENTNEL_HOST)
 		node2.SetPort(sentinelPort)
 
-		nodes = append(nodes, node2)
+		nodes = append(nodes, node, node2)
 	}
 	jobData.SetNodes(nodes)
 
@@ -257,7 +256,7 @@ func (c *Redis) HandleUpdate(ctx context.Context, d *schema.ResourceData, m inte
 			jobData.SetUnregisterOnly(false)
 
 			nodes = append(nodes, node, node2)
-			
+
 			jobData.SetNodes(nodes)
 		}
 

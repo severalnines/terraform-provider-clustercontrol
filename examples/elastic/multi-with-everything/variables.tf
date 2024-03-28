@@ -216,18 +216,6 @@ variable "db_mongo_auth_db" {
   default     = "admin"
 }
 
-variable "db_enable_pbm_agent" {
-  description = "Enable percona backup for mongodb."
-  type        = bool
-  default     = false
-}
-
-variable "db_pbm_backup_dir" {
-  description = "Backup dir, nfs mounted directory / path for PBM backup."
-  type        = string
-  default     = null
-}
-
 # --------------------------
 # Load balancer variables ...
 # --------------------------
@@ -430,6 +418,12 @@ variable "db_backup_retention" {
   description = "DB backup retentions period (days)"
   type        = number
   default     = 7
+}
+
+variable "db_backup_system_db" {
+  description = "Whether to compress backups"
+  type        = bool
+  default     = true
 }
 
 # --------------------------
