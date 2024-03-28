@@ -294,6 +294,10 @@ func (c *Redis) IsValidBackupOptions(vendor string, clusterType string, jobData 
 	return c.Backup.IsValidBackupOptions(vendor, clusterType, jobData)
 }
 
+func (c *Redis) SetBackupJobData(jobData *openapi.JobsJobJobSpecJobData) error {
+	return c.Backup.SetBackupJobData(jobData)
+}
+
 func NewRedis() *Redis {
 	return &Redis{}
 }

@@ -72,3 +72,8 @@ func (c *DbBackupCommon) IsValidBackupOptions(vendor string, clusterType string,
 
 	return nil
 }
+
+func (c *DbBackupCommon) SetBackupJobData(jobData *openapi.JobsJobJobSpecJobData) error {
+	// Nothing to set in common/base
+	return nil
+}

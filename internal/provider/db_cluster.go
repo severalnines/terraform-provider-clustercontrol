@@ -415,6 +415,11 @@ func resourceDbCluster() *schema.Resource {
 				Optional:    true,
 				Description: "Backup dir, nfs mounted directory / path for PBM backup.",
 			},
+			TF_FIELD_CLUSTER_ENABLE_PGBACKREST_AGENT: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Enable PgBackRest for Postgres.",
+			},
 		},
 	}
 }

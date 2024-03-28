@@ -125,6 +125,10 @@ func (c *MsSql) IsValidBackupOptions(vendor string, clusterType string, jobData 
 	return c.Backup.IsValidBackupOptions(vendor, clusterType, jobData)
 }
 
+func (c *MsSql) SetBackupJobData(jobData *openapi.JobsJobJobSpecJobData) error {
+	return c.Backup.SetBackupJobData(jobData)
+}
+
 func NewMsSql() *MsSql {
 	return &MsSql{}
 }

@@ -198,6 +198,19 @@ variable "db_auto_recovery" {
   default     = true
 }
 
+variable "db_enable_ssl" {
+  description = "Enable SSL based comms between the cluster nodes and client access to node."
+  type        = bool
+  default     = true
+}
+
+variable "db_enable_pgbackrest_agent" {
+  description = "Enable PgBackRest for PostgreSQL based clusters."
+  type        = bool
+  default     = false
+}
+
+
 # --------------------------
 # Load balancer variables ...
 # --------------------------

@@ -88,8 +88,9 @@ func (c *PostgresSql) HandleRead(ctx context.Context, d *schema.ResourceData, m 
 }
 
 func (c *PostgresSql) IsUpdateBatchAllowed(d *schema.ResourceData) error {
+	var err error
 
-	if err := c.Common.IsUpdateBatchAllowed(d); err != nil {
+	if err = c.Common.IsUpdateBatchAllowed(d); err != nil {
 		return err
 	}
 
@@ -97,6 +98,13 @@ func (c *PostgresSql) IsUpdateBatchAllowed(d *schema.ResourceData) error {
 	updateClassAprime := d.HasChangeExcept(TF_FIELD_CLUSTER_HOST)
 	if updateClassA && updateClassAprime {
 		return errors.New(fmt.Sprintf("You are not allowed to update %s along with any other fields.", TF_FIELD_CLUSTER_HOST))
+	}
+
+	updateClassA = d.HasChange(TF_FIELD_CLUSTER_ENABLE_PGBACKREST_AGENT)
+	updateClassAprime = d.HasChangeExcept(TF_FIELD_CLUSTER_ENABLE_PGBACKREST_AGENT)
+	if updateClassA && updateClassAprime {
+		err = errors.New(fmt.Sprintf("You are not allowed to update %s along with any other fields.", TF_FIELD_CLUSTER_ENABLE_PGM_AGENT))
+		return err
 	}
 
 	return nil
@@ -248,8 +256,39 @@ func (c *PostgresSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, 
 			slog.Error(err.Error())
 			return err
 		}
+	} // d.HasChange(TF_FIELD_CLUSTER_HOST)
 
-	}
+	if d.HasChange(TF_FIELD_CLUSTER_ENABLE_PGBACKREST_AGENT) {
+		enablePgB := d.Get(TF_FIELD_CLUSTER_ENABLE_PGBACKREST_AGENT).(bool)
+		if !enablePgB {
+			// Don't support disabling pgbackrest at this time
+			return errors.New("Disabling PgBackRest is not currently supported")
+		}
+		apiClient := m.(*openapi.APIClient)
+
+		enablePbmJob := NewCCJob(CMON_JOB_CREATE_JOB)
+		job := enablePbmJob.GetJob()
+		jobSpec := job.GetJobSpec()
+		jobData := jobSpec.GetJobData()
+		enablePbmJob.SetClusterId(clusterInfo.GetClusterId())
+		jobSpec.SetCommand(CMON_JOB_PGBACKREST_COMMAND)
+		jobData.SetAction(JOB_ACTION_SETUP)
+
+		var nodes = []openapi.JobsJobJobSpecJobDataNodesInner{}
+		var node = openapi.JobsJobJobSpecJobDataNodesInner{}
+		node.SetClassName(CMON_CLASS_NAME_PGBACKREST_HOST)
+		node.SetHostname("*")
+		nodes = append(nodes, node)
+		jobData.SetNodes(nodes)
+
+		jobSpec.SetJobData(jobData)
+		job.SetJobSpec(jobSpec)
+		enablePbmJob.SetJob(job)
+
+		if err = SendAndWaitForJobCompletion(ctx, apiClient, enablePbmJob); err != nil {
+			slog.Error(err.Error())
+		}
+	} // d.HasChange(TF_FIELD_CLUSTER_ENABLE_PGBACKREST_AGENT)
 
 	return nil
 }
@@ -270,6 +309,23 @@ func (c *PostgresSql) GetBackupInputs(d *schema.ResourceData, jobData *openapi.J
 
 func (c *PostgresSql) IsValidBackupOptions(vendor string, clusterType string, jobData *openapi.JobsJobJobSpecJobData) error {
 	return c.Backup.IsValidBackupOptions(vendor, clusterType, jobData)
+}
+
+func (c *PostgresSql) SetBackupJobData(jobData *openapi.JobsJobJobSpecJobData) error {
+	var err error
+	if err = c.Backup.SetBackupJobData(jobData); err != nil {
+		return err
+	}
+
+	// Need to set port if backup-method is pgbackrest
+	backupMethod := jobData.GetBackupMethod()
+	if strings.Contains(backupMethod, "pgbackrest") {
+		// unfortunately had to had code it here due to inability to unmarshall getcluster
+		// result into data structures. Why? Because the `port` field data type is inconsistent
+		// in the returned response from CMON. Sometime int, other times string !!!
+		jobData.SetPort(5432)
+	}
+	return nil
 }
 
 func NewPostgres() *PostgresSql {

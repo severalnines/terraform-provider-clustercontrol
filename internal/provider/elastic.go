@@ -132,6 +132,10 @@ func (c *Elastic) IsValidBackupOptions(vendor string, clusterType string, jobDat
 	return c.Backup.IsValidBackupOptions(vendor, clusterType, jobData)
 }
 
+func (c *Elastic) SetBackupJobData(jobData *openapi.JobsJobJobSpecJobData) error {
+	return c.Backup.SetBackupJobData(jobData)
+}
+
 func NewElastic() *Elastic {
 	return &Elastic{}
 }

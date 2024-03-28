@@ -347,6 +347,10 @@ func (c *MySQLMaria) IsValidBackupOptions(vendor string, clusterType string, job
 	return c.Backup.IsValidBackupOptions(vendor, clusterType, jobData)
 }
 
+func (c *MySQLMaria) SetBackupJobData(jobData *openapi.JobsJobJobSpecJobData) error {
+	return c.Backup.SetBackupJobData(jobData)
+}
+
 func NewMySQLMaria() *MySQLMaria {
 	return &MySQLMaria{}
 }

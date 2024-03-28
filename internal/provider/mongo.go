@@ -236,15 +236,15 @@ func (c *MongoDb) IsUpdateBatchAllowed(d *schema.ResourceData) error {
 		return err
 	}
 
-	updateClassA := d.HasChange(TF_FIELD_CLUSTER_HOST)
-	updateClassAprime := d.HasChangeExcept(TF_FIELD_CLUSTER_HOST)
-	if updateClassA && updateClassAprime {
-		err = errors.New(fmt.Sprintf("You are not allowed to update %s along with any other fields.", TF_FIELD_CLUSTER_HOST))
-		return err
-	}
+	//updateClassA := d.HasChange(TF_FIELD_CLUSTER_HOST)
+	//updateClassAprime := d.HasChangeExcept(TF_FIELD_CLUSTER_HOST)
+	//if updateClassA && updateClassAprime {
+	//	err = errors.New(fmt.Sprintf("You are not allowed to update %s along with any other fields.", TF_FIELD_CLUSTER_HOST))
+	//	return err
+	//}
 
-	updateClassA = d.HasChange(TF_FIELD_CLUSTER_ENABLE_PGM_AGENT)
-	updateClassAprime = d.HasChangeExcept(TF_FIELD_CLUSTER_ENABLE_PGM_AGENT)
+	updateClassA := d.HasChange(TF_FIELD_CLUSTER_ENABLE_PGM_AGENT)
+	updateClassAprime := d.HasChangeExcept(TF_FIELD_CLUSTER_ENABLE_PGM_AGENT)
 	if updateClassA && updateClassAprime {
 		err = errors.New(fmt.Sprintf("You are not allowed to update %s along with any other fields.", TF_FIELD_CLUSTER_ENABLE_PGM_AGENT))
 		return err
@@ -355,6 +355,10 @@ func (m *MongoDb) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJ
 
 func (c *MongoDb) IsValidBackupOptions(vendor string, clusterType string, jobData *openapi.JobsJobJobSpecJobData) error {
 	return c.Backup.IsValidBackupOptions(vendor, clusterType, jobData)
+}
+
+func (c *MongoDb) SetBackupJobData(jobData *openapi.JobsJobJobSpecJobData) error {
+	return c.Backup.SetBackupJobData(jobData)
 }
 
 func NewMongo() *MongoDb {

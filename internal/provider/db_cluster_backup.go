@@ -14,6 +14,7 @@ import (
 type DbClusterBackupInterface interface {
 	GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error
 	IsValidBackupOptions(vendor string, clusterType string, jobData *openapi.JobsJobJobSpecJobData) error
+	SetBackupJobData(jobData *openapi.JobsJobJobSpecJobData) error
 }
 
 func resourceDbClusterBackup() *schema.Resource {
@@ -141,6 +142,7 @@ func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 		return diags
 	}
 	createBackup.SetClusterId(clusterInfo.GetClusterId())
+	// clusterInfo.GetPort() // No port field due to json unmarshall issues - many types for port !!
 
 	clusterType := clusterInfo.GetClusterType()
 	vendor := clusterInfo.GetVendor()
@@ -189,6 +191,8 @@ func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 		})
 		return diags
 	}
+
+	_ = backupHandler.SetBackupJobData(&jobData)
 
 	jobSpec.SetJobData(jobData)
 	job.SetJobSpec(jobSpec)
