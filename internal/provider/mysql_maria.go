@@ -133,6 +133,13 @@ func (c *MySQLMaria) IsUpdateBatchAllowed(d *schema.ResourceData) error {
 		return err
 	}
 
+	updateClassA = d.HasChange(TF_FIELD_CLUSTER_LOAD_BALANCER)
+	updateClassAprime = d.HasChangeExcept(TF_FIELD_CLUSTER_LOAD_BALANCER)
+	if updateClassA && updateClassAprime {
+		err = errors.New(fmt.Sprintf("You are not allowed to update %s along with any other fields.", TF_FIELD_CLUSTER_HOST))
+		return err
+	}
+
 	return nil
 }
 
@@ -147,25 +154,25 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 		return err
 	}
 
-	// handle other big updates such as add-replication-slave, remove-node, etc
-	tmpJobData := openapi.NewJobsJobJobSpecJobData()
-	if err = c.GetInputs(d, tmpJobData); err != nil {
-		return err
-	}
-
 	clusterType := clusterInfo.GetClusterType()
 	clusterType = strings.ToLower(clusterType)
 
-	isReplicationType := true
-	hostClassName := CMON_CLASS_NAME_MYSQL_HOST
-	command := CMON_JOB_ADD_REPLICATION_SLAVE_COMMAND
-	if clusterType == CLUSTER_TYPE_GALERA {
-		isReplicationType = false
-		hostClassName = CMON_CLASS_NAME_GALERA_HOST
-		command = CMON_JOB_ADD_NODE_COMMAND
-	}
-
 	if d.HasChange(TF_FIELD_CLUSTER_HOST) {
+		// handle other big updates such as add-replication-slave, remove-node, etc
+		tmpJobData := openapi.NewJobsJobJobSpecJobData()
+		if err = c.GetInputs(d, tmpJobData); err != nil {
+			return err
+		}
+
+		isReplicationType := true
+		hostClassName := CMON_CLASS_NAME_MYSQL_HOST
+		command := CMON_JOB_ADD_REPLICATION_SLAVE_COMMAND
+		if clusterType == CLUSTER_TYPE_GALERA {
+			isReplicationType = false
+			hostClassName = CMON_CLASS_NAME_GALERA_HOST
+			command = CMON_JOB_ADD_NODE_COMMAND
+		}
+
 		var nodesToAdd []openapi.JobsJobJobSpecJobDataNodesInner
 		var nodesToRemove []openapi.JobsJobJobSpecJobDataNodesInner
 
@@ -295,11 +302,87 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 			return err
 		}
 
-	}
+	} // d.HasChange(TF_FIELD_CLUSTER_HOST)
+
+	if d.HasChange(TF_FIELD_CLUSTER_LOAD_BALANCER) {
+		apiClient := m.(*openapi.APIClient)
+		addOrRemoveNodeJob := NewCCJob(CMON_JOB_CREATE_JOB)
+		addOrRemoveNodeJob.SetClusterId(clusterInfo.GetClusterId())
+		job := addOrRemoveNodeJob.GetJob()
+		jobSpec := job.GetJobSpec()
+		jobData := jobSpec.GetJobData()
+
+		var nodesToAdd []openapi.JobsJobJobSpecJobDataNodesInner
+		var nodesToRemove []openapi.JobsJobJobSpecJobDataNodesInner
+
+		// Compare Terraform and CMON to determine whether adding node, remove node or promoting standby/slave
+		if nodesToAdd, nodesToRemove, err = c.Common.determineProxyDelta(d, clusterInfo, CMON_CLASS_NAME_PROXYSQL_HOST); err != nil {
+			return err
+		}
+
+		isAddNode := len(nodesToAdd) > 0
+		isRemoveNode := len(nodesToRemove) > 0
+
+		if isAddNode && len(nodesToAdd) > 1 {
+			return errors.New("Can't add more than one node at a time")
+		}
+
+		if isRemoveNode && len(nodesToRemove) > 1 {
+			return errors.New("Can't remove more than one node at a time")
+		}
+
+		var nodeToAddOrRemove *openapi.JobsJobJobSpecJobDataNodesInner
+		if isAddNode {
+			nodeToAddOrRemove = &nodesToAdd[0]
+			jobSpec.SetCommand(CMON_JOB_CREATE_PROXYSQL_COMMAND)
+
+			loadBalancers := d.Get(TF_FIELD_CLUSTER_LOAD_BALANCER)
+			var theTfRecord = map[string]any{}
+			isFound := false
+			for _, ff := range loadBalancers.([]any) {
+				if isFound {
+					break
+				}
+				f := ff.(map[string]any)
+				myhost := f[TF_FIELD_LB_MY_HOST]
+				for _, tt := range myhost.([]any) {
+					if isFound {
+						break
+					}
+					t := tt.(map[string]any)
+					hostname := t[TF_FIELD_CLUSTER_HOSTNAME].(string)
+					if strings.EqualFold(hostname, nodeToAddOrRemove.GetHostname()) {
+						// found it
+						theTfRecord = f
+						isFound = true
+					}
+				}
+			}
+			var getInputs DbLoadBalancerInterface
+			getInputs = NewProxySql()
+			err = getInputs.GetInputs(theTfRecord, &jobData)
+
+		} else if isRemoveNode {
+			nodeToAddOrRemove = &nodesToRemove[0]
+			jobSpec.SetCommand(CMON_JOB_REMOVE_NODE_COMMAND)
+		} else {
+			return nil
+		}
+
+		jobSpec.SetJobData(jobData)
+		job.SetJobSpec(jobSpec)
+		addOrRemoveNodeJob.SetJob(job)
+
+		if err = SendAndWaitForJobCompletion(ctx, apiClient, addOrRemoveNodeJob); err != nil {
+			slog.Error(err.Error())
+		}
+
+	} // d.HasChange(TF_FIELD_CLUSTER_LOAD_BALANCER)
 
 	// ************************
 	// NOTE: don't remove this block of code
 	// ************************
+
 	//if d.HasChange(TF_FIELD_CLUSTER_TOPOLOGY) {
 	//	// Could be one of a few scenarios...
 	//

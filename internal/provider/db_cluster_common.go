@@ -353,3 +353,79 @@ func (c *DbCommon) determineNodesDelta(d *schema.ResourceData, clusterInfo *open
 
 	return nodesToAdd, nodesToRemove, nil
 }
+
+func (c *DbCommon) determineProxyDelta(d *schema.ResourceData, clusterInfo *openapi.ClusterResponse, hostClass string) ([]openapi.JobsJobJobSpecJobDataNodesInner, []openapi.JobsJobJobSpecJobDataNodesInner, error) {
+	funcName := "determineProxyDelta::determineNodesDelta"
+	slog.Info(funcName)
+
+	var nodesToAdd []openapi.JobsJobJobSpecJobDataNodesInner
+	var nodesToRemove []openapi.JobsJobJobSpecJobDataNodesInner
+	hosts := d.Get(TF_FIELD_CLUSTER_LOAD_BALANCER)
+	nodes := []openapi.JobsJobJobSpecJobDataNodesInner{}
+	for _, ff := range hosts.([]any) {
+		f := ff.(map[string]any)
+		// Capturing hostname only as this is only used for comparison purposes.
+		myHost := f[TF_FIELD_LB_MY_HOST]
+		for _, tt := range myHost.([]any) {
+			t := tt.(map[string]any)
+			hostname := t[TF_FIELD_CLUSTER_HOSTNAME].(string)
+			if hostname == "" {
+				return nil, nil, errors.New("Hostname cannot be empty")
+			}
+			var node = openapi.JobsJobJobSpecJobDataNodesInner{
+				Hostname: &hostname,
+			}
+			nodes = append(nodes, node)
+		}
+	}
+
+	// Locate the node that is in TF but not in CMON; That node needs to be added
+	for i := 0; i < len(nodes); i++ {
+		node := nodes[i]
+		isFound := false
+		hs := clusterInfo.GetHosts()
+		for j := 0; j < len(hs); j++ {
+			if !strings.EqualFold(hs[j].GetClassName(), hostClass) {
+				continue
+			}
+			if strings.EqualFold(node.GetHostname(), hs[j].GetHostname()) {
+				slog.Info(funcName, "Found node from TF in CMON", node.GetHostname())
+				isFound = true
+				break
+			}
+		}
+		if !isFound {
+			slog.Info(funcName, "Node not in CMON. Adding to CMON add-node list", node.GetHostname())
+			// Need to add this node to the cluster
+			nodesToAdd = append(nodesToAdd, node)
+		}
+	}
+
+	// Locate the node that is in CMON but not in TF; That node needs to be removed
+	h := clusterInfo.GetHosts()
+	for i := 0; i < len(h); i++ {
+		host := h[i]
+		if !strings.EqualFold(host.GetClassName(), hostClass) {
+			continue
+		}
+		isFound := false
+		for j := 0; j < len(nodes); j++ {
+			if strings.EqualFold(nodes[j].GetHostname(), host.GetHostname()) {
+				slog.Info(funcName, "Found node from CMON in TF", host.GetHostname())
+				isFound = true
+				break
+			}
+		}
+		if !isFound {
+			slog.Info(funcName, "Node not in TF. Adding to CMON remove-node list", host.GetHostname())
+			// Need to remove this node from the cluster
+			var n = openapi.JobsJobJobSpecJobDataNodesInner{}
+			n.SetHostname(host.GetHostname())
+			n.SetHostnameInternal(host.GetHostnameInternal())
+			n.SetHostnameData(host.GetHostnameData())
+			nodesToRemove = append(nodesToRemove, n)
+		}
+	}
+
+	return nodesToAdd, nodesToRemove, nil
+}

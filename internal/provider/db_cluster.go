@@ -167,6 +167,9 @@ func resourceDbCluster() *schema.Resource {
 				Optional:    true,
 				Description: "The mongodb database to use for authentication purposes",
 			},
+			// ****************************
+			// Database host attributes
+			// ****************************
 			TF_FIELD_CLUSTER_HOST: {
 				Type:        schema.TypeList,
 				Optional:    true,
@@ -366,6 +369,9 @@ func resourceDbCluster() *schema.Resource {
 					},
 				},
 			},
+			// ****************************
+			// MySQL Master/Slave topology speification attributes
+			// ****************************
 			TF_FIELD_CLUSTER_TOPOLOGY: {
 				Type:        schema.TypeList,
 				Optional:    true,
@@ -420,6 +426,144 @@ func resourceDbCluster() *schema.Resource {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "Enable PgBackRest for Postgres.",
+			},
+			// ****************************
+			// Database load balancer attributes
+			// ****************************
+			TF_FIELD_CLUSTER_LOAD_BALANCER: {
+				Type:        schema.TypeList,
+				Optional:    true,
+				Description: "The list of nodes/hosts that make up the cluster",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						TF_FIELD_LB_TYPE: {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The load balancer type (e.g., proxysql, haproxy, etc)",
+						},
+						TF_FIELD_LB_VERSION: {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Software version",
+						},
+						TF_FIELD_LB_ADMIN_USER: {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The load balancer admin user",
+						},
+						TF_FIELD_LB_ADMIN_USER_PW: {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The load balancer admin user's password",
+							Sensitive:   true,
+						},
+						TF_FIELD_LB_MONITOR_USER: {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The load balancer monitor user (only applicable to proxysql)",
+						},
+						TF_FIELD_LB_MONITOR_USER_PW: {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The load balancer monitor user's password",
+							Sensitive:   true,
+						},
+						TF_FIELD_LB_PORT: {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The load balancer port that it will accept connections on behalf of the database it is front-ending.",
+						},
+						TF_FIELD_LB_USE_CLUSTERING: {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "Whether to use ProxySQL clustering or not. Only applicable to ProxySQL at this time",
+						},
+						TF_FIELD_LB_USE_RW_SPLITTING: {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "Whether to Read/Write splitting for queries or not?",
+						},
+						TF_FIELD_CLUSTER_DISABLE_FW: {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "Disable firewall on the host OS when installing DB packages.",
+						},
+						TF_FIELD_CLUSTER_DISABLE_SELINUX: {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "Disable SELinux on the host OS when installing DB packages.",
+						},
+						TF_FIELD_LB_INSTALL_SW: {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "Install DB packages from respective repos",
+						},
+						TF_FIELD_LB_ENABLE_UNINSTALL: {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "When removing DB cluster from ClusterControl, enable uinstalling DB packages.",
+						},
+						TF_FIELD_CLUSTER_SSH_USER: {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The SSH user ClusterControl will use to SSH to the DB host from the ClusterControl host",
+						},
+						TF_FIELD_CLUSTER_SSH_PW: {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "Sudo user's password. If sudo user doesn't have a password, leave this field blank",
+							Sensitive:   true,
+						},
+						TF_FIELD_CLUSTER_SSH_KEY_FILE: {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "SSH Key file. The path to the private key file for the Sudo user on the ClusterControl host.",
+						},
+						TF_FIELD_CLUSTER_SSH_PORT: {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The ssh port.",
+						},
+						//TF_FIELD_CLUSTER_HOST: {
+						//	Type:        schema.TypeList,
+						//	Optional:    true,
+						//	Description: "The Database hosts that make up the cluster.",
+						//	Elem: &schema.Resource{
+						//		Schema: map[string]*schema.Schema{
+						//			TF_FIELD_CLUSTER_HOSTNAME: {
+						//				Type:        schema.TypeString,
+						//				Required:    true,
+						//				Description: "Hostname/IP of the DB host behind this load balancer. Can be IP address as well.",
+						//			},
+						//			TF_FIELD_CLUSTER_HOST_PORT: {
+						//				Type:        schema.TypeString,
+						//				Optional:    true,
+						//				Description: "The port the DB host behind this load balancer.",
+						//			},
+						//		},
+						//	},
+						//},
+						TF_FIELD_LB_MY_HOST: {
+							Type:        schema.TypeList,
+							Optional:    true,
+							Description: "The load balancer host in question (i.e, self)",
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									TF_FIELD_CLUSTER_HOSTNAME: {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "Hostname/IP of this load balancer. Can be IP address as well.",
+									},
+									TF_FIELD_CLUSTER_HOST_PORT: {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "The port of this load balancer.",
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 		},
 	}
@@ -544,6 +688,56 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	d.Set(TF_FIELD_CLUSTER_ID, id)
 	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC822))
 	//d.SetId(clusterName)
+
+	// *************************
+	// Create the load balancer
+	// *************************
+
+	loadBalancers := d.Get(TF_FIELD_CLUSTER_LOAD_BALANCER)
+	for _, ff := range loadBalancers.([]any) {
+		f := ff.(map[string]any)
+
+		createLb := NewCCJob(CMON_JOB_CREATE_JOB)
+		lbJob := createLb.GetJob()
+		lbJobSpec := lbJob.GetJobSpec()
+		lbJobData := lbJobSpec.GetJobData()
+		createLb.SetClusterId(clusterId)
+
+		lbType := f[TF_FIELD_LB_TYPE].(string)
+		var getLbInputs DbLoadBalancerInterface
+		switch lbType {
+		case LOAD_BLANCER_TYPE_PROXYSQL:
+			jobSpec.SetCommand(CMON_JOB_CREATE_PROXYSQL_COMMAND)
+			getLbInputs = NewProxySql()
+		case LOAD_BLANCER_TYPE_HAPROXY:
+			jobSpec.SetCommand(CMON_JOB_CREATE_HAPROXY_COMMAND)
+			getLbInputs = NewHAProxy()
+		default:
+			str := fmt.Sprintf("%s - Unknown load balancer type: %s", funcName, lbType)
+			slog.Warn(str)
+			// Just because LB creation failed, we will not fail a successful DB cluster deployment !!!
+			return diags
+		}
+
+		if getInputs != nil {
+			if err = getLbInputs.GetInputs(f, &lbJobData); err != nil {
+				slog.Error(err.Error())
+				// Just because LB creation failed, we will not fail a successful DB cluster deployment !!!
+				return diags
+			}
+		}
+
+		lbJobSpec.SetJobData(lbJobData)
+		lbJob.SetJobSpec(lbJobSpec)
+		createLb.SetJob(lbJob)
+
+		if err = SendAndWaitForJobCompletion(newCtx, apiClient, createLb); err != nil {
+			slog.Error(err.Error())
+			// Just because LB creation failed, we will not fail a successful DB cluster deployment !!!
+			return diags
+		}
+
+	} // For each Load balancer
 
 	return diags
 }

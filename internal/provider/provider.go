@@ -41,7 +41,6 @@ func Provider() *schema.Provider {
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			RESOURCE_DB_CLUSTER:                 resourceDbCluster(),
-			RESOURCE_DB_LOAD_BALANCER:           resourceDbLoadBalancer(),
 			RESOURCE_DB_CLUSTER_MAINTENANCE:     resourceDbClusterMaintenance(),
 			RESOURCE_DB_CLUSTER_BACKUP:          resourceDbClusterBackup(),
 			RESOURCE_DB_CLUSTER_BACKUP_SCHEDULE: resourceDbClusterBackupSchedule(),

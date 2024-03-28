@@ -192,6 +192,28 @@ variable "db_auto_recovery" {
   default     = true
 }
 
+variable "db_load_balancer" {
+  description = "The list of nodes/hosts that make up the cluster"
+  type = list(object({
+    db_lb_type          = string
+    db_lb_version     = string
+    db_lb_admin_username = string
+    db_lb_admin_user_password              = string
+    db_lb_port          = string
+    disable_firewall  = bool
+    disable_selinux  = bool
+    db_lb_install_software  = bool
+    db_lb_enable_uninstall  = bool
+    db_lb_use_clustering  = bool
+    db_lb_use_rw_splitting  = bool
+    ssh_user          = string
+    ssh_user_password          = string
+    ssh_key_file          = string
+    ssh_port          = string
+  }))
+  default = null
+}
+
 # --------------------------
 # Load balancer variables ...
 # --------------------------

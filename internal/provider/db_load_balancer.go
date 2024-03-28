@@ -11,7 +11,8 @@ import (
 )
 
 type DbLoadBalancerInterface interface {
-	GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error
+	//GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error
+	GetInputs(d map[string]any, jobData *openapi.JobsJobJobSpecJobData) error
 }
 
 func resourceDbLoadBalancer() *schema.Resource {
@@ -247,14 +248,14 @@ func resourceCreateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 	}
 
 	if getInputs != nil {
-		if err = getInputs.GetInputs(d, &jobData); err != nil {
-			slog.Error(err.Error())
-			diags = append(diags, diag.Diagnostic{
-				Severity: diag.Error,
-				Summary:  "Error getting inputs for LoadBalancerCreate",
-			})
-			return diags
-		}
+		//if err = getInputs.GetInputs(d, &jobData); err != nil {
+		//	slog.Error(err.Error())
+		//	diags = append(diags, diag.Diagnostic{
+		//		Severity: diag.Error,
+		//		Summary:  "Error getting inputs for LoadBalancerCreate",
+		//	})
+		//	return diags
+		//}
 	}
 
 	jobSpec.SetJobData(jobData)

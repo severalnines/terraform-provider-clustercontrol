@@ -51,6 +51,32 @@ resource "clustercontrol_db_cluster" "this" {
   #   # datadir = "foo"
   # }
 
+  db_load_balancer {
+    db_lb_type                  = "proxysql"
+    db_lb_version               = var.db_lb_version
+    db_lb_admin_username        = var.db_lb_admin_username
+    db_lb_admin_user_password   = "blah%blah"
+    db_lb_monitor_username      = var.db_lb_monitor_username
+    db_lb_monitor_user_password = "blah%blah"
+    db_lb_port                  = var.db_lb_port
+    db_lb_use_clustering        = var.db_lb_use_clustering
+    db_lb_use_rw_splitting      = var.db_lb_use_rw_splitting
+    db_lb_install_software      = var.db_lb_install_software
+    db_lb_enable_uninstall      = var.db_lb_enable_uninstall
+    disable_firewall            = var.disable_firewall
+    disable_selinux             = var.disable_selinux
+    ssh_user                    = var.ssh_user
+    ssh_user_password           = var.ssh_user_password
+    ssh_key_file                = var.ssh_key_file
+    ssh_port                    = var.ssh_port
+
+      db_my_host {
+        hostname = "test-primary-5"
+        # port     = "3306"
+      }
+
+  }
+
 }
 
 # resource "clustercontrol_db_cluster_backup_schedule" "full-1" {

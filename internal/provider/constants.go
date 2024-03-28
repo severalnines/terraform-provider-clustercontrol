@@ -302,6 +302,7 @@ const (
 	TF_FIELD_CLUSTER_ENABLE_PGM_AGENT        = "db_enable_pbm_agent"
 	TF_FIELD_CLUSTER_PBM_BACKUP_DIR          = "db_pbm_backup_dir"
 	TF_FIELD_CLUSTER_ENABLE_PGBACKREST_AGENT = "db_enable_pgbackrest_agent"
+	TF_FIELD_CLUSTER_LOAD_BALANCER           = "db_load_balancer"
 
 	// Load balancer fields
 	TF_FIELD_LB_CREATE           = "db_lb_create"
