@@ -39,6 +39,32 @@ const (
 )
 
 const (
+	EXT_CLUSTER_TYPE_PG_REPLICAION      = "pg-replication"
+	EXT_CLUSTER_TYPE_MYSQL_REPLICATIOIN = "mysql-replication"
+	EXT_CLUSTER_TYPE_GALERA             = "galera"
+	EXT_CLUSTER_TYPE_MONGODB            = "mongo"
+	EXT_CLUSTER_TYPE_REDIS_SENTINEL     = "redis-sentinel"
+	EXT_CLUSTER_TYPE_REDIS_CLUSTER      = "redis-cluster"
+	EXT_CLUSTER_TYPE_ELASTICSEARH       = "elasticsearch"
+	EXT_CLUSTER_TYPE_MSSQL_ASYN         = "mssql-async"
+	//EXT_CLUSTER_TYPE_ = ""
+)
+
+const (
+	EXT_VENDOR_PERCONA    = "percona"
+	EXT_VENDOR_ORACLE     = "oracle"
+	EXT_VENDOR_MARIADB    = "mariadb"
+	EXT_VENDOR_MONGO      = "mongodb-community"
+	EXT_VENDOR_MICROSOFT  = "microsoft"
+	EXT_VENDOR_ELASTIC    = "elastic"
+	EXT_VENDOR_REDIS      = "redis"
+	EXT_VENDOR_POSTGRESQL = "postgresql"
+	EXT_VENDOR_MONGO_ENT  = "mongodb-X"
+
+	//EXT_VENDOR_ = ""
+)
+
+const (
 	DEFAULT_MYSQL_PORT                  = "3306"
 	DEFAULT_POSTGRES_PORT               = "5432"
 	DEFAULT_MONGO_PORT                  = "27017"

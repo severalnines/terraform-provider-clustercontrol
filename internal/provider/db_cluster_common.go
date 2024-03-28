@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"io"
@@ -24,10 +25,18 @@ func (c *DbCommon) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJob
 	clusterName := d.Get(TF_FIELD_CLUSTER_NAME).(string)
 	jobData.SetClusterName(clusterName)
 
-	clusterType := d.Get(TF_FIELD_CLUSTER_TYPE).(string)
+	extClusterType := d.Get(TF_FIELD_CLUSTER_TYPE).(string)
+	clusterType, ok := gExtClusterTypeToIntClusterTypeMap[extClusterType]
+	if !ok {
+		return errors.New(fmt.Sprintf("Unsupported cluster-type: %s", extClusterType))
+	}
 	jobData.SetClusterType(clusterType)
 
-	dbVendor := d.Get(TF_FIELD_CLUSTER_VENDOR).(string)
+	extVendor := d.Get(TF_FIELD_CLUSTER_VENDOR).(string)
+	dbVendor, ok := gExtVendorIntVendorMap[extVendor]
+	if !ok {
+		return errors.New(fmt.Sprintf("Unsupported vendor: %s", extVendor))
+	}
 	jobData.SetVendor(dbVendor)
 
 	dbVersion := d.Get(TF_FIELD_CLUSTER_VERSION).(string)

@@ -31,6 +31,7 @@ func (m *MsSql) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpe
 
 	hosts := d.Get(TF_FIELD_CLUSTER_HOST)
 	nodes := []openapi.JobsJobJobSpecJobDataNodesInner{}
+	numHosts := 0
 	for _, ff := range hosts.([]any) {
 		f := ff.(map[string]any)
 		hostname := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
@@ -68,7 +69,15 @@ func (m *MsSql) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpe
 		node.SetConfigfile(configFile)
 
 		nodes = append(nodes, node)
+
+		numHosts++
 	}
+
+	// For MSSQL, two internal cluster-types map to one external cluster-type. Fix it
+	if numHosts > 1 {
+		jobData.SetClusterType(CLUSTER_TYPE_MSSQL_AO_ASYNC)
+	}
+
 	jobData.SetNodes(nodes)
 
 	return nil
