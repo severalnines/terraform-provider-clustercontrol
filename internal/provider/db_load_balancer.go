@@ -11,10 +11,12 @@ import (
 )
 
 type DbLoadBalancerInterface interface {
-	//GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error
 	GetInputs(d map[string]any, jobData *openapi.JobsJobJobSpecJobData) error
 }
 
+// ********************************************
+// NOTE: the rest of the code is no longer used !!!
+// ********************************************
 func resourceDbLoadBalancer() *schema.Resource {
 	funcName := "resourceDbLoadBalancer"
 	slog.Debug(funcName)
@@ -281,7 +283,7 @@ func resourceCreateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 }
 
 func resourceReadDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	funcName := "resourceReadDbCluster"
+	funcName := "resourceReadDbLoadBalancer"
 	slog.Debug(funcName)
 
 	// Warning or errors can be collected in a slice type
@@ -299,7 +301,7 @@ func resourceReadDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m i
 }
 
 func resourceUpdateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	funcName := "resourceReadDbCluster"
+	funcName := "resourceUpdateDbLoadBalancer"
 	slog.Debug(funcName)
 
 	// Warning or errors can be collected in a slice type
@@ -316,7 +318,7 @@ func resourceUpdateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 }
 
 func resourceDeleteDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	funcName := "resourceDeleteDbCluster"
+	funcName := "resourceDeleteDbLoadBalancer"
 	slog.Debug(funcName)
 
 	// Warning or errors can be collected in a slice type

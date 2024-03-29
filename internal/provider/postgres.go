@@ -135,7 +135,8 @@ func (c *PostgresSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, 
 		command := CMON_JOB_ADD_REPLICATION_SLAVE_COMMAND
 
 		// Compare Terraform and CMON to determine whether adding node, remove node or promoting standby/slave
-		if nodesToAdd, nodesToRemove, err = c.Common.determineNodesDelta(d, clusterInfo, hostClassName); err != nil {
+		nodes, _ := c.Common.getHosts(d)
+		if nodesToAdd, nodesToRemove, err = c.Common.determineNodesDelta(nodes, clusterInfo, hostClassName); err != nil {
 			return err
 		}
 
@@ -209,12 +210,12 @@ func (c *PostgresSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, 
 			node.SetHostname(nodeFromTf.GetHostname())
 
 			// NOTE: host is guaranteed to be non-nil.
-			h := c.Common.findHost(nodeFromTf.GetHostname(), d.Get(TF_FIELD_CLUSTER_HOST))
-			hostname_data := h[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
-			hostname_internal := h[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
-			port := h[TF_FIELD_CLUSTER_HOST_PORT].(string)
-			datadir := h[TF_FIELD_CLUSTER_HOST_DD].(string)
-			syncReplication := h[TF_FIELD_CLUSTER_SYNC_REP].(bool)
+			hostTfRec := c.Common.findHostEntry(nodeFromTf.GetHostname(), d.Get(TF_FIELD_CLUSTER_HOST))
+			hostname_data := hostTfRec[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
+			hostname_internal := hostTfRec[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
+			port := hostTfRec[TF_FIELD_CLUSTER_HOST_PORT].(string)
+			datadir := hostTfRec[TF_FIELD_CLUSTER_HOST_DD].(string)
+			syncReplication := hostTfRec[TF_FIELD_CLUSTER_SYNC_REP].(bool)
 
 			if hostname_data != "" {
 				node.SetHostnameData(hostname_data)

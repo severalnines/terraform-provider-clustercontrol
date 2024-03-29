@@ -12,8 +12,9 @@ import (
 )
 
 type MySQLMaria struct {
-	Common DbCommon
-	Backup DbBackupCommon
+	Common       DbCommon
+	Backup       DbBackupCommon
+	LoadBalancer LBCommon
 }
 
 func (m *MySQLMaria) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
@@ -177,7 +178,8 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 		var nodesToRemove []openapi.JobsJobJobSpecJobDataNodesInner
 
 		// Compare Terraform and CMON to determine whether adding node, remove node or promoting standby/slave
-		if nodesToAdd, nodesToRemove, err = c.Common.determineNodesDelta(d, clusterInfo, hostClassName); err != nil {
+		nodes, _ := c.Common.getHosts(d)
+		if nodesToAdd, nodesToRemove, err = c.Common.determineNodesDelta(nodes, clusterInfo, hostClassName); err != nil {
 			return err
 		}
 
@@ -257,11 +259,11 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 			node.SetHostname(nodeFromTf.GetHostname())
 
 			// NOTE: host is guaranteed to be non-nil.
-			h := c.Common.findHost(nodeFromTf.GetHostname(), d.Get(TF_FIELD_CLUSTER_HOST))
-			hostname_data := h[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
-			hostname_internal := h[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
-			port := h[TF_FIELD_CLUSTER_HOST_PORT].(string)
-			datadir := h[TF_FIELD_CLUSTER_HOST_DD].(string)
+			hostTfRec := c.Common.findHostEntry(nodeFromTf.GetHostname(), d.Get(TF_FIELD_CLUSTER_HOST))
+			hostname_data := hostTfRec[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
+			hostname_internal := hostTfRec[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
+			port := hostTfRec[TF_FIELD_CLUSTER_HOST_PORT].(string)
+			datadir := hostTfRec[TF_FIELD_CLUSTER_HOST_DD].(string)
 
 			if hostname_data != "" {
 				node.SetHostnameData(hostname_data)
@@ -316,7 +318,8 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 		var nodesToRemove []openapi.JobsJobJobSpecJobDataNodesInner
 
 		// Compare Terraform and CMON to determine whether adding node, remove node or promoting standby/slave
-		if nodesToAdd, nodesToRemove, err = c.Common.determineProxyDelta(d, clusterInfo, CMON_CLASS_NAME_PROXYSQL_HOST); err != nil {
+		nodes, _ := c.LoadBalancer.getHosts(d)
+		if nodesToAdd, nodesToRemove, err = c.Common.determineNodesDelta(nodes, clusterInfo, CMON_CLASS_NAME_PROXYSQL_HOST); err != nil {
 			return err
 		}
 
@@ -335,33 +338,10 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 		if isAddNode {
 			nodeToAddOrRemove = &nodesToAdd[0]
 			jobSpec.SetCommand(CMON_JOB_CREATE_PROXYSQL_COMMAND)
-
-			loadBalancers := d.Get(TF_FIELD_CLUSTER_LOAD_BALANCER)
-			var theTfRecord = map[string]any{}
-			isFound := false
-			for _, ff := range loadBalancers.([]any) {
-				if isFound {
-					break
-				}
-				f := ff.(map[string]any)
-				myhost := f[TF_FIELD_LB_MY_HOST]
-				for _, tt := range myhost.([]any) {
-					if isFound {
-						break
-					}
-					t := tt.(map[string]any)
-					hostname := t[TF_FIELD_CLUSTER_HOSTNAME].(string)
-					if strings.EqualFold(hostname, nodeToAddOrRemove.GetHostname()) {
-						// found it
-						theTfRecord = f
-						isFound = true
-					}
-				}
-			}
+			lbTfRecord, _ := c.LoadBalancer.findLoadbalancerEntry(d, nodeToAddOrRemove.GetHostname())
 			var getInputs DbLoadBalancerInterface
 			getInputs = NewProxySql()
-			err = getInputs.GetInputs(theTfRecord, &jobData)
-
+			err = getInputs.GetInputs(lbTfRecord, &jobData)
 		} else if isRemoveNode {
 			jobSpec.SetCommand(CMON_JOB_REMOVE_NODE_COMMAND)
 			nodeToAddOrRemove = &nodesToRemove[0]
@@ -386,21 +366,7 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 
 	} // d.HasChange(TF_FIELD_CLUSTER_LOAD_BALANCER)
 
-	// ************************
-	// NOTE: don't remove this block of code
-	// ************************
-
 	//if d.HasChange(TF_FIELD_CLUSTER_TOPOLOGY) {
-	//	// Could be one of a few scenarios...
-	//
-	//	// Scenario #2 - Started with 1 node; Then, added a replica and specified the topology for future purposes (Scenario #1)
-	//	if isHostChanged {
-	//		// Noop: Just ignore. Nothing to do. This could possibly be on e of the following:
-	//		// A. The addition of a new replica and the user has specified proper Master=>Slave links
-	//		// B. The removal of a replica and the user has updated (or, if no replicas are present any longer, then completely removed) the topology def
-	//	} else {
-	//		// Scenario #1 - Role change: Slave promoted to Master
-	//	}
 	//}
 
 	return nil
