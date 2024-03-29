@@ -408,6 +408,10 @@ func (c *MySQLMaria) SetBackupJobData(jobData *openapi.JobsJobJobSpecJobData) er
 	return c.Backup.SetBackupJobData(jobData)
 }
 
+func (c *MySQLMaria) IsBackupRemovable(clusterInfo *openapi.ClusterResponse, jobData *openapi.JobsJobJobSpecJobData) bool {
+	return true
+}
+
 func NewMySQLMaria() *MySQLMaria {
 	return &MySQLMaria{}
 }

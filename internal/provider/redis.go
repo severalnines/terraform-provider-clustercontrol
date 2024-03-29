@@ -299,6 +299,10 @@ func (c *Redis) SetBackupJobData(jobData *openapi.JobsJobJobSpecJobData) error {
 	return c.Backup.SetBackupJobData(jobData)
 }
 
+func (c *Redis) IsBackupRemovable(clusterInfo *openapi.ClusterResponse, jobData *openapi.JobsJobJobSpecJobData) bool {
+	return true
+}
+
 func NewRedis() *Redis {
 	return &Redis{}
 }

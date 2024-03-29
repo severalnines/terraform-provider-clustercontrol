@@ -361,6 +361,10 @@ func (c *MongoDb) SetBackupJobData(jobData *openapi.JobsJobJobSpecJobData) error
 	return c.Backup.SetBackupJobData(jobData)
 }
 
+func (c *MongoDb) IsBackupRemovable(clusterInfo *openapi.ClusterResponse, jobData *openapi.JobsJobJobSpecJobData) bool {
+	return true
+}
+
 func NewMongo() *MongoDb {
 	return &MongoDb{}
 }

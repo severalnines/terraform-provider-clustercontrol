@@ -329,6 +329,14 @@ func (c *PostgresSql) SetBackupJobData(jobData *openapi.JobsJobJobSpecJobData) e
 	return nil
 }
 
+func (c *PostgresSql) IsBackupRemovable(clusterInfo *openapi.ClusterResponse, jobData *openapi.JobsJobJobSpecJobData) bool {
+	backupMethod := jobData.GetBackupMethod()
+	if strings.Contains(backupMethod, "pgbackrest") {
+		return false
+	}
+	return true
+}
+
 func NewPostgres() *PostgresSql {
 	return &PostgresSql{}
 }

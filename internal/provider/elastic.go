@@ -136,6 +136,10 @@ func (c *Elastic) SetBackupJobData(jobData *openapi.JobsJobJobSpecJobData) error
 	return c.Backup.SetBackupJobData(jobData)
 }
 
+func (c *Elastic) IsBackupRemovable(clusterInfo *openapi.ClusterResponse, jobData *openapi.JobsJobJobSpecJobData) bool {
+	return true
+}
+
 func NewElastic() *Elastic {
 	return &Elastic{}
 }

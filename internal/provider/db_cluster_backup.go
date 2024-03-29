@@ -15,6 +15,7 @@ type DbClusterBackupInterface interface {
 	GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error
 	IsValidBackupOptions(vendor string, clusterType string, jobData *openapi.JobsJobJobSpecJobData) error
 	SetBackupJobData(jobData *openapi.JobsJobJobSpecJobData) error
+	IsBackupRemovable(clusterInfo *openapi.ClusterResponse, jobData *openapi.JobsJobJobSpecJobData) bool
 }
 
 func resourceDbClusterBackup() *schema.Resource {
@@ -259,6 +260,50 @@ func resourceDeleteDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 		})
 		return diags
 	}
+
+	clusterType := clusterInfo.GetClusterType()
+	clusterType = strings.ToLower(clusterType)
+
+	var backupHandler DbClusterBackupInterface = nil
+
+	switch clusterType {
+	case CLUSTER_TYPE_REPLICATION:
+		backupHandler = NewMySQLMaria()
+	case CLUSTER_TYPE_GALERA:
+		backupHandler = NewMySQLMaria()
+	case CLUSTER_TYPE_PG_SINGLE:
+		backupHandler = NewPostgres()
+	case CLUSTER_TYPE_MOGNODB:
+		backupHandler = NewMongo()
+	case CLUSTER_TYPE_REDIS:
+		backupHandler = NewRedis()
+	case CLUSTER_TYPE_MSSQL_SINGLE:
+		backupHandler = NewMsSql()
+	case CLUSTER_TYPE_MSSQL_AO_ASYNC:
+		backupHandler = NewMsSql()
+	case CLUSTER_TYPE_ELASTIC:
+		backupHandler = NewElastic()
+	default:
+		slog.Warn(funcName, "Unknown cluster type", clusterType)
+	}
+
+	if backupHandler != nil {
+		if err = backupHandler.GetBackupInputs(d, &jobData); err != nil {
+			slog.Error(err.Error())
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error in DB cluster backup create handler.",
+			})
+			return diags
+		}
+		if !backupHandler.IsBackupRemovable(clusterInfo, &jobData) {
+			d.SetId("")
+			d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC822))
+			// Silently return. Some backups are not removable (e.g. pgbackrest)
+			return diags
+		}
+	}
+
 	deleteBackup.SetClusterId(clusterInfo.GetClusterId())
 
 	var iBkpId int

@@ -138,6 +138,10 @@ func (c *MsSql) SetBackupJobData(jobData *openapi.JobsJobJobSpecJobData) error {
 	return c.Backup.SetBackupJobData(jobData)
 }
 
+func (c *MsSql) IsBackupRemovable(clusterInfo *openapi.ClusterResponse, jobData *openapi.JobsJobJobSpecJobData) bool {
+	return true
+}
+
 func NewMsSql() *MsSql {
 	return &MsSql{}
 }
