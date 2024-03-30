@@ -16,6 +16,29 @@ type MongoDb struct {
 	Backup DbBackupCommon
 }
 
+func (c *MongoDb) HostClassRoleAndReplicasetCompare(one *openapi.JobsJobJobSpecJobDataNodesInner, two *openapi.ClusterResponseHostsInner, options ...string) bool {
+	// TODO
+
+	//ii := 0
+	//hostClass := ""
+	//hostRole := ""
+	//replicasetName := ""
+	//if len(options) > ii {
+	//	hostClass = options[ii]
+	//	ii++
+	//}
+	//if len(options) > ii {
+	//	hostRole = options[ii]
+	//	ii++
+	//}
+	//if len(options) > ii {
+	//	replicasetName = options[ii]
+	//	ii++
+	//}
+
+	return strings.EqualFold(one.GetHostname(), two.GetHostname())
+}
+
 func (m *MongoDb) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
 	funcName := "Mongo::GetInputs"
 	slog.Debug(funcName)
@@ -28,9 +51,27 @@ func (m *MongoDb) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 	}
 
 	clusterType := jobData.GetClusterType()
+
+	var iPort int
+	port := d.Get(TF_FIELD_CLUSTER_MONGODB_PORT).(string)
+	if err = CheckForEmptyAndSetDefault(&port, gDefultDbPortMap, clusterType); err != nil {
+		return err
+	}
+	if iPort, err = strconv.Atoi(port); err != nil {
+		slog.Error(funcName, "ERROR", "Non-numeric database port")
+		return err
+	}
+	jobData.SetPort(int32(iPort))
+	topLevelPort := jobData.GetPort()
+
+	configServerPort := d.Get(TF_FIELD_CLUSTER_MONGODB_CFG_SRVR_PORT).(string)
+	if configServerPort == "" {
+		configServerPort = DEFAULT_MONGO_CONFIG_SRVR_PORT
+	}
+	//jobData.SetConfigServerPort(configServerPort)
+
 	dbVendor := jobData.GetVendor()
 	dbVersion := jobData.GetVersion()
-	topLevelPort := jobData.GetPort()
 
 	vendorMap, ok := gDbConfigTemplate[dbVendor]
 	if !ok {
@@ -81,7 +122,7 @@ func (m *MongoDb) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 			hostname := memFromTF[TF_FIELD_CLUSTER_HOSTNAME].(string)
 			hostname_data := memFromTF[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
 			hostname_internal := memFromTF[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
-			port := memFromTF[TF_FIELD_CLUSTER_HOST_PORT].(string)
+			//port := memFromTF[TF_FIELD_CLUSTER_HOST_PORT].(string)
 
 			if hostname == "" {
 				// Not specifying hostname is disallowed !!!
@@ -96,11 +137,12 @@ func (m *MongoDb) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 			if hostname_internal != "" {
 				mem.SetHostnameInternal(hostname_internal)
 			}
-			if port == "" {
-				mem.SetPort(strconv.Itoa(int(topLevelPort)))
-			} else {
-				mem.SetPort(strconv.Itoa(int(convertPortToInt(port, topLevelPort))))
-			}
+			mem.SetPort(strconv.Itoa(int(topLevelPort)))
+			//if port == "" {
+			//	mem.SetPort(strconv.Itoa(int(topLevelPort)))
+			//} else {
+			//	mem.SetPort(strconv.Itoa(int(convertPortToInt(port, topLevelPort))))
+			//}
 			arbiter_only := memFromTF[TF_FIELD_CLUSTER_HOST_ARBITER_ONLY].(bool)
 			mem.SetArbiterOnly(arbiter_only)
 
@@ -138,8 +180,6 @@ func (m *MongoDb) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 	//********************************************
 	// Get Mongo - Config Servers
 	//********************************************
-	//m.getConfigServers(d, jobData)
-	iPort, _ := strconv.Atoi(DEFAULT_MONGO_CONFIG_SRVR_PORT)
 	configServerFromTF := d.Get(TF_FIELD_CLUSTER_MONGO_CONFIG_SERVER)
 	for _, cfgServerFromTF := range configServerFromTF.([]any) {
 		cfgFromTF := cfgServerFromTF.(map[string]any)
@@ -152,7 +192,7 @@ func (m *MongoDb) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 			hostname := memFromTF[TF_FIELD_CLUSTER_HOSTNAME].(string)
 			hostname_data := memFromTF[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
 			hostname_internal := memFromTF[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
-			port := memFromTF[TF_FIELD_CLUSTER_HOST_PORT].(string)
+			//port := memFromTF[TF_FIELD_CLUSTER_HOST_PORT].(string)
 
 			if hostname == "" {
 				return errors.New("Mongo config server hostname cannot be empty.")
@@ -166,11 +206,13 @@ func (m *MongoDb) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 			if hostname_internal != "" {
 				mem.SetHostnameInternal(hostname_internal)
 			}
-			if port == "" {
-				mem.SetPort(strconv.Itoa(iPort))
-			} else {
-				mem.SetPort(strconv.Itoa(int(convertPortToInt(port, int32(iPort)))))
-			}
+			//mem.SetPort(strconv.Itoa(iPort))
+			mem.SetPort(configServerPort)
+			//if port == "" {
+			//	mem.SetPort(strconv.Itoa(iPort))
+			//} else {
+			//	mem.SetPort(strconv.Itoa(int(convertPortToInt(port, int32(iPort)))))
+			//}
 			members = append(members, mem)
 		}
 		var cfgSrvr = openapi.JobsJobJobSpecJobDataConfigServers{
@@ -194,7 +236,7 @@ func (m *MongoDb) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 		hostname := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
 		hostname_data := f[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
 		hostname_internal := f[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
-		port := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
+		//port := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
 
 		if hostname == "" {
 			return errors.New("Mongo config server hostname cannot be empty.")
@@ -208,11 +250,12 @@ func (m *MongoDb) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 		if hostname_internal != "" {
 			mem.SetHostnameInternal(hostname_internal)
 		}
-		if port == "" {
-			mem.SetPort(strconv.Itoa(int(topLevelPort)))
-		} else {
-			mem.SetPort(strconv.Itoa(int(convertPortToInt(port, topLevelPort))))
-		}
+		mem.SetPort(strconv.Itoa(int(topLevelPort)))
+		//if port == "" {
+		//	mem.SetPort(strconv.Itoa(int(topLevelPort)))
+		//} else {
+		//	mem.SetPort(strconv.Itoa(int(convertPortToInt(port, topLevelPort))))
+		//}
 		mongos = append(mongos, mem)
 	}
 	jobData.SetMongosServers(mongos)
@@ -396,12 +439,13 @@ func (c *MongoDb) HandleUpdate(ctx context.Context, d *schema.ResourceData, m in
 			var rsMemNode = openapi.JobsJobJobSpecJobDataNode{}
 			t := rsNodeToAddOrRemove.GetMembers()
 			rsMemNode.SetHostname(t[0].GetHostname())
-			if t[0].GetPort() == "" {
-				rsMemNode.SetPort(tmpJobData.GetPort())
-			} else {
-				iP, _ := strconv.Atoi(t[0].GetPort())
-				rsMemNode.SetPort(int32(iP))
-			}
+			rsMemNode.SetPort(tmpJobData.GetPort())
+			//if t[0].GetPort() == "" {
+			//	rsMemNode.SetPort(tmpJobData.GetPort())
+			//} else {
+			//	iP, _ := strconv.Atoi(t[0].GetPort())
+			//	rsMemNode.SetPort(int32(iP))
+			//}
 			jobData.SetReplicaset(rsNodeToAddOrRemove.GetRs())
 			jobData.SetNodeType(0)
 			jobData.SetNode(rsMemNode)
@@ -417,8 +461,8 @@ func (c *MongoDb) HandleUpdate(ctx context.Context, d *schema.ResourceData, m in
 			t := rsNodeToAddOrRemove.GetMembers()
 			var node openapi.JobsJobJobSpecJobDataNode
 			node.SetHostname(t[0].GetHostname())
-			jobData.SetNode(node)
 			node.SetPort(tmpJobData.GetPort())
+			jobData.SetNode(node)
 			jobData.SetEnableUninstall(true)
 			jobData.SetUnregisterOnly(false)
 			slog.Info(funcName, "Removing hostname", node.GetHostname())

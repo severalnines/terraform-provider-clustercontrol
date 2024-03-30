@@ -81,15 +81,55 @@ func resourceDbCluster() *schema.Resource {
 				Description: "Password for the admin/root user for the database. Note that this may show up in logs, and it will be stored in the state file",
 				Sensitive:   true,
 			},
-			TF_FIELD_CLUSTER_PORT: {
+			//TF_FIELD_CLUSTER_PORT: {
+			//	Type:        schema.TypeString,
+			//	Optional:    true,
+			//	Description: "The port on which the DB will accepts connections",
+			//},
+			TF_FIELD_CLUSTER_MYSQL_PORT: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "The port on which the DB will accepts connections",
+				Description: "The port on which MySQL will accept client connections",
+			},
+			TF_FIELD_CLUSTER_POSTGRES_PORT: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The port on which PostgreSql will accept client connections",
+			},
+			TF_FIELD_CLUSTER_MONGODB_PORT: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The port on which MongoDB will accept client connections",
+			},
+			TF_FIELD_CLUSTER_MONGODB_CFG_SRVR_PORT: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The port on which MongoDB config server will accept client connections. MongoS server will use same port# as db_mongo_port",
+			},
+			TF_FIELD_CLUSTER_REDIS_PORT: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The port on which Redis will accept client connections",
 			},
 			TF_FIELD_CLUSTER_SENTINEL_PORT: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "The port Redis Sentinel uses to communicate",
+			},
+			TF_FIELD_CLUSTER_MSSQL_SERVER_PORT: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The port on which MSSQL will accept client connections",
+			},
+			TF_FIELD_CLUSTER_ELASTIC_HTTP_PORT: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The port on which Elasticsearch will accept client http connections",
+			},
+			TF_FIELD_CLUSTER_ELASTIC_TRANSFER_PORT: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The port on which Elasticsearch will accept client connections for data transfer(?)",
 			},
 			TF_FIELD_CLUSTER_DATA_DIR: {
 				Type:        schema.TypeString,
@@ -191,12 +231,12 @@ func resourceDbCluster() *schema.Resource {
 							Optional:    true,
 							Description: "If there's a private net that all DB hosts can communicate, use it here.",
 						},
-						TF_FIELD_CLUSTER_HOST_PORT: {
-							Type:     schema.TypeString,
-							Optional: true,
-							Description: "The port on which the DB server will listen for connections. If one is not provided, " +
-								"default for the DB type will be used, or inherited from earlier/top-level specification.",
-						},
+						//TF_FIELD_CLUSTER_HOST_PORT: {
+						//	Type:     schema.TypeString,
+						//	Optional: true,
+						//	Description: "The port on which the DB server will listen for connections. If one is not provided, " +
+						//		"default for the DB type will be used, or inherited from earlier/top-level specification.",
+						//},
 						TF_FIELD_CLUSTER_SYNC_REP: {
 							Type:        schema.TypeBool,
 							Optional:    true,
@@ -258,12 +298,12 @@ func resourceDbCluster() *schema.Resource {
 										Optional:    true,
 										Description: "If there's a private net that all DB hosts can communicate, use it here.",
 									},
-									TF_FIELD_CLUSTER_HOST_PORT: {
-										Type:     schema.TypeString,
-										Optional: true,
-										Description: "The port on which the DB server will listen for connections. If " +
-											"one is not provided, the default for the DB type will be used.",
-									},
+									//TF_FIELD_CLUSTER_HOST_PORT: {
+									//	Type:     schema.TypeString,
+									//	Optional: true,
+									//	Description: "The port on which the DB server will listen for connections. If " +
+									//		"one is not provided, the default for the DB type will be used.",
+									//},
 									TF_FIELD_CLUSTER_HOST_ARBITER_ONLY: {
 										Type:        schema.TypeBool,
 										Optional:    true,
@@ -326,11 +366,11 @@ func resourceDbCluster() *schema.Resource {
 										Optional:    true,
 										Description: "If there's a private net that all DB hosts can communicate, use it here.",
 									},
-									TF_FIELD_CLUSTER_HOST_PORT: {
-										Type:        schema.TypeString,
-										Optional:    true,
-										Description: "Port for the config server. If one is not provided, the default will be used.",
-									},
+									//TF_FIELD_CLUSTER_HOST_PORT: {
+									//	Type:        schema.TypeString,
+									//	Optional:    true,
+									//	Description: "Port for the config server. If one is not provided, the default will be used.",
+									//},
 								},
 							},
 						},
@@ -361,11 +401,11 @@ func resourceDbCluster() *schema.Resource {
 							Optional:    true,
 							Description: "If there's a private net that all DB hosts can communicate, use it here.",
 						},
-						TF_FIELD_CLUSTER_HOST_PORT: {
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "Port for the config server. If one is not provided, the default will be used.",
-						},
+						//TF_FIELD_CLUSTER_HOST_PORT: {
+						//	Type:        schema.TypeString,
+						//	Optional:    true,
+						//	Description: "Port for the config server. If one is not provided, the default will be used.",
+						//},
 					},
 				},
 			},
@@ -473,6 +513,11 @@ func resourceDbCluster() *schema.Resource {
 							Optional:    true,
 							Description: "The load balancer port that it will accept connections on behalf of the database it is front-ending.",
 						},
+						TF_FIELD_LB_ADMIN_PORT: {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The load balancer admin port that will be used to administer it.",
+						},
 						TF_FIELD_LB_USE_CLUSTERING: {
 							Type:        schema.TypeBool,
 							Optional:    true,
@@ -554,11 +599,11 @@ func resourceDbCluster() *schema.Resource {
 										Required:    true,
 										Description: "Hostname/IP of this load balancer. Can be IP address as well.",
 									},
-									TF_FIELD_CLUSTER_HOST_PORT: {
-										Type:        schema.TypeString,
-										Optional:    true,
-										Description: "The port of this load balancer.",
-									},
+									//TF_FIELD_CLUSTER_HOST_PORT: {
+									//	Type:        schema.TypeString,
+									//	Optional:    true,
+									//	Description: "The port of this load balancer.",
+									//},
 								},
 							},
 						},

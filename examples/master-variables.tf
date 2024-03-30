@@ -70,16 +70,64 @@ variable "db_admin_user_password" {
   sensitive   = true
 }
 
-variable "db_port" {
-  description = "The port on which the DB will accepts connections"
+#variable "db_port" {
+#  description = "The port on which the DB will accepts connections"
+#  type        = string
+#  default     = null
+#}
+
+variable "db_mysql_port" {
+  description = "The port on which MySQL will accept client connections"
   type        = string
-  default     = null
+  default     = "3306"
+}
+
+variable "db_postgres_port" {
+  description = "The port on which PostgreSql will accept client connections"
+  type        = string
+  default     = "5432"
+}
+
+variable "db_mongo_port" {
+  description = "The port on which MongoDB will accept client connections"
+  type        = string
+  default     = "27017"
+}
+
+variable "db_mongo_config_server_port" {
+  description = "The port on which MongoDB config server will accept client connections. MongoS server will use same port# as db_mongo_port"
+  type        = string
+  default     = "27019"
+}
+
+variable "db_redis_port" {
+  description = "The port on which Redis will accept client connections"
+  type        = string
+  default     = "6379"
 }
 
 variable "db_sentinel_port" {
   description = "The port Redis Sentinel uses to communicate"
   type        = string
   default     = "26379"
+}
+
+variable "db_mssqlserver_port" {
+  description = "The port on which MSSQL will accept client connections"
+  type        = string
+  default     = "1433"
+}
+
+variable "db_elasticsearch_http_port" {
+  description = "The port on which MySQL will accept client connections"
+  type        = string
+  default     = "9200"
+}
+
+variable "db_elasticsearch_transfer_port" {
+  description = "The port on which Elasticsearch will accept client connections for data transfer(?)"
+  type        = string
+  default     = null
 }
 
 variable "db_data_directory" {
@@ -323,7 +371,7 @@ variable "db_lb_port" {
 }
 
 variable "db_lb_admin_port" {
-  description = "The load balancer port that it will accept connections to manage its configuraiton"
+  description = "The load balancer admin port that will be used to administer it."
   type        = string
   default     = "6032"
 }

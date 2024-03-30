@@ -20,7 +20,7 @@ resource "clustercontrol_db_cluster" "this" {
   db_admin_username          = "pgadmin"
   db_admin_user_password     = "blah%blah"
   db_auto_recovery           = true
-  db_port                    = var.db_port
+  db_postgres_port           = var.db_postgres_port
   db_data_directory          = var.db_data_directory
   disable_firewall           = var.disable_firewall
   disable_selinux            = var.disable_selinux
@@ -29,34 +29,32 @@ resource "clustercontrol_db_cluster" "this" {
   db_deploy_agents           = var.db_deploy_agents
   db_enable_ssl              = var.db_enable_ssl
   db_enable_timescale        = false
-  db_enable_pgbackrest_agent = true
+  db_enable_pgbackrest_agent = false
   ssh_user                   = var.ssh_user
   ssh_user_password          = var.ssh_user_password
   ssh_key_file               = var.ssh_key_file
   ssh_port                   = var.ssh_port
-  db_tags                    = ["terra-deploy"]
+  db_tags                    = ["terraform","someothertag"]
 
   db_host {
-    hostname = "test-primary-4"
+    hostname = "test-primary"
     # hostname_data = "foo"
     # hostname_internal = "foo"
-    # port = "foo"
     # config_file = "foo"
     # data_dir = "foo"
   }
 
-  # db_host {
-  #   hostname = "test-primary-2"
-  #   # hostname_data = "foo"
-  #   # hostname_internal = "foo"
-  #   # port = "foo"
-  #   # config_file = "foo"
-  #   # data_dir = "foo"
-  # }
+#   db_host {
+#     hostname = "test-primary-2"
+#     # hostname_data = "foo"
+#     # hostname_internal = "foo"
+#     # config_file = "foo"
+#     # data_dir = "foo"
+#   }
 
 }
 
-# resource "clustercontrol_db_cluster_backup" "full-03-27-2024_1" {
+# resource "clustercontrol_db_cluster_backup" "full-1" {
 #   depends_on                   = [clustercontrol_db_cluster.this]
 #   db_cluster_id                = clustercontrol_db_cluster.this.id
 #   db_backup_method             = "pg_basebackup"
@@ -70,7 +68,7 @@ resource "clustercontrol_db_cluster" "this" {
 #   db_backup_retention          = var.db_backup_retention
 # }
 
-# resource "clustercontrol_db_cluster_backup" "full-03-28-2024_1" {
+# resource "clustercontrol_db_cluster_backup" "pgbackrest-full-1" {
 #   depends_on                   = [clustercontrol_db_cluster.this]
 #   db_cluster_id                = clustercontrol_db_cluster.this.id
 #   db_backup_method             = "pgbackrestfull"

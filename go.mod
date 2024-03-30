@@ -55,7 +55,7 @@ require (
 	github.com/oklog/run v1.0.0 // indirect
 	github.com/posener/complete v1.2.3 // indirect
 	github.com/russross/blackfriday v1.6.0 // indirect
-	github.com/severalnines/clustercontrol-client-sdk/go v0.0.0-20240329195624-5f2008a343f5 // indirect
+	github.com/severalnines/clustercontrol-client-sdk/go v0.0.0-20240330144720-ae9d88ca3ef8 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect

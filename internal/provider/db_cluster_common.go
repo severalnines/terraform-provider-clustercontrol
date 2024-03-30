@@ -10,13 +10,23 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
 type DbCommon struct{}
 
-type CompareHost func(*openapi.JobsJobJobSpecJobDataNodesInner, *openapi.ClusterResponseHostsInner, string, string) bool
+type CompareHost func(one *openapi.JobsJobJobSpecJobDataNodesInner, two *openapi.ClusterResponseHostsInner, options ...string) bool
+
+func (c *DbCommon) HostAndClassCompare(one *openapi.JobsJobJobSpecJobDataNodesInner, two *openapi.ClusterResponseHostsInner, options ...string) bool {
+	ii := 0
+	hostClass := ""
+	if len(options) > ii {
+		hostClass = options[ii]
+		ii++
+	}
+	return (strings.EqualFold(one.GetHostname(), two.GetHostname()) &&
+		strings.EqualFold(hostClass, two.GetClassName()))
+}
 
 func (c *DbCommon) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
 	funcName := "DbCommon::GetInputs"
@@ -55,16 +65,16 @@ func (c *DbCommon) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJob
 	dbAdminUserPassword := d.Get(TF_FIELD_CLUSTER_ADMIN_PW).(string)
 	jobData.SetAdminPassword(dbAdminUserPassword)
 
-	var iPort int
-	port := d.Get(TF_FIELD_CLUSTER_PORT).(string)
-	if err = CheckForEmptyAndSetDefault(&port, gDefultDbPortMap, clusterType); err != nil {
-		return err
-	}
-	if iPort, err = strconv.Atoi(port); err != nil {
-		slog.Error(funcName, "ERROR", "Non-numeric database port")
-		return err
-	}
-	jobData.SetPort(int32(iPort))
+	//var iPort int
+	//port := d.Get(TF_FIELD_CLUSTER_PORT).(string)
+	//if err = CheckForEmptyAndSetDefault(&port, gDefultDbPortMap, clusterType); err != nil {
+	//	return err
+	//}
+	//if iPort, err = strconv.Atoi(port); err != nil {
+	//	slog.Error(funcName, "ERROR", "Non-numeric database port")
+	//	return err
+	//}
+	//jobData.SetPort(int32(iPort))
 
 	disableFirewall := d.Get(TF_FIELD_CLUSTER_DISABLE_FW).(bool)
 	jobData.SetDisableFirewall(disableFirewall)

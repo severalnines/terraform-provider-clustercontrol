@@ -25,8 +25,19 @@ func (m *MsSql) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpe
 		return err
 	}
 
-	//iPort := int(jobData.GetPort())
 	clusterType := jobData.GetClusterType()
+
+	var iPort int
+	port := d.Get(TF_FIELD_CLUSTER_MSSQL_SERVER_PORT).(string)
+	if err = CheckForEmptyAndSetDefault(&port, gDefultDbPortMap, clusterType); err != nil {
+		return err
+	}
+	if iPort, err = strconv.Atoi(port); err != nil {
+		slog.Error(funcName, "ERROR", "Non-numeric database port")
+		return err
+	}
+	jobData.SetPort(int32(iPort))
+
 	topLevelPort := jobData.GetPort()
 
 	hosts := d.Get(TF_FIELD_CLUSTER_HOST)
@@ -37,7 +48,7 @@ func (m *MsSql) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpe
 		hostname := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
 		hostname_data := f[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
 		hostname_internal := f[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
-		port := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
+		//port := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
 		datadir := f[TF_FIELD_CLUSTER_HOST_DD].(string)
 
 		if hostname == "" {
@@ -53,17 +64,18 @@ func (m *MsSql) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpe
 		if hostname_internal != "" {
 			node.SetHostnameInternal(hostname_internal)
 		}
-		if port == "" {
-			node.SetPort(strconv.Itoa(int(topLevelPort)))
-		} else {
-			node.SetPort(strconv.Itoa(int(convertPortToInt(port, topLevelPort))))
-		}
 		if datadir != "" {
 			node.SetDatadir(datadir)
 		} else {
 			dataDir := gDefultDataDir[clusterType]
 			node.SetDatadir(dataDir)
 		}
+		node.SetPort(strconv.Itoa(int(topLevelPort)))
+		//if port == "" {
+		//	node.SetPort(strconv.Itoa(int(topLevelPort)))
+		//} else {
+		//	node.SetPort(strconv.Itoa(int(convertPortToInt(port, topLevelPort))))
+		//}
 
 		configFile := gDefaultHostConfigFile[clusterType]
 		node.SetConfigfile(configFile)

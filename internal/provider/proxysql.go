@@ -22,6 +22,27 @@ func (m *ProxySql) GetInputs(d map[string]any, jobData *openapi.JobsJobJobSpecJo
 		return err
 	}
 
+	port := d[TF_FIELD_LB_PORT].(string)
+	if port == "" {
+		port = DEFAULT_PROXYSQL_LISTEN_PORT
+	}
+	var iPort int
+	if iPort, err = strconv.Atoi(port); err != nil {
+		iPort, _ = strconv.Atoi(DEFAULT_PROXYSQL_LISTEN_PORT)
+	}
+	jobData.SetPort(int32(iPort))
+	//toplevelPort := jobData.GetPort()
+
+	adminPort := d[TF_FIELD_LB_ADMIN_PORT].(string)
+	if adminPort == "" {
+		adminPort = DEFAULT_PROXYSQL_ADMIN_PORT
+	}
+	if iPort, err = strconv.Atoi(adminPort); err != nil {
+		iPort, _ = strconv.Atoi(DEFAULT_PROXYSQL_ADMIN_PORT)
+	}
+	topLevelAdminPort := iPort
+	//jobData.SetAdminPort(adminPort)
+
 	jobData.SetAction(JOB_ACTION_SETUP_PROXYSQL)
 	jobData.SetDbDatabase("*.*")
 
@@ -38,16 +59,6 @@ func (m *ProxySql) GetInputs(d map[string]any, jobData *openapi.JobsJobJobSpecJo
 	monitorPw := d[TF_FIELD_LB_MONITOR_USER_PW].(string)
 	jobData.SetMonitorPassword(monitorPw)
 
-	port := d[TF_FIELD_LB_PORT].(string)
-	if port == "" {
-		port = DEFAULT_PROXYSQL_LISTEN_PORT
-	}
-	var iPort int
-	if iPort, err = strconv.Atoi(port); err != nil {
-		iPort, _ = strconv.Atoi(DEFAULT_PROXYSQL_LISTEN_PORT)
-	}
-	jobData.SetPort(int32(iPort))
-
 	useClustering := d[TF_FIELD_LB_USE_CLUSTERING].(bool)
 	jobData.SetUseClustering(useClustering)
 
@@ -59,14 +70,17 @@ func (m *ProxySql) GetInputs(d map[string]any, jobData *openapi.JobsJobJobSpecJo
 	for _, ff := range host.([]any) {
 		f := ff.(map[string]any)
 		hostname := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
-		myAdminPort := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
-		if iPort, err = strconv.Atoi(myAdminPort); err != nil {
-			iPort, _ = strconv.Atoi(DEFAULT_PROXYSQL_ADMIN_PORT)
-		}
+		//myAdminPort := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
+		//if myAdminPort == "" {
+		//	myAdminPort = DEFAULT_PROXYSQL_ADMIN_PORT
+		//}
+		//if iPort, err = strconv.Atoi(myAdminPort); err != nil {
+		//	iPort, _ = strconv.Atoi(DEFAULT_PROXYSQL_ADMIN_PORT)
+		//}
 		var node = openapi.JobsJobJobSpecJobDataNode{
 			Hostname: &hostname,
 		}
-		node.SetPort(int32(iPort))
+		node.SetPort(int32(topLevelAdminPort))
 		jobData.SetNode(node)
 
 		isAtleastOneNodeDeclared = true

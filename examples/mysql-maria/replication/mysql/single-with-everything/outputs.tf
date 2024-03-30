@@ -10,7 +10,7 @@ output "cluster_id" {
 
 output "database_port" {
   description = "The DB cluster resource ID."
-  value       = try(clustercontrol_db_cluster.this.db_port, null)
+  value       = try(clustercontrol_db_cluster.this.db_mysql_port, null)
 }
 
 # output "db_cluster_status" {
@@ -25,7 +25,7 @@ output "database_port" {
 
 output "db_cluster_primary_port" {
   description = "The primary host's port of DB cluster where read and write operations will be accepted."
-  value       = try(clustercontrol_db_cluster.this.db_port, null)
+  value       = try(clustercontrol_db_cluster.this.db_mysql_port, null)
 }
 
 output "db_admin_user" {

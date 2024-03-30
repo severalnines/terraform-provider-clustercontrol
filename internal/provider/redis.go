@@ -28,6 +28,18 @@ func (m *Redis) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpe
 	}
 
 	clusterType := jobData.GetClusterType()
+
+	var iPort int
+	port := d.Get(TF_FIELD_CLUSTER_REDIS_PORT).(string)
+	if err = CheckForEmptyAndSetDefault(&port, gDefultDbPortMap, clusterType); err != nil {
+		return err
+	}
+	if iPort, err = strconv.Atoi(port); err != nil {
+		slog.Error(funcName, "ERROR", "Non-numeric database port")
+		return err
+	}
+	jobData.SetPort(int32(iPort))
+
 	topLevelPort := jobData.GetPort()
 
 	dataDirectory := d.Get(TF_FIELD_CLUSTER_DATA_DIR).(string)
@@ -49,7 +61,7 @@ func (m *Redis) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpe
 		hostname := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
 		hostname_data := f[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
 		hostname_internal := f[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
-		port := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
+		//port := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
 		datadir := f[TF_FIELD_CLUSTER_HOST_DD].(string)
 
 		if hostname == "" {
@@ -67,11 +79,12 @@ func (m *Redis) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpe
 		if hostname_internal != "" {
 			node.SetHostnameInternal(hostname_internal)
 		}
-		if port == "" {
-			node.SetPort(strconv.Itoa(int(topLevelPort)))
-		} else {
-			node.SetPort(strconv.Itoa(int(convertPortToInt(port, topLevelPort))))
-		}
+		node.SetPort(strconv.Itoa(int(topLevelPort)))
+		//if port == "" {
+		//	node.SetPort(strconv.Itoa(int(topLevelPort)))
+		//} else {
+		//	node.SetPort(strconv.Itoa(int(convertPortToInt(port, topLevelPort))))
+		//}
 		if datadir != "" {
 			node.SetDatadir(datadir)
 		}
@@ -215,7 +228,7 @@ func (c *Redis) HandleUpdate(ctx context.Context, d *schema.ResourceData, m inte
 			hostTfRec := c.Common.findHostEntry(nodeFromTf.GetHostname(), d.Get(TF_FIELD_CLUSTER_HOST))
 			hostname_data := hostTfRec[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
 			hostname_internal := hostTfRec[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
-			port := hostTfRec[TF_FIELD_CLUSTER_HOST_PORT].(string)
+			//port := hostTfRec[TF_FIELD_CLUSTER_HOST_PORT].(string)
 			datadir := hostTfRec[TF_FIELD_CLUSTER_HOST_DD].(string)
 
 			if hostname_data != "" {
@@ -229,14 +242,17 @@ func (c *Redis) HandleUpdate(ctx context.Context, d *schema.ResourceData, m inte
 				node.SetHostnameInternal(hostname_internal)
 				node2.SetHostnameInternal(node.GetHostnameInternal())
 			}
-			if port != "" {
-				node.SetPort(strconv.Itoa(int(convertPortToInt(port, tmpJobData.GetPort()))))
-			} else {
-				node.SetPort(strconv.Itoa(int(tmpJobData.GetPort())))
-			}
+
 			if datadir != "" {
 				node.SetDatadir(datadir)
 			}
+
+			node.SetPort(strconv.Itoa(int(tmpJobData.GetPort())))
+			//if port != "" {
+			//	node.SetPort(strconv.Itoa(int(convertPortToInt(port, tmpJobData.GetPort()))))
+			//} else {
+			//	node.SetPort(strconv.Itoa(int(tmpJobData.GetPort())))
+			//}
 
 			node2.SetPort(tmpJobData.GetSentinelPort())
 

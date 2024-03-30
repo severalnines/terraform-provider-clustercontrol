@@ -29,6 +29,18 @@ func (m *MySQLMaria) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJ
 	}
 
 	clusterType := jobData.GetClusterType()
+
+	var iPort int
+	port := d.Get(TF_FIELD_CLUSTER_MYSQL_PORT).(string)
+	if err = CheckForEmptyAndSetDefault(&port, gDefultDbPortMap, clusterType); err != nil {
+		return err
+	}
+	if iPort, err = strconv.Atoi(port); err != nil {
+		slog.Error(funcName, "ERROR", "Non-numeric database port")
+		return err
+	}
+	jobData.SetPort(int32(iPort))
+
 	dbVendor := jobData.GetVendor()
 	dbVersion := jobData.GetVersion()
 	topLevelPort := jobData.GetPort()
@@ -64,7 +76,7 @@ func (m *MySQLMaria) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJ
 		hostname := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
 		hostname_data := f[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
 		hostname_internal := f[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
-		port := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
+		//port := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
 		datadir := f[TF_FIELD_CLUSTER_HOST_DD].(string)
 
 		if hostname == "" {
@@ -79,14 +91,15 @@ func (m *MySQLMaria) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJ
 		if hostname_internal != "" {
 			node.SetHostnameInternal(hostname_internal)
 		}
-		if port == "" {
-			node.SetPort(strconv.Itoa(int(topLevelPort)))
-		} else {
-			node.SetPort(strconv.Itoa(int(convertPortToInt(port, topLevelPort))))
-		}
 		if datadir != "" {
 			node.SetDatadir(datadir)
 		}
+		node.SetPort(strconv.Itoa(int(topLevelPort)))
+		//if port == "" {
+		//	node.SetPort(strconv.Itoa(int(topLevelPort)))
+		//} else {
+		//	node.SetPort(strconv.Itoa(int(convertPortToInt(port, topLevelPort))))
+		//}
 		nodes = append(nodes, node)
 	}
 	jobData.SetNodes(nodes)
@@ -262,7 +275,7 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 			hostTfRec := c.Common.findHostEntry(nodeFromTf.GetHostname(), d.Get(TF_FIELD_CLUSTER_HOST))
 			hostname_data := hostTfRec[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
 			hostname_internal := hostTfRec[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
-			port := hostTfRec[TF_FIELD_CLUSTER_HOST_PORT].(string)
+			//port := hostTfRec[TF_FIELD_CLUSTER_HOST_PORT].(string)
 			datadir := hostTfRec[TF_FIELD_CLUSTER_HOST_DD].(string)
 
 			if hostname_data != "" {
@@ -273,14 +286,15 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 			if hostname_internal != "" {
 				node.SetHostnameInternal(hostname_internal)
 			}
-			if port != "" {
-				node.SetPort(convertPortToInt(port, tmpJobData.GetPort()))
-			} else {
-				node.SetPort(tmpJobData.GetPort())
-			}
 			if datadir != "" {
 				node.SetDatadir(datadir)
 			}
+			node.SetPort(tmpJobData.GetPort())
+			//if port != "" {
+			//	node.SetPort(convertPortToInt(port, tmpJobData.GetPort()))
+			//} else {
+			//	node.SetPort(tmpJobData.GetPort())
+			//}
 
 		} else if isRemoveNode {
 

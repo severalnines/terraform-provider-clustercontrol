@@ -90,6 +90,11 @@ func resourceDbLoadBalancer() *schema.Resource {
 				Optional:    true,
 				Description: "The load balancer port that it will accept connections on behalf of the database it is front-ending.",
 			},
+			TF_FIELD_LB_ADMIN_PORT: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The load balancer port that it will accept connections on behalf of the database it is front-ending.",
+			},
 			TF_FIELD_LB_USE_CLUSTERING: {
 				Type:        schema.TypeBool,
 				Optional:    true,
@@ -141,25 +146,25 @@ func resourceDbLoadBalancer() *schema.Resource {
 				Optional:    true,
 				Description: "The ssh port.",
 			},
-			TF_FIELD_CLUSTER_HOST: {
-				Type:        schema.TypeList,
-				Optional:    true,
-				Description: "The Database hosts that make up the cluster.",
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						TF_FIELD_CLUSTER_HOSTNAME: {
-							Type:        schema.TypeString,
-							Required:    true,
-							Description: "Hostname/IP of the DB host behind this load balancer. Can be IP address as well.",
-						},
-						TF_FIELD_CLUSTER_HOST_PORT: {
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "The port the DB host behind this load balancer.",
-						},
-					},
-				},
-			},
+			//TF_FIELD_CLUSTER_HOST: {
+			//	Type:        schema.TypeList,
+			//	Optional:    true,
+			//	Description: "The Database hosts that make up the cluster.",
+			//	Elem: &schema.Resource{
+			//		Schema: map[string]*schema.Schema{
+			//			TF_FIELD_CLUSTER_HOSTNAME: {
+			//				Type:        schema.TypeString,
+			//				Required:    true,
+			//				Description: "Hostname/IP of the DB host behind this load balancer. Can be IP address as well.",
+			//			},
+			//			TF_FIELD_CLUSTER_HOST_PORT: {
+			//				Type:        schema.TypeString,
+			//				Optional:    true,
+			//				Description: "The port the DB host behind this load balancer.",
+			//			},
+			//		},
+			//	},
+			//},
 			TF_FIELD_LB_MY_HOST: {
 				Type:        schema.TypeList,
 				Optional:    true,
@@ -171,11 +176,11 @@ func resourceDbLoadBalancer() *schema.Resource {
 							Required:    true,
 							Description: "Hostname/IP of this load balancer. Can be IP address as well.",
 						},
-						TF_FIELD_CLUSTER_HOST_PORT: {
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "The port of this load balancer.",
-						},
+						//TF_FIELD_CLUSTER_HOST_PORT: {
+						//	Type:        schema.TypeString,
+						//	Optional:    true,
+						//	Description: "The port of this load balancer.",
+						//},
 					},
 				},
 			},

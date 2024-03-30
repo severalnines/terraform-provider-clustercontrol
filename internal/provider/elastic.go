@@ -40,7 +40,20 @@ func (m *Elastic) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 		jobData.SetSnapshotHost(snapshotHost)
 	}
 
+	clusterType := jobData.GetClusterType()
+
+	var iPort int
+	port := d.Get(TF_FIELD_CLUSTER_ELASTIC_HTTP_PORT).(string)
+	if err = CheckForEmptyAndSetDefault(&port, gDefultDbPortMap, clusterType); err != nil {
+		return err
+	}
+	if iPort, err = strconv.Atoi(port); err != nil {
+		slog.Error(funcName, "ERROR", "Non-numeric database port")
+		return err
+	}
+	jobData.SetPort(int32(iPort))
 	topLevelPort := jobData.GetPort()
+
 	//clusterType := jobData.GetClusterType()
 	hosts := d.Get(TF_FIELD_CLUSTER_HOST)
 	nodes := []openapi.JobsJobJobSpecJobDataNodesInner{}
@@ -49,7 +62,7 @@ func (m *Elastic) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 		hostname := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
 		hostname_data := f[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
 		hostname_internal := f[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
-		port := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
+		//port := f[TF_FIELD_CLUSTER_HOST_PORT].(string)
 		protocol := f[TF_FIELD_CLUSTER_HOST_PROTO].(string)
 		roles := f[TF_FIELD_CLUSTER_HOST_ROLES].(string)
 
@@ -66,11 +79,12 @@ func (m *Elastic) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 		if hostname_internal != "" {
 			node.SetHostnameInternal(hostname_internal)
 		}
-		if port == "" {
-			node.SetPort(strconv.Itoa(int(topLevelPort)))
-		} else {
-			node.SetPort(strconv.Itoa(int(convertPortToInt(port, topLevelPort))))
-		}
+		node.SetPort(strconv.Itoa(int(topLevelPort)))
+		//if port == "" {
+		//	node.SetPort(strconv.Itoa(int(topLevelPort)))
+		//} else {
+		//	node.SetPort(strconv.Itoa(int(convertPortToInt(port, topLevelPort))))
+		//}
 		if protocol != "" {
 			node.SetProtocol(protocol)
 		}
@@ -122,8 +136,6 @@ func (c *Elastic) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJ
 	if err = c.Backup.GetBackupInputs(d, jobData); err != nil {
 		return err
 	}
-
-	jobData.SetHostname(STINRG_AUTO)
 
 	return err
 }
