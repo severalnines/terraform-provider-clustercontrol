@@ -54,23 +54,23 @@ resource "clustercontrol_db_cluster" "this" {
 
 }
 
- resource "clustercontrol_db_cluster_backup" "full-03-27-2024_1" {
-   depends_on                   = [clustercontrol_db_cluster.this]
-   db_cluster_id                = clustercontrol_db_cluster.this.id
-   db_backup_method             = "mssqlfull"
-   db_backup_dir                = "/var/lib/backups"
-   db_backup_subdir             = var.db_backup_subdir
-   db_backup_host               = "auto"
-   db_backup_storage_controller = var.db_backup_storage_controller
-   db_backup_compression        = var.db_backup_compression
-   db_backup_compression_level  = -1
-   db_backup_retention          = var.db_backup_retention
-   db_backup_system_db          = var.db_backup_system_db
-   # db_backup_encrypt            = var.db_backup_encrypt
-   # db_backup_storage_host       = var.db_backup_storage_host
-   # db_enable_backup_failover    = var.db_enable_backup_failover
-   # db_backup_failover_host      = var.db_backup_failover_host
- }
+# resource "clustercontrol_db_cluster_backup" "full-03-27-2024_1" {
+#   depends_on                   = [clustercontrol_db_cluster.this]
+#   db_cluster_id                = clustercontrol_db_cluster.this.id
+#   db_backup_method             = "mssqlfull"
+#   db_backup_dir                = "/var/lib/backups"
+#   db_backup_subdir             = var.db_backup_subdir
+#   db_backup_host               = "auto"
+#   db_backup_storage_controller = var.db_backup_storage_controller
+#   db_backup_compression        = var.db_backup_compression
+#   db_backup_compression_level  = -1
+#   db_backup_retention          = var.db_backup_retention
+#   db_backup_system_db          = var.db_backup_system_db
+#   # db_backup_encrypt            = var.db_backup_encrypt
+#   # db_backup_storage_host       = var.db_backup_storage_host
+#   # db_enable_backup_failover    = var.db_enable_backup_failover
+#   # db_backup_failover_host      = var.db_backup_failover_host
+# }
 
 # resource "clustercontrol_db_cluster_maintenance" "server-upgrade-03232024" {
 #   depends_on          = [clustercontrol_db_cluster.this]
