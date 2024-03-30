@@ -76,6 +76,12 @@ variable "db_port" {
   default     = null
 }
 
+variable "db_sentinel_port" {
+  description = "The port Redis Sentinel uses to communicate"
+  type        = string
+  default     = "26379"
+}
+
 variable "db_data_directory" {
   description = "The data directory for the database data files. If not set explicily, the default for the respective DB vendor will be chosen"
   type        = string
@@ -208,6 +214,18 @@ variable "db_mongo_auth_db" {
   description = "The mongodb database to use for authentication purposes"
   type        = string
   default     = "admin"
+}
+
+variable "db_enable_pbm_agent" {
+  description = "Enable percona backup for mongodb."
+  type        = bool
+  default     = false
+}
+
+variable "db_pbm_backup_dir" {
+  description = "Backup dir, nfs mounted directory / path for PBM backup."
+  type        = string
+  default     = null
 }
 
 # --------------------------

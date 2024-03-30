@@ -167,12 +167,20 @@ const (
 const (
 	CMON_DB_HOST_ROLE_MASTER              = "master"
 	CMON_DB_HOST_ROLE_SLAVE               = "slave"
-	CMON_DB_HOST_ROLE_MULI                = "multi" // Master->IntermediateSlave(multi)->Slave
-	CMON_DB_HOST_ROLE_MONGO_CFG_SERVER    = "configsvr"
-	CMON_DB_HOST_ROLE_MONGO_SHARD_SERVER  = "shardsvr"
-	CMON_DB_HOST_ROLE_MONGO_MONGOS_SERVER = "mongos"
-	CMON_DB_HOST_ROLE_PRIMARY             = "PRIMARY"
-	CMON_DB_HOST_ROLE_SECONDARY           = "SECONDARY"
+	CMON_DB_HOST_ROLE_MULI                = "multi"     // Master->IntermediateSlave(multi)->Slave
+	CMON_DB_HOST_ROLE_MONGO_CFG_SERVER    = "configsvr" // Mongo
+	CMON_DB_HOST_ROLE_MONGO_SHARD_SERVER  = "shardsvr"  // Mongo
+	CMON_DB_HOST_ROLE_MONGO_MONGOS_SERVER = "mongos"    // Mongo
+	CMON_DB_HOST_ROLE_PRIMARY             = "PRIMARY"   // MS SQL
+	CMON_DB_HOST_ROLE_SECONDARY           = "SECONDARY" // MS SQL
+)
+
+const (
+	// Mongo - a shardsvr can have one primary and many secondaries
+	CMON_DB_HOST_MEMBER_ROLE_PRIMARY = "Primary"
+
+	// Mongo - a shardsvr can have one primary and many secondaries
+	CMON_DB_HOST_MEMBER_ROLE_SECONDARY = "Secondary"
 )
 
 const (

@@ -176,6 +176,8 @@ github.com/severalnines/clustercontrol-client-sdk/go v0.0.0-20240328005530-0baac
 github.com/severalnines/clustercontrol-client-sdk/go v0.0.0-20240328005530-0baac75bba7c/go.mod h1:IMml/pWWW6AwE7RzOBnppEYXpQT72S+7t/zt3ECHexg=
 github.com/severalnines/clustercontrol-client-sdk/go v0.0.0-20240328173608-38b82909fa07 h1:/nWEBEBn/UFLXvVHfRE2JTVZbmXeeNRGqdE2JRFzYCE=
 github.com/severalnines/clustercontrol-client-sdk/go v0.0.0-20240328173608-38b82909fa07/go.mod h1:IMml/pWWW6AwE7RzOBnppEYXpQT72S+7t/zt3ECHexg=
+github.com/severalnines/clustercontrol-client-sdk/go v0.0.0-20240329195624-5f2008a343f5 h1:f1JbVY6x9vrk24w3vQQXU6BYdXWRLl77RaftBH+Qh9A=
+github.com/severalnines/clustercontrol-client-sdk/go v0.0.0-20240329195624-5f2008a343f5/go.mod h1:IMml/pWWW6AwE7RzOBnppEYXpQT72S+7t/zt3ECHexg=
 github.com/shopspring/decimal v1.2.0/go.mod h1:DKyhrW/HYNuLGql+MJL6WCR6knT2jwCFRcu2hWCYk4o=
 github.com/shopspring/decimal v1.3.1 h1:2Usl1nmF/WZucqkFZhnfFYxxxu8LG21F6nPQBE5gKV8=
 github.com/shopspring/decimal v1.3.1/go.mod h1:DKyhrW/HYNuLGql+MJL6WCR6knT2jwCFRcu2hWCYk4o=

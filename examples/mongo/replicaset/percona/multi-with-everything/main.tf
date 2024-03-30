@@ -29,6 +29,8 @@ resource "clustercontrol_db_cluster" "this" {
   db_deploy_agents       = var.db_deploy_agents
   db_enable_ssl          = var.db_enable_ssl
   db_mongo_auth_db       = var.db_mongo_auth_db
+  # db_enable_pbm_agent    = true
+  # db_pbm_backup_dir      = "/nfs/mongobackup"
   ssh_user               = var.ssh_user
   ssh_user_password      = var.ssh_user_password
   ssh_key_file           = var.ssh_key_file
@@ -53,22 +55,22 @@ resource "clustercontrol_db_cluster" "this" {
 
 }
 
-resource "clustercontrol_db_cluster_backup" "full-03-27-2024_1" {
-  depends_on                   = [clustercontrol_db_cluster.this]
-  db_cluster_id                = clustercontrol_db_cluster.this.id
-  db_backup_method             = "mongodump"
-  db_backup_dir                = var.db_backup_dir
-  db_backup_subdir             = var.db_backup_subdir
-  db_backup_encrypt            = var.db_backup_encrypt
-  db_backup_host               = var.db_backup_host
-  db_backup_storage_host       = "test-primary"
-  db_enable_backup_failover    = false
-  db_backup_failover_host      = var.db_backup_failover_host
-  db_backup_storage_controller = var.db_backup_storage_controller
-  db_backup_compression        = var.db_backup_compression
-  db_backup_compression_level  = var.db_backup_compression_level
-  db_backup_retention          = var.db_backup_retention
-}
+# resource "clustercontrol_db_cluster_backup" "full-03-27-2024_1" {
+#   depends_on                   = [clustercontrol_db_cluster.this]
+#   db_cluster_id                = clustercontrol_db_cluster.this.id
+#   db_backup_method             = "mongodump"
+#   db_backup_dir                = var.db_backup_dir
+#   db_backup_subdir             = var.db_backup_subdir
+#   db_backup_encrypt            = var.db_backup_encrypt
+#   db_backup_host               = var.db_backup_host
+#   db_backup_storage_host       = "test-primary"
+#   db_enable_backup_failover    = false
+#   db_backup_failover_host      = var.db_backup_failover_host
+#   db_backup_storage_controller = var.db_backup_storage_controller
+#   db_backup_compression        = var.db_backup_compression
+#   db_backup_compression_level  = var.db_backup_compression_level
+#   db_backup_retention          = var.db_backup_retention
+# }
 
 # resource "clustercontrol_db_cluster_maintenance" "server-upgrade-03232024" {
 #   depends_on          = [clustercontrol_db_cluster.this]

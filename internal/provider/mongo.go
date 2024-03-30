@@ -316,6 +316,124 @@ func (c *MongoDb) HandleUpdate(ctx context.Context, d *schema.ResourceData, m in
 	}
 
 	if d.HasChange(TF_FIELD_CLUSTER_REPLICA_SET) {
+		apiClient := m.(*openapi.APIClient)
+		addOrRemoveNodeJob := NewCCJob(CMON_JOB_CREATE_JOB)
+		addOrRemoveNodeJob.SetClusterId(clusterInfo.GetClusterId())
+		job := addOrRemoveNodeJob.GetJob()
+		jobSpec := job.GetJobSpec()
+		jobData := jobSpec.GetJobData()
+
+		var rsMembersToAdd []openapi.JobsJobJobSpecJobDataReplicaSetsInner
+		var rsMembersToRemove []openapi.JobsJobJobSpecJobDataReplicaSetsInner
+
+		// Compare Terraform and CMON to determine whether adding node, remove node or promoting standby/slave
+		// The logic here basically is...
+		// 1. Get the list of replicasets from TF decleration
+		// 2. Get a list of the member hosts for each of the replicaset
+
+		// Get the list of replicasets from TF decleration
+		replicaSets, _ := c.getReplicasetHosts(d)
+
+		// Get a list of the member hosts for each of the replicasets
+		additions := 0
+		removals := 0
+		for _, replicaSet := range replicaSets {
+			// accumulate the member hosts in a form that can be compared with what's currently available in CMON
+			var nodesToAdd []openapi.JobsJobJobSpecJobDataNodesInner
+			var nodesToRemove []openapi.JobsJobJobSpecJobDataNodesInner
+			rsMembers := replicaSet.GetMembers()
+			var nodes []openapi.JobsJobJobSpecJobDataNodesInner
+			for _, rsMember := range rsMembers {
+				var node openapi.JobsJobJobSpecJobDataNodesInner
+				node.SetHostname(rsMember.GetHostname())
+				// accumulating...
+				nodes = append(nodes, node)
+			}
+			// For each replicaset, compare with what's currently available in CMON.
+			// Result: either nodes need to be added to CMON or removed from CMON
+			if nodesToAdd, nodesToRemove, err = c.Common.determineNodesDelta(nodes, clusterInfo,
+				CMON_CLASS_NAME_MONGO_HOST, CMON_DB_HOST_ROLE_MONGO_SHARD_SERVER, replicaSet.GetRs()); err != nil {
+				return err
+			}
+			// convert back to replicaset format
+			var rsMemberToAdd = openapi.JobsJobJobSpecJobDataReplicaSetsInner{}
+			rsMemberToAdd.SetRs(replicaSet.GetRs())
+			var addMembers []openapi.JobsJobJobSpecJobDataReplicaSetsInnerMembersInner
+			for _, nodeToAdd := range nodesToAdd {
+				var mem = openapi.JobsJobJobSpecJobDataReplicaSetsInnerMembersInner{}
+				mem.SetHostname(nodeToAdd.GetHostname())
+				addMembers = append(addMembers, mem)
+				additions++
+			}
+			rsMemberToAdd.SetMembers(addMembers)
+			rsMembersToAdd = append(rsMembersToAdd, rsMemberToAdd)
+
+			var rsMemberToRemove = openapi.JobsJobJobSpecJobDataReplicaSetsInner{}
+			rsMemberToRemove.SetRs(replicaSet.GetRs())
+			var removeMembers []openapi.JobsJobJobSpecJobDataReplicaSetsInnerMembersInner
+			for _, nodeToRemove := range nodesToRemove {
+				var mem = openapi.JobsJobJobSpecJobDataReplicaSetsInnerMembersInner{}
+				mem.SetHostname(nodeToRemove.GetHostname())
+				removeMembers = append(removeMembers, mem)
+				removals++
+			}
+			rsMemberToRemove.SetMembers(removeMembers)
+			rsMembersToRemove = append(rsMembersToRemove, rsMemberToRemove)
+		}
+
+		isAdd := additions > 0
+		isRemove := removals > 0
+
+		if additions > 1 || removals > 1 {
+			return errors.New("Can only Add/Remove one node at-a-time.")
+		}
+
+		var rsNodeToAddOrRemove *openapi.JobsJobJobSpecJobDataReplicaSetsInner
+		if isAdd {
+			jobSpec.SetCommand(CMON_JOB_ADD_NODE_COMMAND)
+			rsNodeToAddOrRemove = &rsMembersToAdd[0]
+			jobData = *tmpJobData
+			var rsMemNode = openapi.JobsJobJobSpecJobDataNode{}
+			t := rsNodeToAddOrRemove.GetMembers()
+			rsMemNode.SetHostname(t[0].GetHostname())
+			if t[0].GetPort() == "" {
+				rsMemNode.SetPort(tmpJobData.GetPort())
+			} else {
+				iP, _ := strconv.Atoi(t[0].GetPort())
+				rsMemNode.SetPort(int32(iP))
+			}
+			jobData.SetReplicaset(rsNodeToAddOrRemove.GetRs())
+			jobData.SetNodeType(0)
+			jobData.SetNode(rsMemNode)
+			var cfgServers = openapi.JobsJobJobSpecJobDataConfigServers{}
+			jobData.SetConfigServers(cfgServers)
+			var mongosServers = []openapi.JobsJobJobSpecJobDataConfigServersMembersInner{}
+			jobData.SetMongosServers(mongosServers)
+			var emptyReplicasets []openapi.JobsJobJobSpecJobDataReplicaSetsInner
+			jobData.SetReplicaSets(emptyReplicasets)
+		} else if isRemove {
+			jobSpec.SetCommand(CMON_JOB_REMOVE_NODE_COMMAND)
+			rsNodeToAddOrRemove = &rsMembersToRemove[0]
+			t := rsNodeToAddOrRemove.GetMembers()
+			var node openapi.JobsJobJobSpecJobDataNode
+			node.SetHostname(t[0].GetHostname())
+			jobData.SetNode(node)
+			node.SetPort(tmpJobData.GetPort())
+			jobData.SetEnableUninstall(true)
+			jobData.SetUnregisterOnly(false)
+			slog.Info(funcName, "Removing hostname", node.GetHostname())
+		} else {
+			return nil
+		}
+
+		jobSpec.SetJobData(jobData)
+		job.SetJobSpec(jobSpec)
+		addOrRemoveNodeJob.SetJob(job)
+
+		if err = SendAndWaitForJobCompletion(ctx, apiClient, addOrRemoveNodeJob); err != nil {
+			slog.Error(err.Error())
+		}
+
 	}
 
 	return nil
@@ -363,6 +481,37 @@ func (c *MongoDb) SetBackupJobData(jobData *openapi.JobsJobJobSpecJobData) error
 
 func (c *MongoDb) IsBackupRemovable(clusterInfo *openapi.ClusterResponse, jobData *openapi.JobsJobJobSpecJobData) bool {
 	return true
+}
+
+func (c *MongoDb) getReplicasetHosts(d *schema.ResourceData) ([]openapi.JobsJobJobSpecJobDataReplicaSetsInner, error) {
+	var nodes []openapi.JobsJobJobSpecJobDataReplicaSetsInner
+
+	hosts := d.Get(TF_FIELD_CLUSTER_REPLICA_SET)
+	for _, ff := range hosts.([]any) {
+		f := ff.(map[string]any)
+		rsName := f[TF_FIELD_CLUSTER_REPLICA_SET_RS].(string)
+		var node = openapi.JobsJobJobSpecJobDataReplicaSetsInner{
+			Rs: &rsName,
+		}
+		var rsMembers []openapi.JobsJobJobSpecJobDataReplicaSetsInnerMembersInner
+		// Capturing hostname only as this is only used for comparison purposes.
+		myHost := f[TF_FIELD_CLUSTER_REPLICA_MEMBER]
+		for _, tt := range myHost.([]any) {
+			t := tt.(map[string]any)
+			hostname := t[TF_FIELD_CLUSTER_HOSTNAME].(string)
+			if hostname == "" {
+				continue
+			}
+			var rsMem = openapi.JobsJobJobSpecJobDataReplicaSetsInnerMembersInner{
+				Hostname: &hostname,
+			}
+			rsMembers = append(rsMembers, rsMem)
+		}
+		node.SetMembers(rsMembers)
+		nodes = append(nodes, node)
+	}
+
+	return nodes, nil
 }
 
 func NewMongo() *MongoDb {

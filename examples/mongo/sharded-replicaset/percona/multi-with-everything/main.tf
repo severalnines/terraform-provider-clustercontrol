@@ -14,7 +14,7 @@ resource "clustercontrol_db_cluster" "this" {
   db_cluster_create      = true
   db_cluster_import      = false
   db_cluster_name        = "mydbcluster"
-  db_cluster_type        = "mongodb"
+  db_cluster_type        = "mongo"
   db_vendor              = "percona"
   db_version             = "6.0"
   db_admin_username      = "mongoadmin"
@@ -60,6 +60,10 @@ resource "clustercontrol_db_cluster" "this" {
       hostname = "test-primary-3"
       port     = "27107"
     }
+    # member {
+    #   hostname = "test-primary-4"
+    #   port     = "27107"
+    # }
   }
 
 }

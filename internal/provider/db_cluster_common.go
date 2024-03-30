@@ -16,6 +16,8 @@ import (
 
 type DbCommon struct{}
 
+type CompareHost func(*openapi.JobsJobJobSpecJobDataNodesInner, *openapi.ClusterResponseHostsInner, string, string) bool
+
 func (c *DbCommon) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
 	funcName := "DbCommon::GetInputs"
 	slog.Info(funcName)
@@ -299,24 +301,63 @@ func (c *DbCommon) getHosts(d *schema.ResourceData) ([]openapi.JobsJobJobSpecJob
 	return nodes, nil
 }
 
-func (c *DbCommon) determineNodesDelta(nodes []openapi.JobsJobJobSpecJobDataNodesInner, clusterInfo *openapi.ClusterResponse, hostClass string) ([]openapi.JobsJobJobSpecJobDataNodesInner, []openapi.JobsJobJobSpecJobDataNodesInner, error) {
+func (c *DbCommon) compareHost(nodeInTf *openapi.JobsJobJobSpecJobDataNodesInner, nodeInCmon *openapi.ClusterResponseHostsInner, className string, role string) bool {
+	if strings.EqualFold(nodeInCmon.GetClassName(), className) &&
+		strings.EqualFold(nodeInCmon.GetHostname(), nodeInTf.GetHostname()) {
+		if role == "" {
+			return true
+		} else {
+			return strings.EqualFold(role, nodeInCmon.GetRole())
+		}
+	}
+
+	return false
+}
+
+func (c *DbCommon) determineNodesDelta(nodes []openapi.JobsJobJobSpecJobDataNodesInner,
+	clusterInfo *openapi.ClusterResponse, aBunchOfStrings ...string) ([]openapi.JobsJobJobSpecJobDataNodesInner, []openapi.JobsJobJobSpecJobDataNodesInner, error) {
 	funcName := "DbCommon::determineNodesDelta"
 	slog.Info(funcName)
 
 	var nodesToAdd []openapi.JobsJobJobSpecJobDataNodesInner
 	var nodesToRemove []openapi.JobsJobJobSpecJobDataNodesInner
+	var hostClass string
+	var hostRole string
+	var replicasetName string
+
+	ii := 0
+	if len(aBunchOfStrings) > ii {
+		hostClass = aBunchOfStrings[ii]
+		ii++
+	}
+	if len(aBunchOfStrings) > ii {
+		hostRole = aBunchOfStrings[ii]
+		ii++
+	}
+	if len(aBunchOfStrings) > ii {
+		replicasetName = aBunchOfStrings[ii]
+		ii++
+	}
+
+	slog.Info(funcName, "role", hostRole, "rsName", replicasetName)
 
 	// Locate the node that is in TF but not in CMON; That node needs to be added
 	for i := 0; i < len(nodes); i++ {
 		node := nodes[i]
+		slog.Info("In TF", "host", node.GetHostname(), "role", hostRole, "rsName", replicasetName)
 		isFound := false
 		hh := clusterInfo.GetHosts()
 		for j := 0; j < len(hh) && !isFound; j++ {
 			if !strings.EqualFold(hh[j].GetClassName(), hostClass) {
 				continue
 			}
+			if hostRole != "" && replicasetName != "" &&
+				(!strings.EqualFold(hostRole, hh[j].GetRole()) ||
+					!strings.EqualFold(replicasetName, hh[j].GetRs())) {
+				continue
+			}
+			slog.Info("In CMON", "host", hh[j].GetHostname(), "role", hh[j].GetRole(), "rs", hh[j].GetRs())
 			if strings.EqualFold(node.GetHostname(), hh[j].GetHostname()) {
-				slog.Info(funcName, "Found node from TF in CMON", node.GetHostname())
 				isFound = true
 			}
 		}
@@ -334,10 +375,14 @@ func (c *DbCommon) determineNodesDelta(nodes []openapi.JobsJobJobSpecJobDataNode
 		if !strings.EqualFold(h.GetClassName(), hostClass) {
 			continue
 		}
+		if hostRole != "" && replicasetName != "" &&
+			(!strings.EqualFold(hostRole, h.GetRole()) ||
+				!strings.EqualFold(replicasetName, h.GetRs())) {
+			continue
+		}
 		isFound := false
 		for j := 0; j < len(nodes) && !isFound; j++ {
 			if strings.EqualFold(nodes[j].GetHostname(), h.GetHostname()) {
-				slog.Info(funcName, "Found node from CMON in TF", h.GetHostname())
 				isFound = true
 			}
 		}
