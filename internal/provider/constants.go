@@ -48,6 +48,7 @@ const (
 	EXT_CLUSTER_TYPE_REDIS_CLUSTER      = "redis-cluster"
 	EXT_CLUSTER_TYPE_ELASTICSEARH       = "elasticsearch"
 	EXT_CLUSTER_TYPE_MSSQL_ASYN         = "mssql-async"
+	EXT_CLUSTER_TYPE_MSSQL_STANDALONE   = "mssql-standalone"
 	//EXT_CLUSTER_TYPE_ = ""
 )
 

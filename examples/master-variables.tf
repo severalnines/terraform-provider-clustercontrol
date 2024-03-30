@@ -508,6 +508,12 @@ variable "db_backup_retention" {
   default     = 7
 }
 
+variable "db_backup_system_db" {
+  description = "Whether to compress backups"
+  type        = bool
+  default     = true
+}
+
 # --------------------------------------------
 # Backup schedule variables ...
 # --------------------------------------------
