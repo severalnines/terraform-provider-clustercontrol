@@ -70,8 +70,62 @@ variable "db_admin_user_password" {
   sensitive   = true
 }
 
-variable "db_port" {
-  description = "The port on which the DB will accepts connections"
+#variable "db_port" {
+#  description = "The port on which the DB will accepts connections"
+#  type        = string
+#  default     = null
+#}
+
+variable "db_mysql_port" {
+  description = "The port on which MySQL will accept client connections"
+  type        = string
+  default     = "3306"
+}
+
+variable "db_postgres_port" {
+  description = "The port on which PostgreSql will accept client connections"
+  type        = string
+  default     = "5432"
+}
+
+variable "db_mongo_port" {
+  description = "The port on which MongoDB will accept client connections"
+  type        = string
+  default     = "27017"
+}
+
+variable "db_mongo_config_server_port" {
+  description = "The port on which MongoDB config server will accept client connections. MongoS server will use same port# as db_mongo_port"
+  type        = string
+  default     = "27019"
+}
+
+variable "db_redis_port" {
+  description = "The port on which Redis will accept client connections"
+  type        = string
+  default     = "6379"
+}
+
+variable "db_sentinel_port" {
+  description = "The port Redis Sentinel uses to communicate"
+  type        = string
+  default     = "26379"
+}
+
+variable "db_mssqlserver_port" {
+  description = "The port on which MSSQL will accept client connections"
+  type        = string
+  default     = "1433"
+}
+
+variable "db_elasticsearch_http_port" {
+  description = "The port on which MySQL will accept client connections"
+  type        = string
+  default     = "9200"
+}
+
+variable "db_elasticsearch_transfer_port" {
+  description = "The port on which Elasticsearch will accept client connections for data transfer(?)"
   type        = string
   default     = null
 }
@@ -112,6 +166,12 @@ variable "db_enable_uninstall" {
 
 variable "db_semi_sync_replication" {
   description = "Semi-synchronous replication for MySQL and MariaDB non-galera clusters"
+  type        = bool
+  default     = false
+}
+
+variable "db_enable_timescale" {
+  description = "For PosgtgreSql, whether to enable TimescaleDB extension (or not)"
   type        = bool
   default     = false
 }
@@ -192,6 +252,58 @@ variable "db_auto_recovery" {
   default     = true
 }
 
+variable "db_load_balancer" {
+  description = "The list of nodes/hosts that make up the cluster"
+  type = list(object({
+    db_lb_type                = string
+    db_lb_version             = string
+    db_lb_admin_username      = string
+    db_lb_admin_user_password = string
+    db_lb_port                = string
+    disable_firewall          = bool
+    disable_selinux           = bool
+    db_lb_install_software    = bool
+    db_lb_enable_uninstall    = bool
+    db_lb_use_clustering      = bool
+    db_lb_use_rw_splitting    = bool
+    ssh_user                  = string
+    ssh_user_password         = string
+    ssh_key_file              = string
+    ssh_port                  = string
+  }))
+  default = null
+}
+
+variable "db_enable_ssl" {
+  description = "Enable SSL based comms between the cluster nodes and client access to node."
+  type        = bool
+  default     = true
+}
+
+variable "db_enable_pgbackrest_agent" {
+  description = "Enable PgBackRest for PostgreSQL based clusters."
+  type        = bool
+  default     = false
+}
+
+variable "db_mongo_auth_db" {
+  description = "The mongodb database to use for authentication purposes"
+  type        = string
+  default     = "admin"
+}
+
+variable "db_enable_pbm_agent" {
+  description = "Enable percona backup for mongodb."
+  type        = bool
+  default     = false
+}
+
+variable "db_pbm_backup_dir" {
+  description = "Backup dir, nfs mounted directory / path for PBM backup."
+  type        = string
+  default     = null
+}
+
 # --------------------------
 # Load balancer variables ...
 # --------------------------
@@ -259,7 +371,7 @@ variable "db_lb_port" {
 }
 
 variable "db_lb_admin_port" {
-  description = "The load balancer port that it will accept connections to manage its configuraiton"
+  description = "The load balancer admin port that will be used to administer it."
   type        = string
   default     = "6032"
 }
@@ -288,7 +400,6 @@ variable "db_lb_enable_uninstall" {
   nullable    = false
   default     = true
 }
-
 
 variable "db_my_host" {
   description = "Details regarding the load balancer host"
@@ -361,6 +472,24 @@ variable "db_backup_host" {
   default     = "auto"
 }
 
+variable "db_enable_backup_failover" {
+  description = "If the host on which backup is attempted fails, try it on another host"
+  type        = bool
+  default     = true
+}
+
+variable "db_backup_failover_host" {
+  description = "When backup failover takes place, which host to swith to"
+  type        = string
+  default     = "auto"
+}
+
+variable "db_backup_storage_host" {
+  description = "Which host to store the backup on. Typically, used with mongodump backup method."
+  type        = string
+  default     = null
+}
+
 variable "db_backup_compression" {
   description = "Whether to compress backups"
   type        = bool
@@ -377,6 +506,28 @@ variable "db_backup_retention" {
   description = "DB backup retentions period (days)"
   type        = number
   default     = 7
+}
+
+variable "db_backup_system_db" {
+  description = "Whether to compress backups"
+  type        = bool
+  default     = true
+}
+
+# --------------------------------------------
+# Backup schedule variables ...
+# --------------------------------------------
+
+variable "db_backup_sched_title" {
+  description = "A title for the backup schedule (e.g., Daily full, Hourly incremental, etc)"
+  type        = string
+  default     = "Sample backup schedule title"
+}
+
+variable "db_backup_sched_time" {
+  description = "The time to kick off a backup (e.g. 'TZ=UTC 0 0 * * *')"
+  type        = string
+  default     = null
 }
 
 # --------------------------

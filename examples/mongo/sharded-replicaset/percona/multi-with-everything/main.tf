@@ -30,7 +30,7 @@ resource "clustercontrol_db_cluster" "this" {
   db_deploy_agents            = var.db_deploy_agents
   db_enable_ssl               = var.db_enable_ssl
   db_mongo_auth_db            = var.db_mongo_auth_db
-  db_enable_pbm_agent         = true
+  db_enable_pbm_agent         = false
   db_pbm_backup_dir           = "/nfs/mongobackup"
   ssh_user                    = var.ssh_user
   ssh_user_password           = var.ssh_user_password
