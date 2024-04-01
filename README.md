@@ -25,23 +25,27 @@ This is the Terraform Provider for the Severalnines ClusterControl - Database Au
 
 ## Requirements
 
-| Name | Version  |
-|------|----------|
-| <a name="requirement_terraform"></a> Terraform | >= 0.13.x   |
-| <a name="requirement_cc"></a> ClusterControl | >= 1.9.7 |
+| Name | Version   |
+|------|-----------|
+| <a name="requirement_terraform"></a> Terraform | >= 0.13.x |
+| <a name="requirement_cc"></a> ClusterControl | >= 1.9.8  |
 
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="requirement_teraform_cc"></a> Terraform ClusterControl Provider | >= 0.1.0 |
+|------|--------|
+| <a name="requirement_teraform_cc"></a> Terraform ClusterControl Provider | >= 0.1 |
 
 ## Resources
 
-| Name |
-|------|
-| clustercontrol_db_cluster |
+| Name                                                                                                                                                                     |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md#clustercontrol_db_cluster-resource) |
+| [clustercontrol_db_cluster_backup](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup.md#clustercontrol_db_cluster_backup-resource)|                                                                                                                                                                                    |
+| [clustercontrol_db_cluster_backup_schedule](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup_schedule.md#clustercontrol_db_cluster_backup_schedule-resource) |
+| [clustercontrol_db_cluster_maintenance](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_maintenance.md#clustercontrol_db_cluster_maintenance-resource)|
+
 
 ## Quick Start
 ### Installing and configuring ClusterControl for API access
@@ -67,9 +71,13 @@ Where ``username`` and ``password`` are valid login credentials for ClusterContr
 
 ### Deploying database clusters using terraform for ClusterControl
 
-**Navigate** to the examples sub-directory for more information.
+**Navigate** to the [examples](https://github.com/severalnines/terraform-provider-clustercontrol/tree/main/docs) folder 
+for concrete examples on deploying database clusters of various types (MySQL/MariaDB replication or galera with ProxySQL, 
+PostgreSql replication, MongoDB replicaset and/or sharded, Redis sentinel, Microsoft SQL server, and Elasticsearch)
 
-Setup ``terraform.tfvars`` file with the following secrets.
+**Navigate** to the [docs](https://github.com/severalnines/terraform-provider-clustercontrol/tree/main/docs) folder for generated documentation on the terraform provider plugin for ClusterControl
+
+### Setup ``terraform.tfvars`` file with the following secrets.
 
 
 ```editor
