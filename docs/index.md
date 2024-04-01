@@ -17,6 +17,6 @@ description: |-
 
 ### Required
 
-- `cc_api_url` (String)
-- `cc_api_user` (String)
-- `cc_api_user_password` (String, Sensitive)
+- `cc_api_url` (String) ClusterControl controller url e.g. (https://cc-host:9501/v2)
+- `cc_api_user` (String) ClusterControl API user
+- `cc_api_user_password` (String, Sensitive) ClusterControl API user's password

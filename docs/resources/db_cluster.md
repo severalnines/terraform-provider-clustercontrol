@@ -17,61 +17,80 @@ description: |-
 
 ### Required
 
-- `db_admin_user_password` (String, Sensitive) TODO
-- `db_cluster_name` (String) TODO: The name of the resource, also acts as it's unique ID
-- `db_cluster_type` (String) TODO
-- `db_vendor` (String) TODO
-- `db_version` (String) TODO
-- `ssh_user` (String) TODO
+- `db_admin_user_password` (String, Sensitive) Password for the admin/root user for the database. Note that this may show up in logs, and it will be stored in the state file
+- `db_cluster_name` (String) The name of the database cluster.
+- `db_cluster_type` (String) Type of cluster - replication, galera, postgresql_single (single is a misnomer), etc
+- `db_vendor` (String) Database vendor - oracle, percona, mariadb, 10gen, microsoft, redis, elasticsearch, for postgresql it is `default` etc
+- `db_version` (String) The database version
+- `ssh_key_file` (String) SSH Key file. The path to the private key file for the Sudo user on the ClusterControl host
+- `ssh_user` (String) The SSH user ClusterControl will use to SSH to the DB host from the ClusterControl host
 
 ### Optional
 
-- `db_admin_username` (String) TODO
-- `db_cluster_create` (Boolean) TODO
-- `db_cluster_import` (Boolean) TODO
-- `db_config_server` (Block List) The hosts that make up the cluster. (see [below for nested schema](#nestedblock--db_config_server))
-- `db_data_directory` (String) TODO
-- `db_host` (Block List) The hosts that make up the cluster. (see [below for nested schema](#nestedblock--db_host))
-- `db_install_software` (Boolean) TODO
-- `db_mongos_server` (Block List) The hosts that make up the cluster. (see [below for nested schema](#nestedblock--db_mongos_server))
-- `db_port` (String) TODO
+- `db_admin_username` (String) Name for the admin/root user for the database
+- `db_auto_recovery` (Boolean) Have cluster auto-recovery on (or off)
+- `db_cluster_create` (Boolean) Whether to create this resource or not?
+- `db_cluster_import` (Boolean) Whether to import this resource or not?
+- `db_config_server` (Block List) Specification for the MongoDB Configuration Server. (see [below for nested schema](#nestedblock--db_config_server))
+- `db_data_directory` (String) The data directory for the database data files. If not set explicily, the default for the respective DB vendor will be chosen
+- `db_deploy_agents` (Boolean) Automatically deploy prometheus and other relevant agents after setting up the intial DB cluster.
+- `db_elasticsearch_http_port` (String) The port on which Elasticsearch will accept client http connections
+- `db_elasticsearch_transfer_port` (String) The port on which Elasticsearch will accept client connections for data transfer(?)
+- `db_enable_pbm_agent` (Boolean) Enable percona backup for mongodb.
+- `db_enable_pgbackrest_agent` (Boolean) Enable PgBackRest for Postgres.
+- `db_enable_ssl` (Boolean) Enable SSL based comms between the cluster nodes and client access to node.
+- `db_enable_timescale` (Boolean) Whether to setup TimescaleDB extension or not
+- `db_enable_uninstall` (Boolean) When removing DB cluster from ClusterControl, enable uinstalling DB packages.
+- `db_host` (Block List) The list of nodes/hosts that make up the cluster (see [below for nested schema](#nestedblock--db_host))
+- `db_install_software` (Boolean) Install DB packages from respective repos
+- `db_load_balancer` (Block List) The list of nodes/hosts that make up the cluster (see [below for nested schema](#nestedblock--db_load_balancer))
+- `db_mongo_auth_db` (String) The mongodb database to use for authentication purposes
+- `db_mongo_config_server_port` (String) The port on which MongoDB config server will accept client connections. MongoS server will use same port# as db_mongo_port
+- `db_mongo_port` (String) The port on which MongoDB will accept client connections
+- `db_mongos_server` (Block List) Specification for the MongoDB mongos Server. (see [below for nested schema](#nestedblock--db_mongos_server))
+- `db_mssqlserver_port` (String) The port on which MSSQL will accept client connections
+- `db_mysql_port` (String) The port on which MySQL will accept client connections
+- `db_pbm_backup_dir` (String) Backup dir, nfs mounted directory / path for PBM backup.
+- `db_postgres_port` (String) The port on which PostgreSql will accept client connections
+- `db_redis_port` (String) The port on which Redis will accept client connections
 - `db_replica_set` (Block List) The hosts that make up the cluster. (see [below for nested schema](#nestedblock--db_replica_set))
-- `db_semi_sync_replication` (Boolean) TODO
-- `db_snapshot_host` (String) TODO
-- `db_snapshot_location` (String) TODO
-- `db_snapshot_repository` (String) TODO
-- `db_tags` (Set of String) An optional list of tags, represented as a key, value pair
-- `db_topology` (Block List) TODO (see [below for nested schema](#nestedblock--db_topology))
-- `disable_firewall` (Boolean) TODO
-- `ssh_key_file` (String) SSH Key file.
-- `ssh_port` (String) TODO
-- `ssh_user_password` (String, Sensitive) TODO
-- `timeouts` (Map of String) TODO
+- `db_semi_sync_replication` (Boolean) Semi-synchronous replication for MySQL and MariaDB non-galera clusters
+- `db_sentinel_port` (String) The port Redis Sentinel uses to communicate
+- `db_snapshot_host` (String) Elasticsearch snapshot host
+- `db_snapshot_location` (String) Elasticsearch snapshot location
+- `db_snapshot_repository` (String) Elasticsearch snapshot repository
+- `db_tags` (Set of String) Tags to associate with a DB cluster. The tags are only relevant in the ClusterControl domain.
+- `db_topology` (Block List) Only applicable to MySQL/MariaDB non-galera clusters. A way to specify Master and Slave(s). (see [below for nested schema](#nestedblock--db_topology))
+- `disable_firewall` (Boolean) Disable firewall on the host OS when installing DB packages.
+- `disable_selinux` (Boolean) Disable SELinux on the host OS when installing DB packages.
+- `ssh_port` (String) The ssh port.
+- `ssh_user_password` (String, Sensitive) Sudo user's password. If sudo user doesn't have a password, leave this field blank
 
 ### Read-Only
 
+- `db_cluster_id` (String) TODO
 - `id` (String) The ID of this resource.
+- `last_updated` (String) TODO
 
 <a id="nestedblock--db_config_server"></a>
 ### Nested Schema for `db_config_server`
 
 Required:
 
-- `member` (Block List, Min: 1) The hosts that make up the cluster. (see [below for nested schema](#nestedblock--db_config_server--member))
-- `rs` (String) TODO.
+- `member` (Block List, Min: 1) The host that make up the replicaset member. (see [below for nested schema](#nestedblock--db_config_server--member))
+- `rs` (String) The replicaset's name.
 
 <a id="nestedblock--db_config_server--member"></a>
 ### Nested Schema for `db_config_server.member`
 
 Required:
 
-- `hostname` (String) TODO.
+- `hostname` (String) Hostname of the DB host. Can be IP address as well.
 
 Optional:
 
-- `hostname_data` (String) TODO.
-- `hostname_internal` (String) TODO.
-- `port` (String) TODO.
+- `hostname_data` (String) Hostname/IP used for data comms (may be legacy ClusterControl).
+- `hostname_internal` (String) If there's a private net that all DB hosts can communicate, use it here.
 
 
 
@@ -80,17 +99,53 @@ Optional:
 
 Required:
 
-- `hostname` (String) TODO.
+- `hostname` (String) Hostname of the DB host. Can be IP address as well
 
 Optional:
 
-- `data_dir` (String) TODO.
-- `hostname_data` (String) TODO.
-- `hostname_internal` (String) TODO.
-- `port` (String) TODO.
+- `datadir` (String) The data directory for the database data files. If not set explicily, default for the DB type will be used, or inherited from earlier/top-level specification.
+- `hostname_data` (String) Hostname/IP used for data comms (may be legacy ClusterControl).
+- `hostname_internal` (String) If there's a private net that all DB hosts can communicate, use it here.
 - `protocol` (String) TODO.
-- `roles` (String) TODO.
-- `sync_replication` (Boolean) TODO
+- `roles` (String) Applicable to Elasticsearch - the role of this host (master-data: host will be designated as the master node and a data node, etc)
+- `sync_replication` (Boolean) Applicable to PostgreSQL hot-standby nodes only. Use synchronous replication (or  not)
+
+
+<a id="nestedblock--db_load_balancer"></a>
+### Nested Schema for `db_load_balancer`
+
+Required:
+
+- `db_lb_admin_user_password` (String, Sensitive) The load balancer admin user's password
+- `db_lb_monitor_user_password` (String, Sensitive) The load balancer monitor user's password
+- `db_lb_type` (String) The load balancer type (e.g., proxysql, haproxy, etc)
+- `db_lb_version` (String) Software version
+- `ssh_user` (String) The SSH user ClusterControl will use to SSH to the DB host from the ClusterControl host
+
+Optional:
+
+- `db_lb_admin_port` (String) The load balancer admin port that will be used to administer it.
+- `db_lb_admin_username` (String) The load balancer admin user
+- `db_lb_enable_uninstall` (Boolean) When removing DB cluster from ClusterControl, enable uinstalling DB packages.
+- `db_lb_install_software` (Boolean) Install DB packages from respective repos
+- `db_lb_monitor_username` (String) The load balancer monitor user (only applicable to proxysql)
+- `db_lb_port` (String) The load balancer port that it will accept connections on behalf of the database it is front-ending.
+- `db_lb_use_clustering` (Boolean) Whether to use ProxySQL clustering or not. Only applicable to ProxySQL at this time
+- `db_lb_use_rw_splitting` (Boolean) Whether to Read/Write splitting for queries or not?
+- `db_my_host` (Block List) The load balancer host in question (i.e, self) (see [below for nested schema](#nestedblock--db_load_balancer--db_my_host))
+- `disable_firewall` (Boolean) Disable firewall on the host OS when installing DB packages.
+- `disable_selinux` (Boolean) Disable SELinux on the host OS when installing DB packages.
+- `ssh_key_file` (String) SSH Key file. The path to the private key file for the Sudo user on the ClusterControl host.
+- `ssh_port` (String) The ssh port.
+- `ssh_user_password` (String, Sensitive) Sudo user's password. If sudo user doesn't have a password, leave this field blank
+
+<a id="nestedblock--db_load_balancer--db_my_host"></a>
+### Nested Schema for `db_load_balancer.db_my_host`
+
+Required:
+
+- `hostname` (String) Hostname/IP of this load balancer. Can be IP address as well.
+
 
 
 <a id="nestedblock--db_mongos_server"></a>
@@ -98,13 +153,12 @@ Optional:
 
 Required:
 
-- `hostname` (String) TODO.
+- `hostname` (String) Hostname of the DB host. Can be IP address as well.
 
 Optional:
 
-- `hostname_data` (String) TODO.
-- `hostname_internal` (String) TODO.
-- `port` (String) TODO.
+- `hostname_data` (String) Hostname/IP used for data comms (may be legacy ClusterControl).
+- `hostname_internal` (String) If there's a private net that all DB hosts can communicate, use it here.
 
 
 <a id="nestedblock--db_replica_set"></a>
@@ -112,25 +166,24 @@ Optional:
 
 Required:
 
-- `member` (Block List, Min: 1) The hosts that make up the cluster. (see [below for nested schema](#nestedblock--db_replica_set--member))
-- `rs` (String) TODO.
+- `member` (Block List, Min: 1) The hosts that make up the replicaset HA nodes. (see [below for nested schema](#nestedblock--db_replica_set--member))
+- `rs` (String) The replicaset's name.
 
 <a id="nestedblock--db_replica_set--member"></a>
 ### Nested Schema for `db_replica_set.member`
 
 Required:
 
-- `hostname` (String) TODO.
+- `hostname` (String) Hostname of the DB host. Can be IP address as well
 
 Optional:
 
-- `arbiter_only` (Boolean) TODO.
+- `arbiter_only` (Boolean) The host is acting as an arbiter only.
 - `hidden` (Boolean) TODO.
-- `hostname_data` (String) TODO.
-- `hostname_internal` (String) TODO.
-- `port` (String) TODO.
-- `priority` (String) TODO.
-- `slave_delay` (String) TODO.
+- `hostname_data` (String) Hostname/IP used for data comms (may be legacy ClusterControl).
+- `hostname_internal` (String) If there's a private net that all DB hosts can communicate, use it here.
+- `priority` (Number) Priority of the host in the mongo replication setup.
+- `slave_delay` (String) Used in non-galera MySQL/MariaDB standby setup. Specifies the lag for the slave.
 
 
 
@@ -139,5 +192,5 @@ Optional:
 
 Optional:
 
-- `primary` (String) TODO.
-- `replica` (String) TODO.
+- `primary` (String) The Master host
+- `replica` (String) The Slave host.
