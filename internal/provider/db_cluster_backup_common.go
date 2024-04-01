@@ -13,7 +13,7 @@ type DbBackupCommon struct{}
 
 func (c *DbBackupCommon) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
 	funcName := "DbBackupCommon::GetBackupInputs"
-	slog.Info(funcName)
+	slog.Debug(funcName)
 
 	var err error
 

@@ -50,7 +50,7 @@ func (m *Redis) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpe
 
 	sentinelPort := d.Get(TF_FIELD_CLUSTER_SENTINEL_PORT).(string)
 	if sentinelPort == "" {
-		sentinelPort = DEFAULT_MONGO_REDIS_SENTINEL_PORT
+		sentinelPort = DEFAULT_REDIS_SENTINEL_PORT
 	}
 	jobData.SetSentinelPort(sentinelPort)
 
@@ -127,7 +127,7 @@ func (c *Redis) IsUpdateBatchAllowed(d *schema.ResourceData) error {
 
 func (c *Redis) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
 	funcName := "Redis::HandleUpdate"
-	slog.Info(funcName)
+	slog.Debug(funcName)
 
 	var err error
 
@@ -293,7 +293,7 @@ func (c *Redis) HandleUpdate(ctx context.Context, d *schema.ResourceData, m inte
 
 func (c *Redis) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
 	funcName := "Redis::GetBackupInputs"
-	slog.Info(funcName)
+	slog.Debug(funcName)
 
 	var err error
 

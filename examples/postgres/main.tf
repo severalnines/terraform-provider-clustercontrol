@@ -82,7 +82,7 @@ resource "clustercontrol_db_cluster" "this" {
 #   db_backup_retention          = var.db_backup_retention
 # }
 
-# resource "clustercontrol_db_cluster_backup" "full-03-28-2024_1_1" {
+# resource "clustercontrol_db_cluster_backup" "pgbackrest-incremental-1" {
 #   depends_on                   = [clustercontrol_db_cluster.this]
 #   db_cluster_id                = clustercontrol_db_cluster.this.id
 #   db_backup_method             = "pgbackrestincr"
@@ -104,7 +104,7 @@ resource "clustercontrol_db_cluster" "this" {
 #   db_maint_reason     = "Hardware refresh March 27, 2024"
 # }
 
-# resource "clustercontrol_db_cluster_backup" "full-dump-03-27-2024_1" {
+# resource "clustercontrol_db_cluster_backup" "full-2" {
 #   depends_on                   = [clustercontrol_db_cluster.this]
 #   db_cluster_id                = clustercontrol_db_cluster.this.id
 #   db_backup_method             = "pgdumpall"

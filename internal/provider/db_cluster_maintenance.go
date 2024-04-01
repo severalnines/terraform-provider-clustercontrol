@@ -116,7 +116,7 @@ func resourceCreateDbMaintenance(ctx context.Context, d *schema.ResourceData, m 
 		})
 		return diags
 	}
-	slog.Info(funcName, "Resp `MaintenancePost.addMaintenance`", resp, "clusterId", clusterId)
+	slog.Debug(funcName, "Resp `MaintenancePost.addMaintenance`", resp, "clusterId", clusterId)
 
 	var respBytes []byte
 	if respBytes, err = io.ReadAll(resp.Body); err != nil {
@@ -173,7 +173,7 @@ func resourceDeleteDbMaintenance(ctx context.Context, d *schema.ResourceData, m 
 		})
 		return diags
 	}
-	slog.Info(funcName, "Resp `MaintenancePost.removeMaintenance`", resp, "maint UUID", d.Id())
+	slog.Debug(funcName, "Resp `MaintenancePost.removeMaintenance`", resp, "maint UUID", d.Id())
 
 	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC822))
 	d.SetId("")

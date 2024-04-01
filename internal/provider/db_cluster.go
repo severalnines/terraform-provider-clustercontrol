@@ -629,7 +629,7 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	isImport := d.Get(TF_FIELD_CLUSTER_IMPORT).(bool)
 	if !isCreate && !isImport {
 		str := fmt.Sprintf("%s: No work to be done. Create and Import are disabled.", funcName)
-		slog.Info(str)
+		slog.Warn(str)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  str,
@@ -639,7 +639,7 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 
 	if isImport && !isCreate {
 		str := "Importing a cluster into ClusterControl is not supported at this time."
-		slog.Info(str)
+		slog.Warn(str)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  str,
@@ -657,14 +657,14 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	clusterType, ok := gExtClusterTypeToIntClusterTypeMap[extClusterType]
 	if !ok {
 		str := fmt.Sprintf("Unsupported cluster-type: %s", extClusterType)
-		slog.Info(str)
+		slog.Warn(str)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  str,
 		})
 		return diags
 	}
-	slog.Info(clusterType)
+	slog.Debug(clusterType)
 
 	var getInputs DbClusterInterface = nil
 

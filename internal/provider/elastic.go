@@ -128,7 +128,7 @@ func (c *Elastic) HandleUpdate(ctx context.Context, d *schema.ResourceData, m in
 
 func (c *Elastic) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
 	funcName := "Elastic::GetBackupInputs"
-	slog.Info(funcName)
+	slog.Debug(funcName)
 
 	var err error
 

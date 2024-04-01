@@ -77,7 +77,6 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		return nil, diag.FromErr(err)
 	}
 	slog.Debug("providerConfigure", "Resp `AuthApi.AuthPost`", resp)
-	//slog.Info("providerConfigure", "Resp `AuthApi.AuthPost`", resp)
 
 	// fmt.Println("#Cookies: ", len(resp.Cookies()))
 	slog.Debug("providerConfigure", "Num cookies", len(resp.Cookies()))

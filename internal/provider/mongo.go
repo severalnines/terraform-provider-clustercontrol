@@ -305,7 +305,7 @@ func (c *MongoDb) IsUpdateBatchAllowed(d *schema.ResourceData) error {
 
 func (c *MongoDb) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
 	funcName := "MongoDb::HandleUpdate"
-	slog.Info(funcName)
+	slog.Debug(funcName)
 
 	var err error
 
@@ -455,6 +455,7 @@ func (c *MongoDb) HandleUpdate(ctx context.Context, d *schema.ResourceData, m in
 			jobData.SetMongosServers(mongosServers)
 			var emptyReplicasets []openapi.JobsJobJobSpecJobDataReplicaSetsInner
 			jobData.SetReplicaSets(emptyReplicasets)
+			slog.Info(funcName, "Adding hostname", rsMemNode.GetHostname())
 		} else if isRemove {
 			jobSpec.SetCommand(CMON_JOB_REMOVE_NODE_COMMAND)
 			rsNodeToAddOrRemove = &rsMembersToRemove[0]
@@ -465,7 +466,7 @@ func (c *MongoDb) HandleUpdate(ctx context.Context, d *schema.ResourceData, m in
 			jobData.SetNode(node)
 			jobData.SetEnableUninstall(true)
 			jobData.SetUnregisterOnly(false)
-			slog.Info(funcName, "Removing hostname", node.GetHostname())
+			slog.Debug(funcName, "Removing hostname", node.GetHostname())
 		} else {
 			return nil
 		}
@@ -485,7 +486,7 @@ func (c *MongoDb) HandleUpdate(ctx context.Context, d *schema.ResourceData, m in
 
 func (m *MongoDb) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
 	funcName := "MongoDb::GetBackupInputs"
-	slog.Info(funcName)
+	slog.Debug(funcName)
 
 	var err error
 

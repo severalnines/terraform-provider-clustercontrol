@@ -100,7 +100,7 @@ func (c *LBCommon) findLoadbalancerEntry(d *schema.ResourceData, hostname string
 
 func (c *LBCommon) determineProxyDelta(d *schema.ResourceData, clusterInfo *openapi.ClusterResponse, hostClass string) ([]openapi.JobsJobJobSpecJobDataNodesInner, []openapi.JobsJobJobSpecJobDataNodesInner, error) {
 	funcName := "determineProxyDelta::determineNodesDelta"
-	slog.Info(funcName)
+	slog.Debug(funcName)
 
 	var nodesToAdd []openapi.JobsJobJobSpecJobDataNodesInner
 	var nodesToRemove []openapi.JobsJobJobSpecJobDataNodesInner
@@ -133,13 +133,13 @@ func (c *LBCommon) determineProxyDelta(d *schema.ResourceData, clusterInfo *open
 				continue
 			}
 			if strings.EqualFold(node.GetHostname(), hs[j].GetHostname()) {
-				slog.Info(funcName, "Found node from TF in CMON", node.GetHostname())
+				slog.Debug(funcName, "Found node from TF in CMON", node.GetHostname())
 				isFound = true
 				break
 			}
 		}
 		if !isFound {
-			slog.Info(funcName, "Node not in CMON. Adding to CMON add-node list", node.GetHostname())
+			slog.Debug(funcName, "Node not in CMON. Adding to CMON add-node list", node.GetHostname())
 			// Need to add this node to the cluster
 			nodesToAdd = append(nodesToAdd, node)
 		}
@@ -155,13 +155,13 @@ func (c *LBCommon) determineProxyDelta(d *schema.ResourceData, clusterInfo *open
 		isFound := false
 		for j := 0; j < len(nodes); j++ {
 			if strings.EqualFold(nodes[j].GetHostname(), host.GetHostname()) {
-				slog.Info(funcName, "Found node from CMON in TF", host.GetHostname())
+				slog.Debug(funcName, "Found node from CMON in TF", host.GetHostname())
 				isFound = true
 				break
 			}
 		}
 		if !isFound {
-			slog.Info(funcName, "Node not in TF. Adding to CMON remove-node list", host.GetHostname())
+			slog.Debug(funcName, "Node not in TF. Adding to CMON remove-node list", host.GetHostname())
 			// Need to remove this node from the cluster
 			var n = openapi.JobsJobJobSpecJobDataNodesInner{}
 			n.SetHostname(host.GetHostname())

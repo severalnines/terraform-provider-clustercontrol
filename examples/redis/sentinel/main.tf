@@ -59,7 +59,7 @@ resource "clustercontrol_db_cluster" "this" {
 
 }
 
-# resource "clustercontrol_db_cluster_backup" "full-03-27-2024_1" {
+# resource "clustercontrol_db_cluster_backup" "full-1" {
 #   depends_on                   = [clustercontrol_db_cluster.this]
 #   db_cluster_id                = clustercontrol_db_cluster.this.id
 #   db_backup_method             = ""

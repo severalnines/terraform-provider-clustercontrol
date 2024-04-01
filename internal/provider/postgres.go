@@ -128,7 +128,7 @@ func (c *PostgresSql) IsUpdateBatchAllowed(d *schema.ResourceData) error {
 
 func (c *PostgresSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
 	funcName := "PostgresSql::HandleUpdate"
-	slog.Info(funcName)
+	slog.Debug(funcName)
 
 	var err error
 
@@ -313,7 +313,7 @@ func (c *PostgresSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, 
 
 func (c *PostgresSql) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
 	funcName := "PostgresSql::GetBackupInputs"
-	slog.Info(funcName)
+	slog.Debug(funcName)
 
 	var err error
 

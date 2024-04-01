@@ -15,7 +15,7 @@ output "db_cluster_name" {
 
 output "db_cluster_primary_port" {
   description = "The primary host's port of DB cluster where read and write operations will be accepted."
-  value       = try(clustercontrol_db_cluster.this.db_port, null)
+  value       = try(clustercontrol_db_cluster.this.db_mssqlserver_port, null)
 }
 
 output "db_admin_user" {

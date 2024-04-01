@@ -154,7 +154,7 @@ func GetBackupIdForCluster(ctx context.Context, apiClient *openapi.APIClient, cl
 	var resp *http.Response
 	//var backupResp BackupGetOperationResponse
 
-	slog.Info(funcName, "Job Id", jobId)
+	slog.Debug(funcName, "Job Id", jobId)
 
 	getBackupsOp := *openapi.NewBackup(CMON_BACKUP_OPERATION_GET)
 	getBackupsOp.SetClusterId(clusterId)
@@ -180,8 +180,7 @@ func GetBackupIdForCluster(ctx context.Context, apiClient *openapi.APIClient, cl
 		PrintError(err, nil)
 		return backupId, err
 	}
-	slog.Info(funcName, "Resp `GetBackups` req-status", topLevelResp.Request_Status, "Total recs", topLevelResp.Total)
-	//slog.Info(funcName, "Resp `GetBackups` total recs", topLevelResp)
+	slog.Debug(funcName, "Resp `GetBackups` req-status", topLevelResp.Request_Status, "Total recs", topLevelResp.Total)
 
 	// Find the backup-id that matches the job-id
 	// BackupResponseBackupRecordsInner

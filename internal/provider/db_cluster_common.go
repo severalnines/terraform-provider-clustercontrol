@@ -30,7 +30,7 @@ func (c *DbCommon) HostAndClassCompare(one *openapi.JobsJobJobSpecJobDataNodesIn
 
 func (c *DbCommon) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
 	funcName := "DbCommon::GetInputs"
-	slog.Info(funcName)
+	slog.Debug(funcName)
 
 	var err error
 
@@ -120,7 +120,7 @@ func (c *DbCommon) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJob
 
 func (c *DbCommon) HandleRead(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
 	funcName := "DbCommon::HandleRead"
-	slog.Info(funcName)
+	slog.Debug(funcName)
 
 	//var err error
 
@@ -166,7 +166,7 @@ func (c *DbCommon) IsUpdateBatchAllowed(d *schema.ResourceData) error {
 // *******************************************************************************
 func (c *DbCommon) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
 	funcName := "DbCommon::HandleUpdate"
-	slog.Info(funcName)
+	slog.Debug(funcName)
 
 	var configChanges []openapi.ClustersConfigurationInner
 
@@ -214,7 +214,7 @@ func (c *DbCommon) HandleUpdate(ctx context.Context, d *schema.ResourceData, m i
 			PrintError(err, resp)
 			return err
 		}
-		slog.Info(funcName, "Resp `ClustersPost.setConfig`", resp, "clusterId", clusterInfo.GetClusterId())
+		slog.Debug(funcName, "Resp `ClustersPost.setConfig`", resp, "clusterId", clusterInfo.GetClusterId())
 
 		var respBytes []byte
 		if respBytes, err = io.ReadAll(resp.Body); err != nil {
@@ -327,7 +327,7 @@ func (c *DbCommon) compareHost(nodeInTf *openapi.JobsJobJobSpecJobDataNodesInner
 func (c *DbCommon) determineNodesDelta(nodes []openapi.JobsJobJobSpecJobDataNodesInner,
 	clusterInfo *openapi.ClusterResponse, aBunchOfStrings ...string) ([]openapi.JobsJobJobSpecJobDataNodesInner, []openapi.JobsJobJobSpecJobDataNodesInner, error) {
 	funcName := "DbCommon::determineNodesDelta"
-	slog.Info(funcName)
+	slog.Debug(funcName)
 
 	var nodesToAdd []openapi.JobsJobJobSpecJobDataNodesInner
 	var nodesToRemove []openapi.JobsJobJobSpecJobDataNodesInner
@@ -349,12 +349,12 @@ func (c *DbCommon) determineNodesDelta(nodes []openapi.JobsJobJobSpecJobDataNode
 		ii++
 	}
 
-	slog.Info(funcName, "role", hostRole, "rsName", replicasetName)
+	slog.Debug(funcName, "role", hostRole, "rsName", replicasetName)
 
 	// Locate the node that is in TF but not in CMON; That node needs to be added
 	for i := 0; i < len(nodes); i++ {
 		node := nodes[i]
-		slog.Info("In TF", "host", node.GetHostname(), "role", hostRole, "rsName", replicasetName)
+		slog.Debug("In TF", "host", node.GetHostname(), "role", hostRole, "rsName", replicasetName)
 		isFound := false
 		hh := clusterInfo.GetHosts()
 		for j := 0; j < len(hh) && !isFound; j++ {
@@ -366,13 +366,13 @@ func (c *DbCommon) determineNodesDelta(nodes []openapi.JobsJobJobSpecJobDataNode
 					!strings.EqualFold(replicasetName, hh[j].GetRs())) {
 				continue
 			}
-			slog.Info("In CMON", "host", hh[j].GetHostname(), "role", hh[j].GetRole(), "rs", hh[j].GetRs())
+			slog.Debug("In CMON", "host", hh[j].GetHostname(), "role", hh[j].GetRole(), "rs", hh[j].GetRs())
 			if strings.EqualFold(node.GetHostname(), hh[j].GetHostname()) {
 				isFound = true
 			}
 		}
 		if !isFound {
-			slog.Info(funcName, "Node not in CMON. Adding to CMON add-node list", node.GetHostname())
+			slog.Debug(funcName, "Node not in CMON. Adding to CMON add-node list", node.GetHostname())
 			// Need to add this node to the cluster
 			nodesToAdd = append(nodesToAdd, node)
 		}
@@ -397,7 +397,7 @@ func (c *DbCommon) determineNodesDelta(nodes []openapi.JobsJobJobSpecJobDataNode
 			}
 		}
 		if !isFound {
-			slog.Info(funcName, "Node not in TF. Adding to CMON remove-node list", h.GetHostname())
+			slog.Debug(funcName, "Node not in TF. Adding to CMON remove-node list", h.GetHostname())
 			// Need to remove this node from the cluster
 			var n = openapi.JobsJobJobSpecJobDataNodesInner{}
 			n.SetHostname(h.GetHostname())

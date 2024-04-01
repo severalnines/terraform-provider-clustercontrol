@@ -19,7 +19,7 @@ type MySQLMaria struct {
 
 func (m *MySQLMaria) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
 	funcName := "MySQLMaria::GetInputs"
-	slog.Info(funcName)
+	slog.Debug(funcName)
 
 	var err error
 
@@ -159,7 +159,7 @@ func (c *MySQLMaria) IsUpdateBatchAllowed(d *schema.ResourceData) error {
 
 func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
 	funcName := "MySQLMaria::HandleUpdate"
-	slog.Info(funcName)
+	slog.Debug(funcName)
 
 	var err error
 
@@ -356,6 +356,7 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 			var getInputs DbLoadBalancerInterface
 			getInputs = NewProxySql()
 			err = getInputs.GetInputs(lbTfRecord, &jobData)
+			slog.Info(funcName, "Adding hostname", nodeToAddOrRemove.GetHostname())
 		} else if isRemoveNode {
 			jobSpec.SetCommand(CMON_JOB_REMOVE_NODE_COMMAND)
 			nodeToAddOrRemove = &nodesToRemove[0]
@@ -388,7 +389,7 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 
 func (m *MySQLMaria) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
 	funcName := "MySQL_Maria::GetBackupInputs"
-	slog.Info(funcName)
+	slog.Debug(funcName)
 
 	var err error
 

@@ -203,7 +203,7 @@ func resourceCreateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 	isImport := d.Get(TF_FIELD_LB_IMPORT).(bool)
 	if !isCreate && !isImport {
 		str := fmt.Sprintf("%s: No work to be done. Create and Import are disabled.", funcName)
-		slog.Info(str)
+		slog.Warn(str)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  str,
@@ -213,7 +213,7 @@ func resourceCreateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 
 	if isImport && !isCreate {
 		str := "Importing a load balancer into ClusterControl is not supported at this time."
-		slog.Info(str)
+		slog.Warn(str)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  str,

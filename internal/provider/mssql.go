@@ -125,7 +125,7 @@ func (c *MsSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, m inte
 
 func (c *MsSql) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
 	funcName := "MsSql::GetBackupInputs"
-	slog.Info(funcName)
+	slog.Debug(funcName)
 
 	var err error
 
