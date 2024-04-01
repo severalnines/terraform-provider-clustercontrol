@@ -11,15 +11,15 @@ locals {
 }
 
 resource "clustercontrol_db_cluster" "this" {
-  db_cluster_create      = true
-  db_cluster_import      = false
-  db_cluster_name        = "mydbcluster"
-  db_cluster_type        = "mongo"
-  db_vendor              = "percona"
-  db_version             = "6.0"
-  db_admin_username      = "mongoadmin"
-  db_admin_user_password = "blah%blah"
-  db_auto_recovery       = true
+  db_cluster_create           = true
+  db_cluster_import           = false
+  db_cluster_name             = "mydbcluster"
+  db_cluster_type             = "mongo"
+  db_vendor                   = "percona"
+  db_version                  = "6.0"
+  db_admin_username           = "mongoadmin"
+  db_admin_user_password      = "blah%blah"
+  db_auto_recovery            = true
   db_mongo_port               = var.db_mongo_port
   db_mongo_config_server_port = var.db_mongo_config_server_port
   db_data_directory           = var.db_data_directory
@@ -45,11 +45,11 @@ resource "clustercontrol_db_cluster" "this" {
       #   hostname_data     = "hnd-foo"
       #   hostname_internal = "hni-foo"
     }
-#    member {
-#      hostname = "test-primary-2"
-#      #   hostname_data     = "hnd-foo"
-#      #   hostname_internal = "hni-foo"
-#    }
+    #    member {
+    #      hostname = "test-primary-2"
+    #      #   hostname_data     = "hnd-foo"
+    #      #   hostname_internal = "hni-foo"
+    #    }
   }
 
 }

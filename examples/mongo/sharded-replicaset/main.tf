@@ -54,12 +54,12 @@ resource "clustercontrol_db_cluster" "this" {
     member {
       hostname = "test-primary-2"
     }
-#    member {
-#      hostname = "test-primary-3"
-#    }
-#     member {
-#       hostname = "test-primary-4"
-#     }
+    #    member {
+    #      hostname = "test-primary-3"
+    #    }
+    #     member {
+    #       hostname = "test-primary-4"
+    #     }
   }
 
 }

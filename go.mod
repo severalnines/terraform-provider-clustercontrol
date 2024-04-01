@@ -3,9 +3,9 @@ module github.com/premnalla/new-terraform-provider-clustercontrol
 go 1.21.6
 
 require (
-	github.com/google/uuid v1.4.0
 	github.com/hashicorp/terraform-plugin-docs v0.18.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.32.0
+	github.com/severalnines/clustercontrol-client-sdk/go v0.0.0-20240330144720-ae9d88ca3ef8
 )
 
 require (
@@ -22,6 +22,7 @@ require (
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
+	github.com/google/uuid v1.4.0 // indirect
 	github.com/hashicorp/cli v1.1.6 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-checkpoint v0.5.0 // indirect
@@ -55,7 +56,6 @@ require (
 	github.com/oklog/run v1.0.0 // indirect
 	github.com/posener/complete v1.2.3 // indirect
 	github.com/russross/blackfriday v1.6.0 // indirect
-	github.com/severalnines/clustercontrol-client-sdk/go v0.0.0-20240330144720-ae9d88ca3ef8 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect

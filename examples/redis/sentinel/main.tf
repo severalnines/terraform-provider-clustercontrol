@@ -51,11 +51,11 @@ resource "clustercontrol_db_cluster" "this" {
     # hostname_internal = "hni-foo"
   }
 
-#   db_host {
-#     hostname         = "test-primary-5"
-#     # hostname_data     = "hnd-foo"
-#     # hostname_internal = "hni-foo"
-#   }
+  #   db_host {
+  #     hostname         = "test-primary-5"
+  #     # hostname_data     = "hnd-foo"
+  #     # hostname_internal = "hni-foo"
+  #   }
 
 }
 

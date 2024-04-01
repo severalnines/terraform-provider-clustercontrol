@@ -34,7 +34,7 @@ resource "clustercontrol_db_cluster" "this" {
   ssh_user_password          = var.ssh_user_password
   ssh_key_file               = var.ssh_key_file
   ssh_port                   = var.ssh_port
-  db_tags                    = ["terraform","someothertag"]
+  db_tags                    = ["terraform", "someothertag"]
 
   db_host {
     hostname = "test-primary"
@@ -44,13 +44,13 @@ resource "clustercontrol_db_cluster" "this" {
     # data_dir = "foo"
   }
 
-#   db_host {
-#     hostname = "test-primary-2"
-#     # hostname_data = "foo"
-#     # hostname_internal = "foo"
-#     # config_file = "foo"
-#     # data_dir = "foo"
-#   }
+  #   db_host {
+  #     hostname = "test-primary-2"
+  #     # hostname_data = "foo"
+  #     # hostname_internal = "foo"
+  #     # config_file = "foo"
+  #     # data_dir = "foo"
+  #   }
 
 }
 
