@@ -51,3 +51,55 @@ resource "clustercontrol_db_cluster" "this" {
 ...
 }
 ```
+
+### Adding/Removing nodes to an existing cluster - [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md#clustercontrol_db_cluster-resource)
+
+#### Adding a Replicaiton Slave to a cluster
+
+By adding an additional `db_host` block inside the `clsutercontrol_db_cluster` resource you can 
+add a replication slave to an existing cluster.
+
+Example:
+
+```text
+resource "clustercontrol_db_cluster" "this" {
+    ...
+    db_host {
+        hostname = "host-3"
+    }
+    ...
+
+}
+```
+The above block will add `host-3` as a replication slave to an existing cluster.
+
+#### Removing a node from a cluster
+
+By removing a `db_host` block from inside the `clsutercontrol_db_cluster` resource you can
+remove an existing node from a cluster.
+
+Example:
+
+(**Current State**)
+
+```text
+resource "clustercontrol_db_cluster" "this" {
+    ...
+    db_host {
+        hostname = "host-3"
+    }
+    ...
+}
+```
+
+(**End State**)
+
+```text
+resource "clustercontrol_db_cluster" "this" {
+    ...
+    ...
+}
+```
+
+In the above, the end state has removed the `db_host` block for host `host-3`. The result will be the
+removal of the corresponding `host-3` node from the cluster.
