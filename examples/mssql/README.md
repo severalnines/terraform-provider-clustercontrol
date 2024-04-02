@@ -19,7 +19,7 @@ This directory contains a set of examples for deploying Microsoft SQL Server clu
 | Cluster Type   | Description                                                         |
 |----------------|---------------------------------------------------------------------|
 | `mssql-async` | Primary with Hot Standby replication cluster with Async replication |
-| `mssql-standalone` | Standalong MS SQL database instance                                 |
+| `mssql-standalone` | Standalone MS SQL database instance                                 |
 
 ### `db_vendor` - valid values
 
