@@ -45,8 +45,9 @@ resource "clustercontrol_db_cluster" "this" {
         hostname = "host-1"
     }
     db_host {
-        hostname = "host-1"
+        hostname = "host-2"
     }
+    ...
 
 }
 ```
