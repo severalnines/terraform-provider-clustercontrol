@@ -75,7 +75,7 @@ the `clustercontrol_db_cluster_backup_schedule` resource depends on the `cluster
  }
 ```
 
-### Taking adhoc backups using the - [clustercontrol_db_cluster_maintenance](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_maintenance.md#clustercontrol_db_cluster_maintenance-resource) resource
+### Taking adhoc backups using the - [clustercontrol_db_cluster_backup](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup.md#clustercontrol_db_cluster_backup-resource) resource
 You can a maintenance window for a cluster using the `clustercontrol_db_cluster_backup` resource. 
 Here's an example of a full backup using `xtrabackup`. 
 
@@ -95,7 +95,7 @@ Here's an example of a full backup using `xtrabackup`.
  }
 ```
 
-### Setting a maintenance window using the - [clustercontrol_db_cluster_backup](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup.md#clustercontrol_db_cluster_backup-resource) resource
+### Setting a maintenance window using the - [clustercontrol_db_cluster_maintenance](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_maintenance.md#clustercontrol_db_cluster_maintenance-resource) resource
 You can take adhoc backups (full or incremental) of a cluster using the `clustercontrol_db_cluster_backup` resource.
 Here's an example of a full backup using `xtrabackup`. 
 
