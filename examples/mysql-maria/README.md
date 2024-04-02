@@ -62,7 +62,7 @@ resource "clustercontrol_db_cluster" "this" {
 }
 ```
 
-Above, `host-` is the master and hosts `host-` and `host-3` are slaves to `host-`
+Above, `host-1` is the master and hosts `host-2` and `host-3` are slaves to `host-1`
 
 ## ProxySQL load balancer for MySQL/MariaDB
 You can deploy a ProxySQL load balancer to your MySQL or MariaDB database cluster. 
