@@ -38,7 +38,7 @@ that makes up the DB cluster should have one of these blocks. The mandatory attr
 
 Example:
 
-```
+```text
 resource "clustercontrol_db_cluster" "this" {
     ...
     db_host {
@@ -113,15 +113,15 @@ Here's an example of a full backup using `xtrabackup`.
 
 The following types are supported.
 
-| Database type | Vendor         | Backup method                                              |
-|---------------|----------------|------------------------------------------------------------|
-| MySQL         | Oracle, Percona | `xtrabackupfull`, `xtrabackupincr`, `mysqldump`            |
-| MariaDB       | MariaDB        | `mariabackupfull`, `mariabackupincr`, `mysqldump`          |
-| PostgreSQL    | Community      | `pg_basebackup`, `pgdumpall`, `pgbackrest(full,incr,diff)` |
-| MongoDB       | MongoDB        | `mongodump`, `pbm`- Percona Backup for MongoDB             |
-| Redis         | Redis          | Use the value `""` to indicate (aof - default redis)       |
-| SQL Server    | Microsoft      | `mssql_full`                                               |
-| Elasticsearch | Elastic        | TBD - default snapshot                                     |
+| Database type | Vendor         | Backup method                                                   |
+|---------------|----------------|-----------------------------------------------------------------|
+| MySQL         | Oracle, Percona | `xtrabackupfull`, `xtrabackupincr`, `mysqldump`                 |
+| MariaDB       | MariaDB        | `mariabackupfull`, `mariabackupincr`, `mysqldump`               |
+| PostgreSQL    | Community      | `pg_basebackup`, `pgdumpall`, `pgbackrest(full,incr,diff)`      |
+| MongoDB       | MongoDB        | `mongodump`, `percona-backup-mongodb` |
+| Redis         | Redis          | Use the value `""` to indicate (aof - default redis)            |
+| SQL Server    | Microsoft      | `mssql_full`                                                    |
+| Elasticsearch | Elastic        | TBD - default snapshot                                          |
 
 
 ### Toggling cluster auto-recovery option

@@ -1,6 +1,6 @@
-# MongoDB Shard Example
+# MongoDB Replicaset Example
 
-This directory contains an example for deploying MongoDB shard cluster using the terraform provider for ClusterControl.
+This directory contains an example for deploying MongoDB replicaset cluster using the terraform provider for ClusterControl.
 
 ## Resources
 
@@ -12,24 +12,13 @@ This directory contains an example for deploying MongoDB shard cluster using the
 | [clustercontrol_db_cluster_maintenance](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_maintenance.md#clustercontrol_db_cluster_maintenance-resource)|
 
 
-### Specifying MongoDB Shards
+### Specifying MongoDB Replicasets
 
 #### Specifing MongoDB Config servers and Mongos server for shard clusters
 
 ```text
 resource "clustercontrol_db_cluster" "this" {
 ...
-
-    db_config_server {
-        rs = "rs_config"
-        member {
-          hostname = "config-server"
-        }
-    }
-
-    db_mongos_server {
-        hostname = "config-server"
-    }
 
     db_replica_set {
         rs = "rs0"
@@ -44,24 +33,8 @@ resource "clustercontrol_db_cluster" "this" {
 }
 ```
 
-The `db_config_server` and `db_mongos_server` fields within the [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md#clustercontrol_db_cluster-resource) should be used to specify
-the Mongo config server and mongos server.
+Above, the `db_replica_set` specifies a replicaset with two hosts.
 
-Above, the `db_replica_set` specifies a shard with two hosts in the replicaset.
+### Backup method for Mongo replicaset
 
-### `db_enable_pbm_agent` Enabling PBM (Percona Backup for MongoDB) agent
-Use the `db_enable_pbm_agent` attributed in the [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md#clustercontrol_db_cluster-resource) to enable PBM agent. Once
-the agent is enabled, you can use the `percona-backup-mongodb` backup method either in
-[adhoc backups](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/examples/README.md) or in
-[backup schedules](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/examples/README.md).
-
-You must remember to set an NFS mounted shared filesystem for PBM as shown with the `db_pbm_backup_dir` attribute.
-
-```text
-resource "clustercontrol_db_cluster" "this" {
-...
-  db_enable_pbm_agent = true
-  db_pbm_backup_dir   = "/nfs/mongobackup"
-...
-}
-```
+`mongodump` should be used as the backup method for mongo replicaset deployment.

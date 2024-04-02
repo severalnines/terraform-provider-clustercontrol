@@ -1,21 +1,29 @@
-# ClusterControl Provider Examples
+# MongoDB Examples
 
-This directory contains a set of examples of deploying MongoDb database (replicaset) clusters 
-using ClusterControl. 
+This directory contains a set of examples for deploying MongoDB (Sharded or Replicaset)
+clusters using the terraform provider for ClusterControl.
 
 ## Resources
 
-| Name |
-|------|
-| clustercontrol_db_cluster |
+| Name                                                                                                                                                                     |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md#clustercontrol_db_cluster-resource) |
+| [clustercontrol_db_cluster_backup](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup.md#clustercontrol_db_cluster_backup-resource)|                                                                                                                                                                                    |
+| [clustercontrol_db_cluster_backup_schedule](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup_schedule.md#clustercontrol_db_cluster_backup_schedule-resource) |
+| [clustercontrol_db_cluster_maintenance](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_maintenance.md#clustercontrol_db_cluster_maintenance-resource)|
 
-## Attributes specific to  MongoDB sharded & replicaset deployment
 
-| Attribute                | Data Type   | Required | Description                                                                                 |
-|--------------------------|-------------|----------|---------------------------------------------------------------------------------------------|
-| db_cluster_type | string      | Yes      | Type of cluster. The valid is -``mongodb``                                                  |
-| db_vendor                | string      | Yes      | Database vendor (percona, 10gen).                                                           |
-| db_version               | string      | Yes      | DB version (4.2, 4.4, 5.0, 6.0)                                                             |
-| db_admin_user            | string      | Yes      | DB admin user (eg: mongoadmin)                                                              |
-| db_replica_set           | object      | Yes      | Replicaset specification. List of replicasets and primary/standby hosts for each replicaset |
+## Choosing attribute values for MySQL and MariaDB (replication or galera)
 
+### `db_cluster_type` - valid values for MySQL/MariaDB
+
+| Cluster Type | Description                                                                                |
+|--------------|--------------------------------------------------------------------------------------------|
+| `mongo`      | MongoDB database cluster. Both, Sharded and Replicaset clusters use the same cluster-type. |
+
+### `db_vendor` - valid values
+
+| Vendors             | Description                    |
+|---------------------|--------------------------------|
+| `percona`           | Percona's MongoDB distribution |
+| `mongodb-community` | MongoDB community edition      |

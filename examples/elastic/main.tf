@@ -14,8 +14,8 @@ resource "clustercontrol_db_cluster" "this" {
   db_cluster_create              = true
   db_cluster_import              = false
   db_cluster_name                = "mydbcluster"
-  db_cluster_type                = "elastic"
-  db_vendor                      = "elasticsearch"
+  db_cluster_type                = "elasticsearch"
+  db_vendor                      = "elastic"
   db_version                     = "8.3.1"
   db_admin_username              = "esadmin"
   db_admin_user_password         = "blah%blah"
