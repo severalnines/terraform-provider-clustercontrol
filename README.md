@@ -71,7 +71,7 @@ Where ``username`` and ``password`` are valid login credentials for ClusterContr
 
 ### Deploying database clusters using terraform for ClusterControl
 
-**Navigate** to the [examples](https://github.com/severalnines/terraform-provider-clustercontrol/tree/main/docs) folder 
+**Navigate** to the [examples](https://github.com/severalnines/terraform-provider-clustercontrol/tree/main/examples) folder 
 for concrete examples on deploying database clusters of various types (MySQL/MariaDB replication or galera with ProxySQL, 
 PostgreSql replication, MongoDB replicaset and/or sharded, Redis sentinel, Microsoft SQL server, and Elasticsearch)
 
