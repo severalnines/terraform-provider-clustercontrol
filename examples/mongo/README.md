@@ -29,9 +29,9 @@ clusters using the terraform provider for ClusterControl.
 | `mongodb-community` | MongoDB community edition      |
 
 
-### Adding/Removing nodes to a replicaset cluster - [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md#clustercontrol_db_cluster-resource)
+### Adding/Removing a node to/from a Replicaset - [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md#clustercontrol_db_cluster-resource)
 
-#### Adding a node to a Replicaset
+#### Adding a node to a replicaset
 
 By adding an additional `member` block inside `db_replica_set` you can add a node to an existing replicaset.
 
@@ -81,6 +81,6 @@ resource "clustercontrol_db_cluster" "this" {
 The above would add member host, `shard0-host-3`, to replicaset `rs0`
 
 
-#### Removing a node from a cluster
+#### Removing a node from a Replicaset
 
-Similarly, by removing a `member` block inside the `db_replica_set` block, you can remove an existing replicaset node.
+Similarly, by removing a `member` block inside the `db_replica_set` block, you can remove an existing replicaset member.
