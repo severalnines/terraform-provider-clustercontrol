@@ -150,7 +150,7 @@ func (c *MySQLMaria) IsUpdateBatchAllowed(d *schema.ResourceData) error {
 	updateClassA = d.HasChange(TF_FIELD_CLUSTER_LOAD_BALANCER)
 	updateClassAprime = d.HasChangeExcept(TF_FIELD_CLUSTER_LOAD_BALANCER)
 	if updateClassA && updateClassAprime {
-		err = errors.New(fmt.Sprintf("You are not allowed to update %s along with any other fields.", TF_FIELD_CLUSTER_HOST))
+		err = errors.New(fmt.Sprintf("You are not allowed to update %s along with any other fields.", TF_FIELD_CLUSTER_LOAD_BALANCER))
 		return err
 	}
 
