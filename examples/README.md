@@ -52,7 +52,7 @@ resource "clustercontrol_db_cluster" "this" {
 }
 ```
 
-### Resource Backup schedule - [clustercontrol_db_cluster_backup_schedule](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup_schedule.md#clustercontrol_db_cluster_backup_schedule-resource)
+### Scheduling Backups using the - [clustercontrol_db_cluster_backup_schedule](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup_schedule.md#clustercontrol_db_cluster_backup_schedule-resource) Resource 
 The backup schedule resource allows you to create a backup schedule for a cluster in ClusterControl through the 
 terraform provider. Here's an example of a daily full backup schedule using `xtrabackup`. As can be seen 
 the `clustercontrol_db_cluster_backup_schedule` resource depends on the `clustercontrol_db_cluster` resource.
