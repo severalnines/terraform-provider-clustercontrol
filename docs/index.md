@@ -9,8 +9,8 @@ description: "Supported databases: MySQL Replication, MySQL Galera, PostgreSQL, 
 # clustercontrol provider
 
 ClusterControl is a database operations orchestration platform for 
-mysql replication, mariadb server, mariadb galera cluster, percona server, 
-percona xtradb, postgresql, timescaledb, mongodb, ms sql server, redis, and elasticsearch, 
+MySQL replication, MariaDB server, MariaDB Galera cluster, Percona server, 
+Percona XtraDB, PostgreSQL, TimescaleDB, MongoDB, MS SQL Server, Redis, and ElasticSearch, 
 that can be deployed in on-premises, cloud, and hybrid environments.
 
 It supports full-lifecycle database ops such as deployment, replication, high availability, 
@@ -28,7 +28,7 @@ ClusterControl is for teams supporting mid to enterprise-level database operatio
 these uses generally require access, workload portability, and automation at scale.
 
 This provider is used to create database resources provided by clustercontrol. 
-Supported databases: mysql replication, mysql galera, postgresql, timescaledb, redis sentinel, and mongodb replicaset and shards
+Supported databases: MySQL replication, MySQL Galera, Postgresql, Timescaledb, Redis Sentinel, and MongoDB Replicaset and Shards.
 
 Use the navigation to the left to read about the available resources.
 
