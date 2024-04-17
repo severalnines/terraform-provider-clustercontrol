@@ -16,7 +16,7 @@ A complete set of examples can be found in the [examples](../../examples/README.
     - [ProxySQL deployment and configuration ](../../examples/mysql-maria#proxysql-load-balancer-for-mysqlmariadb)
   - [PostgreSQL cluster deployment and configuration](../../examples/postgres)
     - [PostgreSQL cluster deployment and configuration example](../../examples/postgres/main.tf)
-    - [Enabling TimescaleDB](../..n/examples/postgres#db_enable_timescale-enabling-timescaledb-extension)
+    - [Enabling TimescaleDB](../../examples/postgres#db_enable_timescale-enabling-timescaledb-extension)
     - [Enabling PgBackRest agent](../../examples/postgres#db_enable_pgbackrest_agent-enabling-pgbackrest-agent)
   - [MongoDB cluster deployment and configuration ](../../examples/mongo)
     - [MongoDB Sharded Replicaset cluster deployment and configuration](../../examples/mongo/sharded-replicaset)
