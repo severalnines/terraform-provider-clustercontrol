@@ -34,8 +34,8 @@ This is the Terraform Provider for the Severalnines ClusterControl - Database Au
 ## Providers
 
 | Name | Version |
-|------|--------|
-| <a name="requirement_teraform_cc"></a> Terraform ClusterControl Provider | >= 0.1 |
+|------|---------|
+| <a name="requirement_teraform_cc"></a> Terraform ClusterControl Provider | >= 0.1  |
 
 ## Resources
 
