@@ -56,3 +56,11 @@ resource "clustercontrol_db_cluster" "this" {
 
 }
 ```
+
+### Host/Node roles
+
+| Role          | Description                                                      |
+|---------------|------------------------------------------------------------------|
+| `master-data` | The host will function as both a `Master` node and a `Data` node |
+| `master`      | The host will function as both a `Master` node only              |
+| `data`        | The host will function as both a `Data` node only                |
