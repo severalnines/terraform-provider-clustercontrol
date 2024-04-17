@@ -4,7 +4,7 @@ page_title: "Examples"
 
 # Examples Guide
 
-A complete set of examples can be found in the [examples](https://github.com/severalnines/terraform-provider-clustercontrol/tree/main/examples) folder.
+A complete set of examples can be found in the [examples](../../examples/README.md) folder.
 
 ## Example topics
 
