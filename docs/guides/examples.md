@@ -10,8 +10,8 @@ A complete set of examples can be found in the [examples](https://github.com/sev
 
 - [Getting Started](./getting-started.md)
 ### Deploying Database Clusters
-  - [MySQL/MariaDB deployment and configuration](https://github.com/severalnines/terraform-provider-clustercontrol/tree/main/examples/mysql-maria)
-    - [MySQL/MariaDB replication cluster deployment and configuration example](https://github.com/severalnines/terraform-provider-clustercontrol/tree/main/examples/mysql-maria/replication/main.tf)
+  - [MySQL/MariaDB deployment and configuration](../../examples/mysql-maria/README.md)
+    - [MySQL/MariaDB replication cluster deployment and configuration example](../../examples/mysql-maria/replication/main.tf)
     - [Percona XtraDB cluster or MariaDB Galera cluster deployment and configuration example](https://github.com/severalnines/terraform-provider-clustercontrol/tree/main/examples/mysql-maria/galera/main.tf)
     - [ProxySQL deployment and configuration ](https://github.com/severalnines/terraform-provider-clustercontrol/tree/main/examples/mysql-maria#proxysql-load-balancer-for-mysqlmariadb)
   - [PostgreSQL cluster deployment and configuration](https://github.com/severalnines/terraform-provider-clustercontrol/tree/main/examples/postgres)
