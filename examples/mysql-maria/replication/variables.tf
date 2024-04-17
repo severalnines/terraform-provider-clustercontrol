@@ -243,7 +243,7 @@ variable "db_tags" {
 variable "db_deploy_agents" {
   description = "Automatically deploy prometheus and other relevant agents after setting up the intial DB cluster."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "db_auto_recovery" {
