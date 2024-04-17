@@ -75,7 +75,7 @@ Where ``username`` and ``password`` are valid login credentials for ClusterContr
 for concrete examples on deploying database clusters of various types (MySQL/MariaDB replication or galera with ProxySQL, 
 PostgreSql replication, MongoDB replicaset and/or sharded, Redis sentinel, Microsoft SQL server, and Elasticsearch)
 
-**Navigate** to the [docs](https://github.com/severalnines/terraform-provider-clustercontrol/tree/main/docs) folder for generated documentation on the terraform provider plugin for ClusterControl
+**Navigate** to the [docs](./docs/index.md) folder for generated documentation on the terraform provider plugin for ClusterControl
 
 ### Setup ``terraform.tfvars`` file with the following secrets.
 
