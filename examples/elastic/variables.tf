@@ -319,15 +319,15 @@ variable "db_snapshot_repository" {
 variable "db_snapshot_repository_type" {
   description = "Snapshot repository type pertaining to Elasticsearch."
   type        = string
-  default     = "fs-nfs"
+  default     = "fs-nfs" 
+  #other values: 
+  #   "fs" - if you have already setup a shared nfs mounted fs on all nodes
 }
 
 variable "db_snapshot_storage_host" {
   description = "Snapshot storage host name pertaining to Elasticsearch."
   type        = string
   default     = null
-  #other values: 
-  #   "fs" - if you have already setup a shared nfs mounted fs on all nodes
 }
 
 # --------------------------
