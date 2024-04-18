@@ -56,9 +56,10 @@ description: |-
 - `db_replica_set` (Block List) The hosts that make up the cluster. (see [below for nested schema](#nestedblock--db_replica_set))
 - `db_semi_sync_replication` (Boolean) Semi-synchronous replication for MySQL and MariaDB non-galera clusters
 - `db_sentinel_port` (String) The port Redis Sentinel uses to communicate
-- `db_snapshot_host` (String) Elasticsearch snapshot host
 - `db_snapshot_location` (String) Elasticsearch snapshot location
 - `db_snapshot_repository` (String) Elasticsearch snapshot repository
+- `db_snapshot_repository_type` (String) Elasticsearch snapshot repository type
+- `db_snapshot_storage_host` (String) Elasticsearch snapshot storage host
 - `db_tags` (Set of String) Tags to associate with a DB cluster. The tags are only relevant in the ClusterControl domain.
 - `db_topology` (Block List) Only applicable to MySQL/MariaDB non-galera clusters. A way to specify Master and Slave(s). (see [below for nested schema](#nestedblock--db_topology))
 - `disable_firewall` (Boolean) Disable firewall on the host OS when installing DB packages.

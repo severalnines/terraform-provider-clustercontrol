@@ -34,6 +34,7 @@ description: |-
 - `db_backup_subdir` (String) Sub-dir for backups - default: "BACKUP-%I"
 - `db_backup_system_db` (Boolean) Whether to enable backup failover to another host in case the host crashes
 - `db_enable_backup_failover` (Boolean) Whether to enable backup failover to another host in case the host crashes
+- `db_snapshot_repository` (String) Elasticsearch snapshot repository
 
 ### Read-Only
 
