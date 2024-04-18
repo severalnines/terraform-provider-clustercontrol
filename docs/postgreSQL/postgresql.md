@@ -1,6 +1,6 @@
 # Deploying PostgreSQL Database Clusters
-- [PostgreSql cluster deployment and configuration](../../examples/postgres/README.md)
-  - [PostgreSql cluster deployment and configuration example](../../examples/postgres/main.tf)
+- [PostgreSQL cluster deployment and configuration](../../examples/postgres/README.md)
+  - [PostgreSQL cluster deployment and configuration example](../../examples/postgres/main.tf)
   - [Enabling TimescaleDB](../../examples/postgres/README.md#db_enable_timescale-enabling-timescaledb-extension)
   - [Enabling PgBackRest agent](../../examples/postgres/README.md#db_enable_pgbackrest_agent-enabling-pgbackrest-agent)
 

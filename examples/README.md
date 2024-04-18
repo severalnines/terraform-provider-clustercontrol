@@ -95,21 +95,6 @@ Here's an example of a full backup using `xtrabackup`.
  }
 ```
 
-### Setting a maintenance window using the - [clustercontrol_db_cluster_maintenance](../docs/resources/db_cluster_maintenance.md#clustercontrol_db_cluster_maintenance-resource) resource
-You can take adhoc backups (full or incremental) of a cluster using the `clustercontrol_db_cluster_backup` resource.
-Here's an example of a full backup using `xtrabackup`. 
-
-```hcl
- resource "clustercontrol_db_cluster_maintenance" "server-upgrade-03312024" {
-   depends_on = [clustercontrol_db_cluster.this]
-   db_cluster_id       = clustercontrol_db_cluster.this.id
-   db_maint_start_time = "Mar-31-2024T00:00"
-   db_maint_stop_time  = "Mar-31-2024T23:30"
-   db_maint_reason     = "Hardware refresh March 31, 2024"
- }
-```
-**NOTE**: The `db_maint_start_time` and `db_maint_stop_time` should be specified in local time (without the timezone).
-
 #### Supported backup methods for the respective database types (and vendors)
 
 The following types are supported.
@@ -124,6 +109,20 @@ The following types are supported.
 | SQL Server    | Microsoft       | `mssql_full`                                                  |
 | Elasticsearch | Elastic         | Use the value `""` to indicate default Elasticsearch snapshot |
 
+### Setting a maintenance window using the - [clustercontrol_db_cluster_maintenance](../docs/resources/db_cluster_maintenance.md#clustercontrol_db_cluster_maintenance-resource) resource
+You can take adhoc backups (full or incremental) of a cluster using the `clustercontrol_db_cluster_backup` resource.
+Here's an example of a full backup using `xtrabackup`. 
+
+```hcl
+ resource "clustercontrol_db_cluster_maintenance" "server-upgrade-03312024" {
+   depends_on = [clustercontrol_db_cluster.this]
+   db_cluster_id       = clustercontrol_db_cluster.this.id
+   db_maint_start_time = "Mar-31-2024T00:00"
+   db_maint_stop_time  = "Mar-31-2024T23:30"
+   db_maint_reason     = "Hardware refresh March 31, 2024"
+ }
+```
+**NOTE**: The `db_maint_start_time` and `db_maint_stop_time` should be specified in local time (without the timezone).
 
 ### Toggling cluster auto-recovery option
 You can toggle the cluster-auto-recovery feature in ClusterControl using the `db_auto_recovery` field of the 

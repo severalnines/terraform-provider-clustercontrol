@@ -12,9 +12,9 @@ This directory contains a set of examples for deploying Postgres clusters using 
 | [clustercontrol_db_cluster_maintenance](../../docs/resources/db_cluster_maintenance.md#clustercontrol_db_cluster_maintenance-resource)             |
 
 
-## Choosing attribute values for MySQL and MariaDB (replication or galera)
+## Choosing attribute values for PostgreSQL
 
-### `db_cluster_type` - valid values for MySQL/MariaDB
+### `db_cluster_type` - valid values for PostgreSQL
 
 | Cluster Type   | Description                                                                                       |
 |----------------|---------------------------------------------------------------------------------------------------|
