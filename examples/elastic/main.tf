@@ -47,24 +47,25 @@ resource "clustercontrol_db_cluster" "this" {
     # port = "foo"
   }
 
-  # db_host {
-  #   hostname = "test-primary-2"
-  #   roles    = "master-data"
-  #   # hostname_data     = "hnd-foo"
-  #   # hostname_internal = "hni-foo"
-  #   # port              = "p-foo"
-  # }
+  db_host {
+    hostname = "test-primary-2"
+    roles    = "master-data"
+    # hostname_data     = "hnd-foo"
+    # hostname_internal = "hni-foo"
+    # port              = "p-foo"
+  }
+
+  db_host {
+    hostname = "test-primary-3"
+    roles    = "master-data"
+    # hostname_data     = "hnd-foo"
+    # hostname_internal = "hni-foo"
+    # port              = "p-foo"
+  }
 
   # db_host {
-  #   hostname = "test-primary-3"
+  #   hostname = "test-primary-4"
   #   roles    = "master-data"
-  #   # hostname_data     = "hnd-foo"
-  #   # hostname_internal = "hni-foo"
-  #   # port              = "p-foo"
-  # }
-
-  # db_host {
-  #   hostname         = "test-primary-3"
   #   # hostname_data     = "hnd-foo"
   #   # hostname_internal = "hni-foo"
   #   # port              = "p-foo"
