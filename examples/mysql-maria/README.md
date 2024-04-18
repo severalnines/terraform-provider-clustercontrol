@@ -7,10 +7,10 @@ clusters using the terraform provider for ClusterControl.
 
 | Name                                                                                                                                                                     |
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md#clustercontrol_db_cluster-resource) |
-| [clustercontrol_db_cluster_backup](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup.md#clustercontrol_db_cluster_backup-resource)|                                                                                                                                                                                    |
-| [clustercontrol_db_cluster_backup_schedule](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup_schedule.md#clustercontrol_db_cluster_backup_schedule-resource) |
-| [clustercontrol_db_cluster_maintenance](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_maintenance.md#clustercontrol_db_cluster_maintenance-resource)|
+| [clustercontrol_db_cluster](../../docs/resources/db_cluster.md#clustercontrol_db_cluster-resource)                                                 |
+| [clustercontrol_db_cluster_backup](../../docs/resources/db_cluster_backup.md#clustercontrol_db_cluster_backup-resource)                            |                                                                                                                                                                                    |
+| [clustercontrol_db_cluster_backup_schedule](../../docs/resources/db_cluster_backup_schedule.md#clustercontrol_db_cluster_backup_schedule-resource) |
+| [clustercontrol_db_cluster_maintenance](../../docs/resources/db_cluster_maintenance.md#clustercontrol_db_cluster_maintenance-resource)             |
 
 
 ## Choosing attribute values for MySQL and MariaDB (replication or galera)
@@ -31,7 +31,7 @@ clusters using the terraform provider for ClusterControl.
 | `mariadb` | MariaDB community edition        |
 
 ### `db_topology` - Specifying Master --> Slave replication topology
-The `db_topology` field within the [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md#clustercontrol_db_cluster-resource) should be used to specify the replication topology.
+The `db_topology` field within the [clustercontrol_db_cluster](../../docs/resources/db_cluster.md#clustercontrol_db_cluster-resource) should be used to specify the replication topology.
 
 ```text
 resource "clustercontrol_db_cluster" "this" {
@@ -98,7 +98,7 @@ resource "clustercontrol_db_cluster" "this" {
 The above will deploy a ProxySQL instance on host `lbhost-1` and will subsequently 
 set up all the necessary configuration to front-end the backing database cluster (master/slave or galera).
 
-### Adding/Removing nodes to an existing cluster - [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md#clustercontrol_db_cluster-resource)
+### Adding/Removing nodes to an existing cluster - [clustercontrol_db_cluster](../../docs/resources/db_cluster.md#clustercontrol_db_cluster-resource)
 
 #### Adding a Replicaiton Slave to a Master/Slave cluster or an addition node to a Galera cluster
 
@@ -150,3 +150,55 @@ resource "clustercontrol_db_cluster" "this" {
 
 In the above, the end state has removed the `db_host` block for host `host-3`. The result will be the 
 removal of the corresponding `host-3` node from the cluster.
+
+### Scheduling Backups using the - [clustercontrol_db_cluster_backup_schedule](../../docs/resources/db_cluster_backup_schedule.md#clustercontrol_db_cluster_backup_schedule-resource) Resource
+The backup schedule resource allows you to create a backup schedule for a cluster in ClusterControl through the
+terraform provider.
+
+```hcl
+resource "clustercontrol_db_cluster_backup_schedule" "daily-full" {
+  depends_on                   = [clustercontrol_db_cluster.this]
+  db_backup_sched_title        = "Daily full backup"
+  db_backup_sched_time         = "TZ=UTC 0 0 * * *"
+  db_cluster_id                = clustercontrol_db_cluster.this.id
+  db_backup_method             = "xtrabackupfull"
+  db_backup_dir                = var.db_backup_dir
+  db_backup_subdir             = var.db_backup_subdir
+  db_backup_encrypt            = var.db_backup_encrypt
+  db_backup_host               = var.db_backup_host
+  db_backup_storage_controller = var.db_backup_storage_controller
+  db_backup_compression        = var.db_backup_compression
+  db_backup_compression_level  = var.db_backup_compression_level
+  db_backup_retention          = var.db_backup_retention
+}
+```
+
+### Taking adhoc backups using the - [clustercontrol_db_cluster_backup](../../docs/resources/db_cluster_backup.md#clustercontrol_db_cluster_backup-resource) resource
+You can a maintenance window for a cluster using the `clustercontrol_db_cluster_backup` resource.
+Here's an example of it.
+
+```hcl
+resource "clustercontrol_db_cluster_backup" "full-1" {
+  depends_on                   = [clustercontrol_db_cluster.this]
+  db_cluster_id                = clustercontrol_db_cluster.this.id
+  db_backup_method             = "xtrabackupfull"
+  db_backup_dir                = var.db_backup_dir
+  db_backup_subdir             = var.db_backup_subdir
+  db_backup_encrypt            = var.db_backup_encrypt
+  db_backup_host               = var.db_backup_host
+  db_backup_storage_controller = var.db_backup_storage_controller
+  db_backup_compression        = var.db_backup_compression
+  db_backup_compression_level  = var.db_backup_compression_level
+  db_backup_retention          = var.db_backup_retention
+}
+```
+
+### Supported backup methods for MySQL and MariaDB
+
+The following types are supported.
+
+| Database type | Vendor         | Backup method                                                 |
+|---------------|----------------|---------------------------------------------------------------|
+| MySQL         | Oracle, Percona | `xtrabackupfull`, `xtrabackupincr`, `mysqldump`               |
+| MariaDB       | MariaDB         | `mariabackupfull`, `mariabackupincr`, `mysqldump`             |
+

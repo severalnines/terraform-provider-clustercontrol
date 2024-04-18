@@ -6,10 +6,10 @@ This directory contains a set of examples for deploying Postgres clusters using 
 
 | Name                                                                                                                                                                     |
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md#clustercontrol_db_cluster-resource) |
-| [clustercontrol_db_cluster_backup](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup.md#clustercontrol_db_cluster_backup-resource)|                                                                                                                                                                                    |
-| [clustercontrol_db_cluster_backup_schedule](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup_schedule.md#clustercontrol_db_cluster_backup_schedule-resource) |
-| [clustercontrol_db_cluster_maintenance](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_maintenance.md#clustercontrol_db_cluster_maintenance-resource)|
+| [clustercontrol_db_cluster](../../docs/resources/db_cluster.md#clustercontrol_db_cluster-resource)                                                 |
+| [clustercontrol_db_cluster_backup](../../docs/resources/db_cluster_backup.md#clustercontrol_db_cluster_backup-resource)                            |                                                                                                                                                                                    |
+| [clustercontrol_db_cluster_backup_schedule](../../docs/resources/db_cluster_backup_schedule.md#clustercontrol_db_cluster_backup_schedule-resource) |
+| [clustercontrol_db_cluster_maintenance](../../docs/resources/db_cluster_maintenance.md#clustercontrol_db_cluster_maintenance-resource)             |
 
 
 ## Choosing attribute values for MySQL and MariaDB (replication or galera)
@@ -27,7 +27,7 @@ This directory contains a set of examples for deploying Postgres clusters using 
 | postgresql | PostgreSQL community edition |
 
 ### `db_enable_timescale` Enabling TimescaleDB extension
-Use the `db_enable_timescale` attributed in the [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md#clustercontrol_db_cluster-resource) to enable TimescaleDB.
+Use the `db_enable_timescale` attributed in the [clustercontrol_db_cluster](../../docs/resources/db_cluster.md#clustercontrol_db_cluster-resource) to enable TimescaleDB.
 
 ```text
 resource "clustercontrol_db_cluster" "this" {
@@ -39,10 +39,8 @@ resource "clustercontrol_db_cluster" "this" {
 
 
 ### `db_enable_pgbackrest_agent` Enabling PgBackRest agent
-Use the `db_enable_pgbackrest_agent` attributed in the [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md#clustercontrol_db_cluster-resource) to enable PgBackRest agent. Once
-the agent is enabled, you can use the pgbackrest(full,incr,diff) backup methods either in
-[adhoc backups](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/examples/README.md) or in 
-[backup schedules](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/examples/README.md).
+Use the `db_enable_pgbackrest_agent` attributed in the [clustercontrol_db_cluster](../../docs/resources/db_cluster.md#clustercontrol_db_cluster-resource) to enable PgBackRest agent. Once
+the agent is enabled, you can use the pgbackrest(full,incr,diff) backup methods either in adhoc backups or backup schedules.
 
 ```text
 resource "clustercontrol_db_cluster" "this" {
@@ -52,7 +50,7 @@ resource "clustercontrol_db_cluster" "this" {
 }
 ```
 
-### Adding/Removing nodes to an existing cluster - [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md#clustercontrol_db_cluster-resource)
+### Adding/Removing nodes to an existing cluster - [clustercontrol_db_cluster](../../docs/resources/db_cluster.md#clustercontrol_db_cluster-resource)
 
 #### Adding a Replicaiton Slave to a cluster
 
@@ -103,3 +101,54 @@ resource "clustercontrol_db_cluster" "this" {
 
 In the above, the end state has removed the `db_host` block for host `host-3`. The result will be the
 removal of the corresponding `host-3` node from the cluster.
+
+### Scheduling Backups using the - [clustercontrol_db_cluster_backup_schedule](../../docs/resources/db_cluster_backup_schedule.md#clustercontrol_db_cluster_backup_schedule-resource) Resource
+The backup schedule resource allows you to create a backup schedule for a cluster in ClusterControl through the
+terraform provider.
+
+```hcl
+resource "clustercontrol_db_cluster_backup_schedule" "daily-full" {
+  depends_on                   = [clustercontrol_db_cluster.this]
+  db_backup_sched_title        = "Daily full backup"
+  db_backup_sched_time         = "TZ=UTC 0 0 * * *"
+  db_cluster_id                = clustercontrol_db_cluster.this.id
+  db_backup_method             = "pg_basebackup"
+  db_backup_dir                = var.db_backup_dir
+  db_backup_subdir             = var.db_backup_subdir
+  db_backup_encrypt            = var.db_backup_encrypt
+  db_backup_host               = var.db_backup_host
+  db_backup_storage_controller = var.db_backup_storage_controller
+  db_backup_compression        = var.db_backup_compression
+  db_backup_compression_level  = var.db_backup_compression_level
+  db_backup_retention          = var.db_backup_retention
+}
+```
+
+### Taking adhoc backups using the - [clustercontrol_db_cluster_backup](../../docs/resources/db_cluster_backup.md#clustercontrol_db_cluster_backup-resource) resource
+You can a maintenance window for a cluster using the `clustercontrol_db_cluster_backup` resource.
+Here's an example of it.
+
+```hcl
+resource "clustercontrol_db_cluster_backup" "full-1" {
+  depends_on                   = [clustercontrol_db_cluster.this]
+  db_cluster_id                = clustercontrol_db_cluster.this.id
+  db_backup_method             = "pg_basebackup"
+  db_backup_dir                = var.db_backup_dir
+  db_backup_subdir             = var.db_backup_subdir
+  db_backup_encrypt            = var.db_backup_encrypt
+  db_backup_host               = var.db_backup_host
+  db_backup_storage_controller = var.db_backup_storage_controller
+  db_backup_compression        = var.db_backup_compression
+  db_backup_compression_level  = var.db_backup_compression_level
+  db_backup_retention          = var.db_backup_retention
+}
+```
+
+### Supported backup methods for Postgres
+
+The following types are supported.
+
+| Database type | Vendor         | Backup method                                                 |
+|---------------|----------------|---------------------------------------------------------------|
+| PostgreSQL    | PostgreSQL      | `pg_basebackup`, `pgdumpall`, `pgbackrest(full,incr,diff)`    |
+

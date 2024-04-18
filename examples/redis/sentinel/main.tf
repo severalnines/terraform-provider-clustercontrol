@@ -67,9 +67,22 @@ resource "clustercontrol_db_cluster" "this" {
 #   db_backup_subdir             = var.db_backup_subdir
 #   db_backup_encrypt            = var.db_backup_encrypt
 #   db_backup_host               = var.db_backup_host
-#   # db_backup_storage_host       = var.db_backup_storage_host
-#   # db_enable_backup_failover    = var.db_enable_backup_failover
-#   # db_backup_failover_host      = var.db_backup_failover_host
+#   db_backup_storage_controller = var.db_backup_storage_controller
+#   db_backup_compression        = var.db_backup_compression
+#   db_backup_compression_level  = var.db_backup_compression_level
+#   db_backup_retention          = var.db_backup_retention
+# }
+
+# resource "clustercontrol_db_cluster_backup_schedule" "daily-full" {
+#   depends_on                   = [clustercontrol_db_cluster.this]
+#   db_backup_sched_title        = "Daily full backup"
+#   db_backup_sched_time         = "TZ=UTC 0 0 * * *"
+#   db_cluster_id                = clustercontrol_db_cluster.this.id
+#   db_backup_method             = ""
+#   db_backup_dir                = var.db_backup_dir
+#   db_backup_subdir             = var.db_backup_subdir
+#   db_backup_encrypt            = var.db_backup_encrypt
+#   db_backup_host               = var.db_backup_host
 #   db_backup_storage_controller = var.db_backup_storage_controller
 #   db_backup_compression        = var.db_backup_compression
 #   db_backup_compression_level  = var.db_backup_compression_level

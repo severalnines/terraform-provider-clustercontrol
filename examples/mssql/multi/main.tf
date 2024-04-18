@@ -66,10 +66,6 @@ resource "clustercontrol_db_cluster" "this" {
 #   db_backup_compression_level  = -1
 #   db_backup_retention          = var.db_backup_retention
 #   db_backup_system_db          = var.db_backup_system_db
-#   # db_backup_encrypt            = var.db_backup_encrypt
-#   # db_backup_storage_host       = var.db_backup_storage_host
-#   # db_enable_backup_failover    = var.db_enable_backup_failover
-#   # db_backup_failover_host      = var.db_backup_failover_host
 # }
 
 # resource "clustercontrol_db_cluster_maintenance" "server-upgrade-03232024" {
