@@ -304,6 +304,32 @@ variable "db_pbm_backup_dir" {
   default     = null
 }
 
+variable "db_snapshot_location" {
+  description = "Snapshot location pertaining to Elasticsearch."
+  type        = string
+  default     = "/mnt/data/backups/es-snapshot-repositories"
+}
+
+variable "db_snapshot_repository" {
+  description = "Snapshot repository name pertaining to Elasticsearch."
+  type        = string
+  default     = "cc_snapshots"
+}
+
+variable "db_snapshot_repository_type" {
+  description = "Snapshot repository type pertaining to Elasticsearch."
+  type        = string
+  default     = "fs-nfs" 
+  #other values: 
+  #   "fs" - if you have already setup a shared nfs mounted fs on all nodes
+}
+
+variable "db_snapshot_storage_host" {
+  description = "Snapshot storage host name pertaining to Elasticsearch."
+  type        = string
+  default     = null
+}
+
 # --------------------------
 # Load balancer variables ...
 # --------------------------

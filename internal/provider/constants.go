@@ -247,9 +247,20 @@ const (
 	BACKUP_METHOD_PGDUMPALL        = "pgdumpall"
 	BACKUP_METHOD_MONGODUMP        = "mongodump"
 	BACKUP_METHOD_PBM              = "percona-backup-mongodb"
+	BACKUP_METHOD_ELASTI_SNAPSHOT  = "elasticsearch-snapshot"
 	BACKUP_MSSQL_FULL              = "mssqlfull"
 	BACKUP_MSSQL_DIFF              = "mssqldiff"
 	BACKUP_MSSQL_TRANSACTION_LOG   = "mssqllog"
+)
+
+const (
+	ES_PROTO_ELASTIC = "elastic"
+)
+
+const (
+	ES_ROLES_MASTER_DATA = "master-data"
+	ES_ROLES_MASTER      = "master"
+	ES_ROLES_DATA        = "data"
 )
 
 const (
@@ -277,26 +288,27 @@ const (
 	TF_FIELD_CLUSTER_ELASTIC_HTTP_PORT     = "db_elasticsearch_http_port"
 	TF_FIELD_CLUSTER_ELASTIC_TRANSFER_PORT = "db_elasticsearch_transfer_port"
 
-	TF_FIELD_CLUSTER_DATA_DIR         = "db_data_directory"
-	TF_FIELD_CLUSTER_CFG_TEMPLATE     = "db_config_template"
-	TF_FIELD_CLUSTER_DISABLE_FW       = "disable_firewall"
-	TF_FIELD_CLUSTER_DISABLE_SELINUX  = "disable_selinux"
-	TF_FIELD_CLUSTER_INSTALL_SW       = "db_install_software"
-	TF_FIELD_CLUSTER_ENABLE_UNINSTALL = "db_enable_uninstall"
-	TF_FIELD_CLUSTER_SYNC_REP         = "sync_replication"
-	TF_FIELD_CLUSTER_SEMISYNC_REP     = "db_semi_sync_replication"
-	TF_FIELD_CLUSTER_PG_TIMESALE_EXT  = "db_enable_timescale"
-	TF_FIELD_CLUSTER_SSH_USER         = "ssh_user"
-	TF_FIELD_CLUSTER_SSH_PW           = "ssh_user_password"
-	TF_FIELD_CLUSTER_SSH_KEY_FILE     = "ssh_key_file"
-	TF_FIELD_CLUSTER_SSH_PORT         = "ssh_port"
-	TF_FIELD_CLUSTER_SNAPSHOT_LOC     = "db_snapshot_location"
-	TF_FIELD_CLUSTER_SNAPSHOT_REPO    = "db_snapshot_repository"
-	TF_FIELD_CLUSTER_SNAPSHOT_HOST    = "db_snapshot_host"
-	TF_FIELD_CLUSTER_HOST             = "db_host"
-	TF_FIELD_CLUSTER_HOSTNAME         = "hostname"
-	TF_FIELD_CLUSTER_HOSTNAME_DATA    = "hostname_data"
-	TF_FIELD_CLUSTER_HOSTNAME_INT     = "hostname_internal"
+	TF_FIELD_CLUSTER_DATA_DIR           = "db_data_directory"
+	TF_FIELD_CLUSTER_CFG_TEMPLATE       = "db_config_template"
+	TF_FIELD_CLUSTER_DISABLE_FW         = "disable_firewall"
+	TF_FIELD_CLUSTER_DISABLE_SELINUX    = "disable_selinux"
+	TF_FIELD_CLUSTER_INSTALL_SW         = "db_install_software"
+	TF_FIELD_CLUSTER_ENABLE_UNINSTALL   = "db_enable_uninstall"
+	TF_FIELD_CLUSTER_SYNC_REP           = "sync_replication"
+	TF_FIELD_CLUSTER_SEMISYNC_REP       = "db_semi_sync_replication"
+	TF_FIELD_CLUSTER_PG_TIMESALE_EXT    = "db_enable_timescale"
+	TF_FIELD_CLUSTER_SSH_USER           = "ssh_user"
+	TF_FIELD_CLUSTER_SSH_PW             = "ssh_user_password"
+	TF_FIELD_CLUSTER_SSH_KEY_FILE       = "ssh_key_file"
+	TF_FIELD_CLUSTER_SSH_PORT           = "ssh_port"
+	TF_FIELD_CLUSTER_SNAPSHOT_LOC       = "db_snapshot_location"
+	TF_FIELD_CLUSTER_SNAPSHOT_REPO      = "db_snapshot_repository"
+	TF_FIELD_CLUSTER_SNAPSHOT_REPO_TYPE = "db_snapshot_repository_type"
+	TF_FIELD_CLUSTER_STORAGE_HOST       = "db_snapshot_storage_host"
+	TF_FIELD_CLUSTER_HOST               = "db_host"
+	TF_FIELD_CLUSTER_HOSTNAME           = "hostname"
+	TF_FIELD_CLUSTER_HOSTNAME_DATA      = "hostname_data"
+	TF_FIELD_CLUSTER_HOSTNAME_INT       = "hostname_internal"
 
 	// Set this at the top level and not at the host level. Why?
 	// Because: there's no way yet to get it from CMON due to unmarshal restrictions

@@ -109,6 +109,11 @@ func resourceDbClusterBackup() *schema.Resource {
 				Optional:    true,
 				Description: "Whether to enable backup failover to another host in case the host crashes",
 			},
+			TF_FIELD_CLUSTER_SNAPSHOT_REPO: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Elasticsearch snapshot repository",
+			},
 		},
 	}
 }

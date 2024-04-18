@@ -236,6 +236,11 @@ var (
 				"",
 			},
 		},
+		CLUSTER_TYPE_ELASTIC: { // VENDOR_REDIS
+			VENDOR_ELASTIC: {
+				"",
+			},
+		},
 		CLUSTER_TYPE_PG_SINGLE: { // VENDOR_REDIS
 			VENDOR_DEFAULT: {
 				BACKUP_METHOD_PG_BASEBACKUP,

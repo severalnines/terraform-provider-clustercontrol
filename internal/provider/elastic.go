@@ -35,9 +35,14 @@ func (m *Elastic) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 		jobData.SetSnapshotRepository(snapshotRepo)
 	}
 
-	snapshotHost := d.Get(TF_FIELD_CLUSTER_SNAPSHOT_HOST).(string)
-	if snapshotHost != "" {
-		jobData.SetSnapshotHost(snapshotHost)
+	snapshotRepoType := d.Get(TF_FIELD_CLUSTER_SNAPSHOT_REPO_TYPE).(string)
+	if snapshotRepoType != "" {
+		jobData.SetSnapshotRepositoryType(snapshotRepoType)
+	}
+
+	storageHost := d.Get(TF_FIELD_CLUSTER_STORAGE_HOST).(string)
+	if storageHost != "" {
+		jobData.SetStorageHost(storageHost)
 	}
 
 	clusterType := jobData.GetClusterType()
@@ -52,7 +57,7 @@ func (m *Elastic) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 		return err
 	}
 	jobData.SetPort(int32(iPort))
-	topLevelPort := jobData.GetPort()
+	// topLevelPort := jobData.GetPort()
 
 	//clusterType := jobData.GetClusterType()
 	hosts := d.Get(TF_FIELD_CLUSTER_HOST)
@@ -79,16 +84,20 @@ func (m *Elastic) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 		if hostname_internal != "" {
 			node.SetHostnameInternal(hostname_internal)
 		}
-		node.SetPort(strconv.Itoa(int(topLevelPort)))
+		// node.SetPort(strconv.Itoa(int(topLevelPort)))
 		//if port == "" {
 		//	node.SetPort(strconv.Itoa(int(topLevelPort)))
 		//} else {
 		//	node.SetPort(strconv.Itoa(int(convertPortToInt(port, topLevelPort))))
 		//}
-		if protocol != "" {
+		if protocol == "" {
+			node.SetProtocol(ES_PROTO_ELASTIC)
+		} else {
 			node.SetProtocol(protocol)
 		}
-		if roles != "" {
+		if roles == "" {
+			node.SetRoles(ES_ROLES_MASTER_DATA)
+		} else {
 			node.SetRoles(roles)
 		}
 		nodes = append(nodes, node)
@@ -136,6 +145,11 @@ func (c *Elastic) GetBackupInputs(d *schema.ResourceData, jobData *openapi.JobsJ
 	if err = c.Backup.GetBackupInputs(d, jobData); err != nil {
 		return err
 	}
+
+	//jobData.SetBackupMethod("")
+
+	snapshotRepo := d.Get(TF_FIELD_CLUSTER_SNAPSHOT_REPO).(string)
+	jobData.SetSnapshotRepository(snapshotRepo)
 
 	return err
 }

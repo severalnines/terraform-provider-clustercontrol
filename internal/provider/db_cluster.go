@@ -197,10 +197,15 @@ func resourceDbCluster() *schema.Resource {
 				Optional:    true,
 				Description: "Elasticsearch snapshot repository",
 			},
-			TF_FIELD_CLUSTER_SNAPSHOT_HOST: {
+			TF_FIELD_CLUSTER_SNAPSHOT_REPO_TYPE: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Elasticsearch snapshot host",
+				Description: "Elasticsearch snapshot repository type",
+			},
+			TF_FIELD_CLUSTER_STORAGE_HOST: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Elasticsearch snapshot storage host",
 			},
 			TF_FIELD_CLUSTER_MONGO_AUTH_DB: {
 				Type:        schema.TypeString,

@@ -23,6 +23,10 @@ resource "clustercontrol_db_cluster" "this" {
   db_elasticsearch_http_port     = var.db_elasticsearch_http_port
   db_elasticsearch_transfer_port = var.db_elasticsearch_transfer_port
   db_data_directory              = var.db_data_directory
+  db_snapshot_location           = var.db_snapshot_location
+  db_snapshot_repository         = var.db_snapshot_repository
+  db_snapshot_repository_type    = var.db_snapshot_repository_type
+  db_snapshot_storage_host       = "test-primary-1"
   disable_firewall               = var.disable_firewall
   disable_selinux                = var.disable_selinux
   db_enable_uninstall            = var.db_enable_uninstall
@@ -36,26 +40,28 @@ resource "clustercontrol_db_cluster" "this" {
   db_tags                        = ["terra-deploy"]
 
   db_host {
-    hostname = "test-primary"
+    hostname = "test-primary-1"
     roles    = "master-data"
     # hostname_data = "foo"
     # hostname_internal = "foo"
     # port = "foo"
   }
-  db_host {
-    hostname = "test-primary-2"
-    roles    = "master-data"
-    # hostname_data     = "hnd-foo"
-    # hostname_internal = "hni-foo"
-    # port              = "p-foo"
-  }
-  db_host {
-    hostname = "test-primary-3"
-    roles    = "master-data"
-    # hostname_data     = "hnd-foo"
-    # hostname_internal = "hni-foo"
-    # port              = "p-foo"
-  }
+
+  # db_host {
+  #   hostname = "test-primary-2"
+  #   roles    = "master-data"
+  #   # hostname_data     = "hnd-foo"
+  #   # hostname_internal = "hni-foo"
+  #   # port              = "p-foo"
+  # }
+
+  # db_host {
+  #   hostname = "test-primary-3"
+  #   roles    = "master-data"
+  #   # hostname_data     = "hnd-foo"
+  #   # hostname_internal = "hni-foo"
+  #   # port              = "p-foo"
+  # }
 
   # db_host {
   #   hostname         = "test-primary-3"
@@ -72,3 +78,29 @@ resource "clustercontrol_db_cluster" "this" {
   # }
 
 }
+
+# resource "clustercontrol_db_cluster_backup_schedule" "daily-snap" {
+#   depends_on             = [clustercontrol_db_cluster.this]
+#   db_backup_sched_title  = "Daily snapshot"
+#   db_backup_sched_time   = "TZ=UTC 0 0 * * *"
+#   db_cluster_id          = clustercontrol_db_cluster.this.id
+#   db_backup_method       = ""
+#   db_backup_retention    = var.db_backup_retention
+#   db_snapshot_repository = var.db_snapshot_repository
+# }
+
+# resource "clustercontrol_db_cluster_backup" "snap-1" {
+#   depends_on             = [clustercontrol_db_cluster.this]
+#   db_cluster_id          = clustercontrol_db_cluster.this.id
+#   db_backup_method       = ""
+#   db_snapshot_repository = var.db_snapshot_repository
+#   db_backup_retention    = var.db_backup_retention
+# }
+
+# resource "clustercontrol_db_cluster_maintenance" "server-upgrade-03232024" {
+#   depends_on          = [clustercontrol_db_cluster.this]
+#   db_cluster_id       = clustercontrol_db_cluster.this.id
+#   db_maint_start_time = "Mar-27-2024T22:00"
+#   db_maint_stop_time  = "Mar-28-2024T23:30"
+#   db_maint_reason     = "Hardware refresh March 27, 2024"
+# }
