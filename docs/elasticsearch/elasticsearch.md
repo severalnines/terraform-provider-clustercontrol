@@ -1,5 +1,5 @@
 # Deploying Elasticsearch Clusters
-- [Elasticsearch cluster deployment and configuration ](../../examples/elastic/README.md)
+- [Elasticsearch cluster deployment and configuration ](../../examples/elastic)
   - [Elasticsearch cluster deployment and configuration example](../../examples/elastic/main.tf)
 
 ### Scaling a database cluster
