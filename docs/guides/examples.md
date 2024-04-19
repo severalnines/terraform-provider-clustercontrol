@@ -30,7 +30,7 @@ A complete set of examples can be found in the [examples](../../examples/README.
   - [Microsoft SQL server cluster deployment and configuration ](https://github.com/severalnines/terraform-provider-clustercontrol/tree/main/examples/mssql)
     - [Microsoft SQL server standalone database deployment and configuration example](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/examples/mssql/single/main.tf)
     - [Microsoft SQL server Primary/Standby cluster deployment and configuration example](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/examples/mssql/multi/main.tf)
-- [Elasticsearch cluster deployment and configuration ](https://github.com/severalnines/terraform-provider-clustercontrol/tree/main/examples/elastic)
+  - [Elasticsearch cluster deployment and configuration ](https://github.com/severalnines/terraform-provider-clustercontrol/tree/main/examples/elastic)
     - [Elasticsearch cluster deployment and configuration example](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/examples/elastic/main.tf)
 
 ### Scaling a database cluster
