@@ -27,12 +27,12 @@ func resourceDbClusterMaintenance() *schema.Resource {
 			TF_FIELD_RESOURCE_ID: {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "TODO",
+				Description: "The ID of the resource allocated by ClusterControl.",
 			},
 			TF_FIELD_LAST_UPDATED: {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "TODO",
+				Description: "Last updated timestamp for the resource in question.",
 			},
 			TF_FIELD_CLUSTER_ID: {
 				Type:        schema.TypeString,
@@ -52,7 +52,7 @@ func resourceDbClusterMaintenance() *schema.Resource {
 			TF_FIELD_MAINT_REASON: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "TODO",
+				Description: "The reason for the maintenance window. Something meaningful and short.",
 			},
 		},
 	}

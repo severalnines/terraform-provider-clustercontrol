@@ -33,12 +33,12 @@ func resourceDbCluster() *schema.Resource {
 			TF_FIELD_CLUSTER_ID: {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "TODO",
+				Description: "Cluster ID allocated by ClusterControl.",
 			},
 			TF_FIELD_LAST_UPDATED: {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "TODO",
+				Description: "Last updated timestamp for the resource in question.",
 			},
 			TF_FIELD_CLUSTER_CREATE: {
 				Type:        schema.TypeBool,
@@ -256,7 +256,7 @@ func resourceDbCluster() *schema.Resource {
 						TF_FIELD_CLUSTER_HOST_PROTO: {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "TODO.",
+							Description: "The protocol used within for e.g. Elasticsearch. Valid values are (`elastic`)",
 						},
 						TF_FIELD_CLUSTER_HOST_ROLES: {
 							Type:     schema.TypeString,
@@ -322,7 +322,7 @@ func resourceDbCluster() *schema.Resource {
 									TF_FIELD_CLUSTER_HOST_HIDDEN: {
 										Type:        schema.TypeBool,
 										Optional:    true,
-										Description: "TODO.",
+										Description: "Whether the host is a hidden host or not. Default is - `false`",
 									},
 									TF_FIELD_CLUSTER_HOST_SLAVE_DELAY: {
 										Type:     schema.TypeString,
