@@ -6,10 +6,10 @@ This directory contains a set of examples for deploying Microsoft SQL Server clu
 
 | Name                                                                                                                                                                     |
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [clustercontrol_db_cluster](../../docs/resources/db_cluster.md#clustercontrol_db_cluster-resource)                                                 |
-| [clustercontrol_db_cluster_backup](../../docs/resources/db_cluster_backup.md#clustercontrol_db_cluster_backup-resource)                            |                                                                                                                                                                                    |
-| [clustercontrol_db_cluster_backup_schedule](../../docs/resources/db_cluster_backup_schedule.md#clustercontrol_db_cluster_backup_schedule-resource) |
-| [clustercontrol_db_cluster_maintenance](../../docs/resources/db_cluster_maintenance.md#clustercontrol_db_cluster_maintenance-resource)             |
+| [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md)                                                 |
+| [clustercontrol_db_cluster_backup](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup.md)                            |                                                                                                                                                                                    |
+| [clustercontrol_db_cluster_backup_schedule](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup_schedule.md) |
+| [clustercontrol_db_cluster_maintenance](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_maintenance.md)             |
 
 
 ## Choosing attribute values for Microsoft SQL Server
@@ -27,9 +27,8 @@ This directory contains a set of examples for deploying Microsoft SQL Server clu
 |------------|-------------|
 | `microsoft` | Microsoft   |
 
-### Scheduling Backups using the - [clustercontrol_db_cluster_backup_schedule](../../docs/resources/db_cluster_backup_schedule.md#clustercontrol_db_cluster_backup_schedule-resource) Resource
-The backup schedule resource allows you to create a backup schedule for a cluster in ClusterControl through the
-terraform provider.
+### Scheduling Backups using the - [clustercontrol_db_cluster_backup_schedule](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup_schedule.md) Resource
+The backup schedule resource allows you to create a backup schedule for a cluster in ClusterControl through the terraform provider.
 
 ```hcl
 resource "clustercontrol_db_cluster_backup_schedule" "daily-full" {
@@ -49,9 +48,8 @@ resource "clustercontrol_db_cluster_backup_schedule" "daily-full" {
 }
 ```
 
-### Taking adhoc backups using the - [clustercontrol_db_cluster_backup](../../docs/resources/db_cluster_backup.md#clustercontrol_db_cluster_backup-resource) resource
-You can a maintenance window for a cluster using the `clustercontrol_db_cluster_backup` resource.
-Here's an example of it.
+### Taking adhoc backups using the - [clustercontrol_db_cluster_backup](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup.md) resource
+You can a maintenance window for a cluster using the `clustercontrol_db_cluster_backup` resource. Here's an example of it.
 
 ```hcl
 resource "clustercontrol_db_cluster_backup" "full-1" {

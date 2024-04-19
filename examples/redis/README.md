@@ -6,10 +6,10 @@ This directory contains an example for deploying Redis (sentinel) clusters using
 
 | Name                                                                                                                                                                     |
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [clustercontrol_db_cluster](../../docs/resources/db_cluster.md#clustercontrol_db_cluster-resource)                                                 |
-| [clustercontrol_db_cluster_backup](../../docs/resources/db_cluster_backup.md#clustercontrol_db_cluster_backup-resource)                            |                                                                                                                                                                                    |
-| [clustercontrol_db_cluster_backup_schedule](../../docs/resources/db_cluster_backup_schedule.md#clustercontrol_db_cluster_backup_schedule-resource) |
-| [clustercontrol_db_cluster_maintenance](../../docs/resources/db_cluster_maintenance.md#clustercontrol_db_cluster_maintenance-resource)             |
+| [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md)                                                 |
+| [clustercontrol_db_cluster_backup](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup.md)                            |                                                                                                                                                                                    |
+| [clustercontrol_db_cluster_backup_schedule](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup_schedule.md) |
+| [clustercontrol_db_cluster_maintenance](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_maintenance.md)             |
 
 
 ## Choosing attribute values for Redis
@@ -27,7 +27,7 @@ This directory contains an example for deploying Redis (sentinel) clusters using
 | redis   | Redis community edition |
 
 
-### Adding/Removing nodes to an existing cluster - [clustercontrol_db_cluster](../../docs/resources/db_cluster.md#clustercontrol_db_cluster-resource)
+### Adding/Removing nodes to an existing cluster - [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md)
 
 #### Adding a Replicaiton Slave to a cluster
 
@@ -79,9 +79,8 @@ resource "clustercontrol_db_cluster" "this" {
 In the above, the end state has removed the `db_host` block for host `host-3`. The result will be the
 removal of the corresponding `host-3` node from the cluster.
 
-### Scheduling Backups using the - [clustercontrol_db_cluster_backup_schedule](../../docs/resources/db_cluster_backup_schedule.md#clustercontrol_db_cluster_backup_schedule-resource) Resource
-The backup schedule resource allows you to create a backup schedule for a cluster in ClusterControl through the
-terraform provider.
+### Scheduling Backups using the - [clustercontrol_db_cluster_backup_schedule](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup_schedule.md) Resource
+The backup schedule resource allows you to create a backup schedule for a cluster in ClusterControl through the terraform provider.
 
 ```hcl
 resource "clustercontrol_db_cluster_backup_schedule" "daily-full" {
@@ -101,7 +100,7 @@ resource "clustercontrol_db_cluster_backup_schedule" "daily-full" {
 }
 ```
 
-### Taking adhoc backups using the - [clustercontrol_db_cluster_backup](../../docs/resources/db_cluster_backup.md#clustercontrol_db_cluster_backup-resource) resource
+### Taking adhoc backups using the - [clustercontrol_db_cluster_backup](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup.md) resource
 You can a maintenance window for a cluster using the `clustercontrol_db_cluster_backup` resource.
 Here's an example of it.
 

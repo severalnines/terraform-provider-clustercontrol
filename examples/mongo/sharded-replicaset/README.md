@@ -48,18 +48,3 @@ The `db_config_server` and `db_mongos_server` fields within the [clustercontrol_
 the Mongo config server and mongos server.
 
 Above, the `db_replica_set` specifies a shard with two hosts in the replicaset.
-
-### `db_enable_pbm_agent` Enabling PBM (Percona Backup for MongoDB) agent
-Use the `db_enable_pbm_agent` attributed in the [clustercontrol_db_cluster](../../docs/resources/db_cluster.md#clustercontrol_db_cluster-resource) to enable PBM agent. Once
-the agent is enabled, you can use the `percona-backup-mongodb` backup method either in adhoc backups or backup schedules.
-
-You must remember to set an NFS mounted shared filesystem for PBM as shown with the `db_pbm_backup_dir` attribute.
-
-```text
-resource "clustercontrol_db_cluster" "this" {
-...
-  db_enable_pbm_agent = true
-  db_pbm_backup_dir   = "/nfs/mongobackup"
-...
-}
-```
