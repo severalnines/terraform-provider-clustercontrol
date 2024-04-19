@@ -69,9 +69,9 @@ description: |-
 
 ### Read-Only
 
-- `db_cluster_id` (String) TODO
+- `db_cluster_id` (String) Cluster ID allocated by ClusterControl.
 - `id` (String) The ID of this resource.
-- `last_updated` (String) TODO
+- `last_updated` (String) Last updated timestamp for the resource in question.
 
 <a id="nestedblock--db_config_server"></a>
 ### Nested Schema for `db_config_server`
@@ -107,7 +107,7 @@ Optional:
 - `datadir` (String) The data directory for the database data files. If not set explicily, default for the DB type will be used, or inherited from earlier/top-level specification.
 - `hostname_data` (String) Hostname/IP used for data comms (may be legacy ClusterControl).
 - `hostname_internal` (String) If there's a private net that all DB hosts can communicate, use it here.
-- `protocol` (String) TODO.
+- `protocol` (String) The protocol used within for e.g. Elasticsearch. Valid values are (`elastic`)
 - `roles` (String) Applicable to Elasticsearch - the role of this host (master-data: host will be designated as the master node and a data node, etc)
 - `sync_replication` (Boolean) Applicable to PostgreSQL hot-standby nodes only. Use synchronous replication (or  not)
 
@@ -180,7 +180,7 @@ Required:
 Optional:
 
 - `arbiter_only` (Boolean) The host is acting as an arbiter only.
-- `hidden` (Boolean) TODO.
+- `hidden` (Boolean) Whether the host is a hidden host or not. Default is - `false`
 - `hostname_data` (String) Hostname/IP used for data comms (may be legacy ClusterControl).
 - `hostname_internal` (String) If there's a private net that all DB hosts can communicate, use it here.
 - `priority` (Number) Priority of the host in the mongo replication setup.

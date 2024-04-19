@@ -23,10 +23,10 @@ description: |-
 
 ### Optional
 
-- `db_maint_reason` (String) TODO
+- `db_maint_reason` (String) The reason for the maintenance window. Something meaningful and short.
 
 ### Read-Only
 
-- `db_resource_id` (String) TODO
+- `db_resource_id` (String) The ID of the resource allocated by ClusterControl.
 - `id` (String) The ID of this resource.
-- `last_updated` (String) TODO
+- `last_updated` (String) Last updated timestamp for the resource in question.

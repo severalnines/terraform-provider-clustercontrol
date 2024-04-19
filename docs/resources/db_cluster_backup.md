@@ -38,6 +38,6 @@ description: |-
 
 ### Read-Only
 
-- `db_resource_id` (String) TODO
+- `db_resource_id` (String) The ID of the resource allocated by ClusterControl.
 - `id` (String) The ID of this resource.
-- `last_updated` (String) TODO
+- `last_updated` (String) Last updated timestamp for the resource in question.
