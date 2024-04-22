@@ -76,8 +76,7 @@ the `clustercontrol_db_cluster_backup_schedule` resource depends on the `cluster
 ```
 
 ### Taking adhoc backups using the - [clustercontrol_db_cluster_backup](../docs/resources/db_cluster_backup.md#clustercontrol_db_cluster_backup-resource) resource
-You can a maintenance window for a cluster using the `clustercontrol_db_cluster_backup` resource. 
-Here's an example of a full backup using `xtrabackup`. 
+You can take adhoc backups (full or incremental) of a cluster using the `clustercontrol_db_cluster_backup` resource.
 
 ```hcl
  resource "clustercontrol_db_cluster_backup" "full-1" {
@@ -110,8 +109,7 @@ The following types are supported.
 | Elasticsearch | Elastic         | Use the value `""` to indicate default Elasticsearch snapshot |
 
 ### Setting a maintenance window using the - [clustercontrol_db_cluster_maintenance](../docs/resources/db_cluster_maintenance.md#clustercontrol_db_cluster_maintenance-resource) resource
-You can take adhoc backups (full or incremental) of a cluster using the `clustercontrol_db_cluster_backup` resource.
-Here's an example of a full backup using `xtrabackup`. 
+You can set a maintenance window for a cluster using the `clustercontrol_db_cluster_backup` resource.
 
 ```hcl
  resource "clustercontrol_db_cluster_maintenance" "server-upgrade-03312024" {

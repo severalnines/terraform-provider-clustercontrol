@@ -101,8 +101,7 @@ resource "clustercontrol_db_cluster_backup_schedule" "daily-full" {
 ```
 
 ### Taking adhoc backups using the - [clustercontrol_db_cluster_backup](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup.md) resource
-You can a maintenance window for a cluster using the `clustercontrol_db_cluster_backup` resource.
-Here's an example of it.
+You can take adhoc backups (full or incremental) of a cluster using the `clustercontrol_db_cluster_backup` resource.
 
 ```hcl
 resource "clustercontrol_db_cluster_backup" "full-1" {
