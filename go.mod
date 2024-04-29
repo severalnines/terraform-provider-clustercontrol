@@ -1,4 +1,4 @@
-module github.com/premnalla/new-terraform-provider-clustercontrol
+module github.com/severalnines/terraform-provider-clustercontrol
 
 go 1.21.6
 
