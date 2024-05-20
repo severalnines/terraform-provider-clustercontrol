@@ -1,15 +1,11 @@
 package provider
 
-import (
-	"context"
-	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
-)
-
-var (
-	gNewCtx    context.Context
-	gCfg       *openapi.Configuration
-	gApiClient *openapi.APIClient
-)
+// NOTE: The following use of globals causes SEGV in TF cloud (and only in TF cloud) !!!
+//var (
+//	gNewCtx    context.Context
+//	gCfg       *openapi.Configuration
+//	gApiClient *openapi.APIClient
+//)
 
 var (
 	gDefultDbPortMap = map[string]string{

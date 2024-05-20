@@ -195,9 +195,13 @@ func resourceCreateDbLoadBalancer(ctx context.Context, d *schema.ResourceData, m
 	var diags diag.Diagnostics
 	var err error
 
-	newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+	providerDetails := m.(*ProviderDetails)
 
-	apiClient := m.(*openapi.APIClient)
+	//newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+
+	//apiClient := m.(*openapi.APIClient)
+	apiClient := providerDetails.ApiClient
 
 	isCreate := d.Get(TF_FIELD_LB_CREATE).(bool)
 	isImport := d.Get(TF_FIELD_LB_IMPORT).(bool)

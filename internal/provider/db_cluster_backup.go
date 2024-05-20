@@ -125,9 +125,13 @@ func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 	var diags diag.Diagnostics
 	var err error
 
-	newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+	providerDetails := m.(*ProviderDetails)
 
-	apiClient := m.(*openapi.APIClient)
+	//newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+
+	//apiClient := m.(*openapi.APIClient)
+	apiClient := providerDetails.ApiClient
 
 	createBackup := NewCCJob(CMON_JOB_CREATE_JOB)
 	job := createBackup.GetJob()
@@ -242,9 +246,13 @@ func resourceDeleteDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 	var diags diag.Diagnostics
 	var err error
 
-	newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+	providerDetails := m.(*ProviderDetails)
 
-	apiClient := m.(*openapi.APIClient)
+	//newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+
+	//apiClient := m.(*openapi.APIClient)
+	apiClient := providerDetails.ApiClient
 
 	deleteBackup := NewCCJob(CMON_JOB_CREATE_JOB)
 	job := deleteBackup.GetJob()

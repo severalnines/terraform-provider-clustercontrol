@@ -11,6 +11,20 @@ import (
 	"strings"
 )
 
+type ProviderDetails struct {
+	SessionIdCtx context.Context
+	Cfg          *openapi.Configuration
+	ApiClient    *openapi.APIClient
+}
+
+func NewProviderDetails(ctx context.Context, configuration *openapi.Configuration, client *openapi.APIClient) *ProviderDetails {
+	return &ProviderDetails{
+		SessionIdCtx: ctx,
+		Cfg:          configuration,
+		ApiClient:    client,
+	}
+}
+
 func Provider() *schema.Provider {
 	funcName := "Provider"
 	slog.Debug(funcName)
@@ -58,8 +72,8 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	apiUserPw := d.Get(API_USER_PW).(string)
 	apiUrl := d.Get(CONTROLLER_URL).(string)
 
-	gCfg = newConfiguration(apiUrl)
-	gApiClient = openapi.NewAPIClient(gCfg)
+	cfg := newConfiguration(apiUrl)
+	apiClient := openapi.NewAPIClient(cfg)
 	authenticate := openapi.NewAuthenticate(CMON_OP_AUTHENTICATE_WITH_PW)
 	authenticate.SetUserName(apiUser /*os.Getenv("API_USER")*/)
 	authenticate.SetPassword(apiUserPw /*os.Getenv("API_USER_PW")*/)
@@ -71,7 +85,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		return nil, nil
 	}
 
-	resp, err := gApiClient.AuthAPI.AuthPost(ctx).Authenticate(*authenticate).Execute()
+	resp, err := apiClient.AuthAPI.AuthPost(ctx).Authenticate(*authenticate).Execute()
 	if err != nil {
 		PrintError(err, resp)
 		return nil, diag.FromErr(err)
@@ -80,13 +94,16 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 
 	// fmt.Println("#Cookies: ", len(resp.Cookies()))
 	slog.Debug("providerConfigure", "Num cookies", len(resp.Cookies()))
+	var ccSessionIdCtx context.Context
 	for _, cookie := range resp.Cookies() {
 		slog.Debug("providerConfigure", "Cookie", cookie)
-		gNewCtx = context.WithValue(ctx, "cookie", cookie)
+		ccSessionIdCtx = context.WithValue(ctx, "cookie", cookie)
 		break
 	}
 
-	return gApiClient, diags
+	prividerDetails := NewProviderDetails(ccSessionIdCtx, cfg, apiClient)
+
+	return prividerDetails, diags
 }
 
 func newConfiguration(url string) *openapi.Configuration {

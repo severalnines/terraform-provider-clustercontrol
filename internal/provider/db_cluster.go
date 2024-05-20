@@ -626,9 +626,13 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	var diags diag.Diagnostics
 	var err error
 
-	newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+	providerDetails := m.(*ProviderDetails)
 
-	apiClient := m.(*openapi.APIClient)
+	//newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+
+	//apiClient := m.(*openapi.APIClient)
+	apiClient := providerDetails.ApiClient
 
 	isCreate := d.Get(TF_FIELD_CLUSTER_CREATE).(bool)
 	isImport := d.Get(TF_FIELD_CLUSTER_IMPORT).(bool)
@@ -801,9 +805,13 @@ func resourceReadDbCluster(ctx context.Context, d *schema.ResourceData, m interf
 	var clusterInfo *openapi.ClusterResponse
 	var err error
 
-	newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+	providerDetails := m.(*ProviderDetails)
 
-	apiClient := m.(*openapi.APIClient)
+	//newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+
+	//apiClient := m.(*openapi.APIClient)
+	apiClient := providerDetails.ApiClient
 
 	clusterId := d.Id()
 
@@ -875,9 +883,13 @@ func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	var clusterInfo *openapi.ClusterResponse
 	var err error
 
-	newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+	providerDetails := m.(*ProviderDetails)
 
-	apiClient := m.(*openapi.APIClient)
+	//newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+
+	//apiClient := m.(*openapi.APIClient)
+	apiClient := providerDetails.ApiClient
 
 	clusterId := d.Id()
 
@@ -958,9 +970,13 @@ func resourceDeleteDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
 
-	newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+	providerDetails := m.(*ProviderDetails)
 
-	apiClient := m.(*openapi.APIClient)
+	//newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+
+	//apiClient := m.(*openapi.APIClient)
+	apiClient := providerDetails.ApiClient
 
 	delCluster := NewCCJob(CMON_JOB_CREATE_JOB)
 	job := delCluster.GetJob()

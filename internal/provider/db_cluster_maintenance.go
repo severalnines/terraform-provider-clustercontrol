@@ -65,9 +65,13 @@ func resourceCreateDbMaintenance(ctx context.Context, d *schema.ResourceData, m 
 	var diags diag.Diagnostics
 	var err error
 
-	newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+	providerDetails := m.(*ProviderDetails)
 
-	apiClient := m.(*openapi.APIClient)
+	//newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+
+	//apiClient := m.(*openapi.APIClient)
+	apiClient := providerDetails.ApiClient
 
 	maintStartTmStr := d.Get(TF_FIELD_MAINT_START_TIME).(string)
 	maintStopTmStr := d.Get(TF_FIELD_MAINT_STOP_TIME).(string)
@@ -156,9 +160,13 @@ func resourceDeleteDbMaintenance(ctx context.Context, d *schema.ResourceData, m 
 	var diags diag.Diagnostics
 	var err error
 
-	newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+	providerDetails := m.(*ProviderDetails)
 
-	apiClient := m.(*openapi.APIClient)
+	//newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
+	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+
+	//apiClient := m.(*openapi.APIClient)
+	apiClient := providerDetails.ApiClient
 
 	maintOperation := *openapi.NewMaintenance(CMON_MAINTENANCE_OPERATION_REMOVE_MAINT)
 	maintOperation.SetUUID(d.Id())
