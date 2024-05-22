@@ -629,7 +629,8 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	providerDetails := m.(*ProviderDetails)
 
 	//newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
-	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+	//newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionCookie)
 
 	//apiClient := m.(*openapi.APIClient)
 	apiClient := providerDetails.ApiClient
@@ -808,7 +809,8 @@ func resourceReadDbCluster(ctx context.Context, d *schema.ResourceData, m interf
 	providerDetails := m.(*ProviderDetails)
 
 	//newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
-	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+	//newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionCookie)
 
 	//apiClient := m.(*openapi.APIClient)
 	apiClient := providerDetails.ApiClient
@@ -886,7 +888,8 @@ func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	providerDetails := m.(*ProviderDetails)
 
 	//newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
-	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+	//newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionCookie)
 
 	//apiClient := m.(*openapi.APIClient)
 	apiClient := providerDetails.ApiClient
@@ -973,7 +976,8 @@ func resourceDeleteDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 	providerDetails := m.(*ProviderDetails)
 
 	//newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
-	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+	//newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionCookie)
 
 	//apiClient := m.(*openapi.APIClient)
 	apiClient := providerDetails.ApiClient

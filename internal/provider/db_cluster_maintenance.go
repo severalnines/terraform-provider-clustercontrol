@@ -68,7 +68,8 @@ func resourceCreateDbMaintenance(ctx context.Context, d *schema.ResourceData, m 
 	providerDetails := m.(*ProviderDetails)
 
 	//newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
-	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+	//newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionCookie)
 
 	//apiClient := m.(*openapi.APIClient)
 	apiClient := providerDetails.ApiClient
@@ -163,7 +164,8 @@ func resourceDeleteDbMaintenance(ctx context.Context, d *schema.ResourceData, m 
 	providerDetails := m.(*ProviderDetails)
 
 	//newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
-	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+	//newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionCookie)
 
 	//apiClient := m.(*openapi.APIClient)
 	apiClient := providerDetails.ApiClient

@@ -12,16 +12,18 @@ import (
 )
 
 type ProviderDetails struct {
-	SessionIdCtx context.Context
-	Cfg          *openapi.Configuration
-	ApiClient    *openapi.APIClient
+	//SessionIdCtx context.Context
+	SessionCookie *http.Cookie
+	Cfg           *openapi.Configuration
+	ApiClient     *openapi.APIClient
 }
 
-func NewProviderDetails(ctx context.Context, configuration *openapi.Configuration, client *openapi.APIClient) *ProviderDetails {
+func NewProviderDetails(cookie *http.Cookie, configuration *openapi.Configuration, client *openapi.APIClient) *ProviderDetails {
 	return &ProviderDetails{
-		SessionIdCtx: ctx,
-		Cfg:          configuration,
-		ApiClient:    client,
+		//SessionIdCtx: ctx,
+		SessionCookie: cookie,
+		Cfg:           configuration,
+		ApiClient:     client,
 	}
 }
 
@@ -94,14 +96,16 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 
 	// fmt.Println("#Cookies: ", len(resp.Cookies()))
 	slog.Debug("providerConfigure", "Num cookies", len(resp.Cookies()))
-	var ccSessionIdCtx context.Context
+	//var ccSessionIdCtx context.Context
+	var sessionCookie http.Cookie
 	for _, cookie := range resp.Cookies() {
 		slog.Debug("providerConfigure", "Cookie", cookie)
-		ccSessionIdCtx = context.WithValue(ctx, "cookie", cookie)
+		//ccSessionIdCtx = context.WithValue(ctx, "cookie", cookie)
+		sessionCookie = *cookie
 		break
 	}
 
-	prividerDetails := NewProviderDetails(ccSessionIdCtx, cfg, apiClient)
+	prividerDetails := NewProviderDetails(&sessionCookie, cfg, apiClient)
 
 	return prividerDetails, diags
 }

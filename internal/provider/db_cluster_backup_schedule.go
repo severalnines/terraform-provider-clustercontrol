@@ -134,7 +134,8 @@ func resourceCreateDbClusterBackupSched(ctx context.Context, d *schema.ResourceD
 	providerDetails := m.(*ProviderDetails)
 
 	//newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
-	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+	//newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionCookie)
 
 	//apiClient := m.(*openapi.APIClient)
 	apiClient := providerDetails.ApiClient
@@ -294,7 +295,8 @@ func resourceDeleteDbClusterBackupSched(ctx context.Context, d *schema.ResourceD
 	providerDetails := m.(*ProviderDetails)
 
 	//newCtx := context.WithValue(ctx, "cookie", gNewCtx.Value("cookie"))
-	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+	//newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionIdCtx.Value("cookie"))
+	newCtx := context.WithValue(ctx, "cookie", providerDetails.SessionCookie)
 
 	//apiClient := m.(*openapi.APIClient)
 	apiClient := providerDetails.ApiClient
