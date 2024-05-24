@@ -65,7 +65,9 @@ Where ``10.0.0.5`` is the private IP of the ClusterControl host. Restart Cluster
 
 5. Run a quick test to make sure you can access ClusterControl via its REST API (curl or postman)
 
-```curl -c cookie.jar.txt -k 'https://10.0.0.5:9501/v2/auth' -XPOST -d '{"operation":"authenticateWithPassword","user_name":"CHANGE_ME","password":"CHANGE_ME"}'```
+```shell
+curl -c cookie.jar.txt -k 'https://10.0.0.5:9501/v2/auth' -XPOST -d '{"operation":"authenticateWithPassword","user_name":"CHANGE_ME","password":"CHANGE_ME"}'
+```
 
 Where ``username`` and ``password`` are valid login credentials for ClusterControl.
 
