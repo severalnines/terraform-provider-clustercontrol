@@ -111,7 +111,7 @@ A cookie will be returned by ClusterControl back-end and saved in the `cookie.ja
 Execute the following additional curl command and check the response to make sure you are properly authenticated with ClusterControl.
 
 ```shell
-curl -k -b cookie.jar.txt -k 'https://10.0.0.5:9501/v2/clusters' -XPOST -d '{"operation": "getAllClusterInfo"}'
+curl -k -b cookie.jar.txt 'https://10.0.0.5:9501/v2/clusters' -XPOST -d '{"operation": "getAllClusterInfo"}'
 ```
 Response should look like the following `JSON`:
 ```json
