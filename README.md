@@ -65,9 +65,65 @@ Where ``10.0.0.5`` is the private IP of the ClusterControl host. Restart Cluster
 
 5. Run a quick test to make sure you can access ClusterControl via its REST API (curl or postman)
 
-```curl -k 'https://10.0.0.5:9501/v2/clusters' -XPOST -d '{"operation": "getAllClusterInfo", "authenticate": {"password": "CHANGE-ME","username": "CHANGE-ME"}}'```
+```curl -c cookie.jar.txt -k 'https://10.0.0.5:9501/v2/auth' -XPOST -d '{"operation":"authenticateWithPassword","user_name":"CHANGE_ME","password":"CHANGE_ME"}'```
 
 Where ``username`` and ``password`` are valid login credentials for ClusterControl.
+
+Make sure you get a response like the following. If you don't get a similar `JSON` response, it means something has gone wrong.
+
+```json
+{
+    "controller_id": "76936896-794a-4f5f-95ac-5c44cefb6830",
+    "is_superuser": true,
+    "request_processed": "2024-05-24T15:00:35.400Z",
+    "request_status": "Ok",
+    "debug_messages": 
+    [
+        "RPC V2 authenticated user is 'username'."
+    ],
+    "user": 
+    {
+        "class_name": "CmonUser",
+        "owner_user_name": "username",
+        "groups": 
+        [
+            {
+                "class_name": "CmonGroup",
+                "cdt_path": "/groups",
+                "group_name": "admins"
+            }
+        ],
+        "timezone": 
+        {
+            "class_name": "CmonTimeZone",
+            "name": "UTC",
+            "abbreviation": "UTC",
+            "offset": 0,
+            "use_dst": false
+        }
+    }
+}
+```
+
+A cookie will be returned by ClusterControl back-end and saved in the `cookie.jar.txt` per the curl command.
+Execute the following additional curl command and check the response to make sure you are properly authenticated with ClusterControl.
+
+```shell
+curl -k -b cookie.jar.txt -k 'https://10.0.0.5:9501/v2/clusters' -XPOST -d '{"operation": "getAllClusterInfo"}'
+```
+Response should look like the following `JSON`:
+```json
+{
+    "controller_id": "76936896-794a-4f5f-95ac-5c44cefb6830",
+    "request_processed": "2024-05-24T15:07:25.837Z",
+    "request_status": "Ok",
+    "request_user_id": 5,
+    "total": 0,
+    "debug_messages": [
+        "RPC V2 authenticated user is 'username'."
+    ]
+}
+```
 
 ### Deploying database clusters using terraform for ClusterControl
 
