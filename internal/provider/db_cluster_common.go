@@ -63,7 +63,9 @@ func (c *DbCommon) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJob
 	}
 
 	dbAdminUserPassword := d.Get(TF_FIELD_CLUSTER_ADMIN_PW).(string)
-	jobData.SetAdminPassword(dbAdminUserPassword)
+	// CLUS-4103
+	//jobData.SetAdminPassword(dbAdminUserPassword)
+	jobData.SetDbPassword(dbAdminUserPassword)
 
 	//var iPort int
 	//port := d.Get(TF_FIELD_CLUSTER_PORT).(string)
