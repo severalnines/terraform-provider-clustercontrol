@@ -12,7 +12,7 @@ TARGET_DIR=~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${
 default: install
 
 build:
-	go build -o ${TARGET}
+	CGO_ENABLED=0 go build -o ${TARGET}
 
 all: ${TARGET}
 

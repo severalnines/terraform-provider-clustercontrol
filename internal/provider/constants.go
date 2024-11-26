@@ -20,6 +20,8 @@ const (
 	CLUSTER_TYPE_MOGNODB        = "mongodb"
 	CLUSTER_TYPE_PG_SINGLE      = "postgresql_single"
 	CLUSTER_TYPE_REDIS          = "redis"
+	CLUSTER_TYPE_REDIS_SHARDED  = "redis_sharded"
+	CLUSTER_TYPE_VALKEY_SHARDED = "valkey_sharded"
 	CLUSTER_TYPE_MSSQL_AO_ASYNC = "mssql_ao_async"
 	CLUSTER_TYPE_MSSQL_SINGLE   = "mssql_single"
 	CLUSTER_TYPE_ELASTIC        = "elastic"
@@ -32,6 +34,7 @@ const (
 	VENDOR_ORACLE     = "oracle"
 	VENDOR_ELASTIC    = "elasticsearch"
 	VENDOR_REDIS      = "redis"
+	VENDOR_VALKEY     = "valkey"
 	VENDOR_MICROSOFT  = "microsoft"
 	VENDOR_DEFAULT    = "default"
 	VENDOR_POSTGRESQL = "postgresql"
@@ -73,6 +76,7 @@ const (
 	DEFAULT_MONGO_CONFIG_SRVR_PORT = "27019"
 	DEFAULT_REDIS_PORT             = "6379"
 	DEFAULT_REDIS_SENTINEL_PORT    = "26379"
+	DEFAULT_REDIS_BUS_PORT         = "16379"
 	DEFAULT_ELASTIC_HTTP_PORT      = "9200"
 	DEFAULT_ELASTIC_TRANSFER_PORT  = "9200"
 	DEFAULT_MSSQL_PORT             = "1433"
@@ -82,10 +86,12 @@ const (
 
 const (
 	MYSQL_VERSION_8   = "8.0"
+	MYSQL_VERSION_8_4 = "8.4"
 	MYSQL_VERSION_5_7 = "5.7"
 )
 
 const (
+	MARIADB_VERSION_11_4  = "11.4"
 	MARIADB_VERSION_10_11 = "10.11"
 	MARIADB_VERSION_10_10 = "10.10"
 	MARIADB_VERSION_10_9  = "10.9"
@@ -97,6 +103,7 @@ const (
 )
 
 const (
+	POSTGRESQL_VERSION_16 = "16"
 	POSTGRESQL_VERSION_15 = "15"
 	POSTGRESQL_VERSION_14 = "14"
 	POSTGRESQL_VERSION_13 = "13"
@@ -105,6 +112,7 @@ const (
 )
 
 const (
+	MONGODB_VERSION_7_0 = "7.0"
 	MONGODB_VERSION_6_0 = "6.0"
 	MONGODB_VERSION_5_0 = "5.0"
 	MONGODB_VERSION_4_4 = "4.4"
@@ -113,7 +121,12 @@ const (
 
 const (
 	REDIS_VERSION_7 = "7"
-	REDIS_VERSION_6 = "6"
+	REDIS_VERSION_8 = "8"
+)
+
+const (
+	VALKEY_VERSION_7 = "7"
+	VALKEY_VERSION_8 = "8"
 )
 
 const (
@@ -122,6 +135,7 @@ const (
 )
 
 const (
+	ELASTIC_VERSION_8_15   = "8.15"
 	ELASTIC_VERSION_8_3_1  = "8.3.1"
 	ELASTIC_VERSION_8_1_3  = "8.1.3"
 	ELASTIC_VERSION_7_17_3 = "7.17.3"
@@ -149,6 +163,7 @@ const (
 const (
 	CMON_CLASS_NAME_REDIS_HOST         = "CmonRedisHost"
 	CMON_CLASS_NAME_REDIS_SENTNEL_HOST = "CmonRedisSentinelHost"
+	CMON_CLASS_NAME_REDIS_SHARDED_HOST = "RedisShardedHost"
 	CMON_CLASS_NAME_MSSQL_HOST         = "CmonMsSqlHost"
 	CMON_CLASS_NAME_ELASTIC_HOST       = "CmonElasticHost"
 	CMON_CLASS_NAME_CMON_HOST          = "CmonHost"
@@ -174,6 +189,7 @@ const (
 	CMON_DB_HOST_ROLE_MONGO_MONGOS_SERVER = "mongos"    // Mongo
 	CMON_DB_HOST_ROLE_PRIMARY             = "PRIMARY"   // MS SQL
 	CMON_DB_HOST_ROLE_SECONDARY           = "SECONDARY" // MS SQL
+	CMON_DB_HOST_ROLE_REPLICA             = "REPLICA"   // MS SQL
 )
 
 const (
@@ -284,6 +300,7 @@ const (
 	TF_FIELD_CLUSTER_MONGODB_CFG_SRVR_PORT = "db_mongo_config_server_port"
 	TF_FIELD_CLUSTER_REDIS_PORT            = "db_redis_port"
 	TF_FIELD_CLUSTER_SENTINEL_PORT         = "db_sentinel_port"
+	TF_FIELD_CLUSTER_REDIS_BUS_PORT        = "db_redis_bus_port"
 	TF_FIELD_CLUSTER_MSSQL_SERVER_PORT     = "db_mssqlserver_port"
 	TF_FIELD_CLUSTER_ELASTIC_HTTP_PORT     = "db_elasticsearch_http_port"
 	TF_FIELD_CLUSTER_ELASTIC_TRANSFER_PORT = "db_elasticsearch_transfer_port"
@@ -324,6 +341,7 @@ const (
 	TF_FIELD_CLUSTER_HOST_HIDDEN             = "hidden"
 	TF_FIELD_CLUSTER_HOST_PROTO              = "protocol"
 	TF_FIELD_CLUSTER_HOST_ROLES              = "roles"
+	TF_FIELD_CLUSTER_HOST_ROLE               = "role"
 	TF_FIELD_CLUSTER_TOPOLOGY                = "db_topology"
 	TF_FIELD_CLUSTER_PRIMARY                 = "primary"
 	TF_FIELD_CLUSTER_REPLICA                 = "replica"

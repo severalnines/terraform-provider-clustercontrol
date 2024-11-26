@@ -115,8 +115,9 @@ var (
 	gDbConfigTemplate = map[string]map[string]map[string]string{
 		VENDOR_ORACLE: {
 			CLUSTER_TYPE_REPLICATION: {
-				MYSQL_VERSION_5_7: "my.cnf.repl57",
+				//MYSQL_VERSION_5_7: "my.cnf.repl57",
 				MYSQL_VERSION_8:   "my.cnf.repl80",
+				MYSQL_VERSION_8_4: "my.cnf.repl84",
 			},
 			//CLUSTER_TYPE_GALERA: {
 			//	MYSQL_VERSION_8: "my.cnf.80-pxc",
@@ -124,22 +125,26 @@ var (
 		},
 		VENDOR_PERCONA: {
 			CLUSTER_TYPE_REPLICATION: {
-				MYSQL_VERSION_5_7: "my.cnf.repl57",
+				//MYSQL_VERSION_5_7: "my.cnf.repl57",
 				MYSQL_VERSION_8:   "my.cnf.repl80",
+				MYSQL_VERSION_8_4: "my.cnf.repl84",
 			},
 			CLUSTER_TYPE_GALERA: {
-				MYSQL_VERSION_5_7: "my57.cnf.galera",
-				MYSQL_VERSION_8:   "my.cnf.80-pxc",
+				//MYSQL_VERSION_5_7: "my57.cnf.galera",
+				MYSQL_VERSION_8: "my.cnf.80-pxc",
+				//MYSQL_VERSION_8_4: "my.cnf.84-pxc",
 			},
 			CLUSTER_TYPE_MOGNODB: {
+				MONGODB_VERSION_7_0: "mongodb.conf.7.0.percona",
 				MONGODB_VERSION_6_0: "mongodb.conf.6.0.percona",
 				MONGODB_VERSION_5_0: "mongodb.conf.5.0.percona",
 				MONGODB_VERSION_4_4: "mongodb.conf.4.4.percona",
-				MONGODB_VERSION_4_2: "mongodb.conf.4.2.percona",
+				//MONGODB_VERSION_4_2: "mongodb.conf.4.2.percona",
 			},
 		},
 		VENDOR_MARIADB: {
 			CLUSTER_TYPE_REPLICATION: {
+				MARIADB_VERSION_11_4:  "my.cnf.replication",
 				MARIADB_VERSION_10_11: "my.cnf.mdb10x-replication",
 				MARIADB_VERSION_10_10: "my.cnf.mdb10x-replication",
 				MARIADB_VERSION_10_9:  "my.cnf.mdb10x-replication",
@@ -147,9 +152,10 @@ var (
 				MARIADB_VERSION_10_6:  "my.cnf.mdb10x-replication",
 				MARIADB_VERSION_10_5:  "my.cnf.mdb10x-replication",
 				MARIADB_VERSION_10_4:  "my.cnf.mdb10x-replication",
-				MARIADB_VERSION_10_3:  "my.cnf.mdb10x-replication",
+				//MARIADB_VERSION_10_3:  "my.cnf.mdb10x-replication",
 			},
 			CLUSTER_TYPE_GALERA: {
+				MARIADB_VERSION_11_4:  "my.cnf.mdb106+-galera",
 				MARIADB_VERSION_10_11: "my.cnf.mdb106+-galera",
 				MARIADB_VERSION_10_10: "my.cnf.mdb106+-galera",
 				MARIADB_VERSION_10_9:  "my.cnf.mdb106+-galera",
@@ -157,15 +163,28 @@ var (
 				MARIADB_VERSION_10_6:  "my.cnf.mdb106+-galera",
 				MARIADB_VERSION_10_5:  "my.cnf.mdb10x-galera",
 				MARIADB_VERSION_10_4:  "my.cnf.mdb10x-galera",
-				MARIADB_VERSION_10_3:  "my.cnf.mdb10x-galera",
+				//MARIADB_VERSION_10_3:  "my.cnf.mdb10x-galera",
 			},
 		},
 		VENDOR_10GEN: {
 			CLUSTER_TYPE_MOGNODB: {
-				MONGODB_VERSION_6_0: "mongodb.conf.6.0.percona",
-				MONGODB_VERSION_5_0: "mongodb.conf.5.0.percona",
-				MONGODB_VERSION_4_4: "mongodb.conf.4.4.percona",
+				MONGODB_VERSION_7_0: "mongodb.conf.7.0.org",
+				MONGODB_VERSION_6_0: "mongodb.conf.6.0.org",
+				MONGODB_VERSION_5_0: "mongodb.conf.5.0.org",
+				MONGODB_VERSION_4_4: "mongodb.conf.4.4.org",
 				//MONGODB_VERSION_4_2: "mongodb.conf.4.2.percona",
+			},
+		},
+		VENDOR_REDIS: {
+			CLUSTER_TYPE_REDIS_SHARDED: {
+				REDIS_VERSION_7: "redis7-tls.conf",
+				REDIS_VERSION_8: "redis8-tls.conf",
+			},
+		},
+		VENDOR_VALKEY: {
+			CLUSTER_TYPE_VALKEY_SHARDED: {
+				VALKEY_VERSION_7: "valkey7-tls.conf",
+				VALKEY_VERSION_8: "valkey8-tls.conf",
 			},
 		},
 	}

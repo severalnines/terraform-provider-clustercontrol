@@ -293,6 +293,27 @@ func (c *DbCommon) findHostEntry(hostname string, hosts interface{}) map[string]
 	return nil
 }
 
+func (c *DbCommon) findPrimaryOfReplica(hostname string, hosts interface{}) map[string]any {
+	funcName := "DbCommon::findPrimaryOfReplica"
+	slog.Debug(funcName)
+
+	var immediatePrimary map[string]any
+	for _, ff := range hosts.([]any) {
+		f := ff.(map[string]any)
+		hn := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
+		role := f[TF_FIELD_CLUSTER_HOST_ROLE].(string)
+		if role != "" && strings.EqualFold(role, CMON_DB_HOST_ROLE_PRIMARY) {
+			immediatePrimary = f
+			//slog.Debug(funcName, "ImmediatePrimary", immediatePrimary)
+			continue
+		}
+		if strings.EqualFold(hostname, hn) {
+			return immediatePrimary
+		}
+	}
+	return nil
+}
+
 func (c *DbCommon) getHosts(d *schema.ResourceData) ([]openapi.JobsJobJobSpecJobDataNodesInner, error) {
 	var nodes []openapi.JobsJobJobSpecJobDataNodesInner
 
@@ -363,13 +384,28 @@ func (c *DbCommon) determineNodesDelta(nodes []openapi.JobsJobJobSpecJobDataNode
 			if !strings.EqualFold(hh[j].GetClassName(), hostClass) {
 				continue
 			}
+
+			// ClassNames match
+
 			if hostRole != "" && replicasetName != "" &&
 				(!strings.EqualFold(hostRole, hh[j].GetRole()) ||
 					!strings.EqualFold(replicasetName, hh[j].GetRs())) {
 				continue
 			}
+
+			// Role and ReplicasetNames match (mongodb)
+
+			// CLUS-4796: RedisCluster & Valkey
+			//if hostRole != "" && replicasetName == "" &&
+			//	(!strings.EqualFold(hostRole, hh[j].GetRole())) {
+			//	continue
+			//}
+
+			// Roles match (RedisCluster & Valkey)
+
 			slog.Debug("In CMON", "host", hh[j].GetHostname(), "role", hh[j].GetRole(), "rs", hh[j].GetRs())
 			if strings.EqualFold(node.GetHostname(), hh[j].GetHostname()) {
+				// Hostnames match
 				isFound = true
 			}
 		}
@@ -387,14 +423,29 @@ func (c *DbCommon) determineNodesDelta(nodes []openapi.JobsJobJobSpecJobDataNode
 		if !strings.EqualFold(h.GetClassName(), hostClass) {
 			continue
 		}
+
+		// ClassNames match
+
 		if hostRole != "" && replicasetName != "" &&
 			(!strings.EqualFold(hostRole, h.GetRole()) ||
 				!strings.EqualFold(replicasetName, h.GetRs())) {
 			continue
 		}
+
+		// Role and ReplicasetNames match (mongodb)
+
+		// CLUS-4796: RedisCluster & Valkey
+		//if hostRole != "" && replicasetName == "" &&
+		//	(!strings.EqualFold(hostRole, h.GetRole())) {
+		//	continue
+		//}
+
+		// Roles match (RedisCluster & Valkey)
+
 		isFound := false
 		for j := 0; j < len(nodes) && !isFound; j++ {
 			if strings.EqualFold(nodes[j].GetHostname(), h.GetHostname()) {
+				// Hostnames match
 				isFound = true
 			}
 		}

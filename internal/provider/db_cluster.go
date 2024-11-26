@@ -689,6 +689,11 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 		getInputs = NewMongo()
 	case CLUSTER_TYPE_REDIS:
 		getInputs = NewRedis()
+	case CLUSTER_TYPE_REDIS_SHARDED:
+		getInputs = NewRedisSharded()
+	case CLUSTER_TYPE_VALKEY_SHARDED:
+		//getInputs = NewValkeySharded()
+		getInputs = NewRedisSharded()
 	case CLUSTER_TYPE_MSSQL_SINGLE:
 		getInputs = NewMsSql()
 	case CLUSTER_TYPE_MSSQL_AO_ASYNC:
