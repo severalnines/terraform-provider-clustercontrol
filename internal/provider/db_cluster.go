@@ -14,9 +14,9 @@ import (
 
 type DbClusterInterface interface {
 	GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error
-	HandleRead(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error
+	HandleRead(ctx context.Context, d *schema.ResourceData, apiClient *openapi.APIClient, clusterInfo *openapi.ClusterResponse) error
 	IsUpdateBatchAllowed(d *schema.ResourceData) error
-	HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error
+	HandleUpdate(ctx context.Context, d *schema.ResourceData, apiClient *openapi.APIClient, clusterInfo *openapi.ClusterResponse) error
 }
 
 func resourceDbCluster() *schema.Resource {
@@ -63,7 +63,7 @@ func resourceDbCluster() *schema.Resource {
 			TF_FIELD_CLUSTER_VENDOR: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Database vendor - oracle, percona, mariadb, 10gen, microsoft, redis, elasticsearch, for postgresql it is `default` etc",
+				Description: "Database vendor - oracle, percona, mariadb, 10gen, microsoft, redis/valkey, elasticsearch, for postgresql it is `default` etc",
 			},
 			TF_FIELD_CLUSTER_VERSION: {
 				Type:        schema.TypeString,
@@ -115,6 +115,21 @@ func resourceDbCluster() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "The port Redis Sentinel uses to communicate",
+			},
+			TF_FIELD_CLUSTER_REDIS_BUS_PORT: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The port on which Redis or Valkey (Sharded) Cluster management takes place",
+			},
+			TF_FIELD_CLUSTER_REDIS_NODE_TIMEOUT_MS: {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "Redis (and Valkey) Sharded Cluster node timeout in milliseconds",
+			},
+			TF_FIELD_CLUSTER_REDIS_REPLICA_VALIDITY_FACTOR: {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "Redis (and Valkey) Sharded Cluster replica validity factor",
 			},
 			TF_FIELD_CLUSTER_MSSQL_SERVER_PORT: {
 				Type:        schema.TypeString,
@@ -263,6 +278,11 @@ func resourceDbCluster() *schema.Resource {
 							Optional: true,
 							Description: "Applicable to Elasticsearch - the role of this host (master-data: host will " +
 								"be designated as the master node and a data node, etc)",
+						},
+						TF_FIELD_CLUSTER_HOST_ROLE: {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "Applicable to Redis or Valkey (Sharded) Cluster - the role of this host (primary or replica)",
 						},
 					},
 				},
@@ -849,6 +869,11 @@ func resourceReadDbCluster(ctx context.Context, d *schema.ResourceData, m interf
 		readHandler = NewMongo()
 	case CLUSTER_TYPE_REDIS:
 		readHandler = NewRedis()
+	case CLUSTER_TYPE_REDIS_SHARDED:
+		readHandler = NewRedisSharded()
+	case CLUSTER_TYPE_VALKEY_SHARDED:
+		//getInputs = NewValkeySharded()
+		readHandler = NewRedisSharded()
 	case CLUSTER_TYPE_MSSQL_SINGLE:
 		readHandler = NewMsSql()
 	case CLUSTER_TYPE_MSSQL_AO_ASYNC:
@@ -866,7 +891,7 @@ func resourceReadDbCluster(ctx context.Context, d *schema.ResourceData, m interf
 	}
 
 	if readHandler != nil {
-		if err = readHandler.HandleRead(newCtx, d, m, clusterInfo); err != nil {
+		if err = readHandler.HandleRead(newCtx, d, apiClient, clusterInfo); err != nil {
 			slog.Error(err.Error())
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,
@@ -928,6 +953,11 @@ func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 		updateHandler = NewMongo()
 	case CLUSTER_TYPE_REDIS:
 		updateHandler = NewRedis()
+	case CLUSTER_TYPE_REDIS_SHARDED:
+		updateHandler = NewRedisSharded()
+	case CLUSTER_TYPE_VALKEY_SHARDED:
+		//getInputs = NewValkeySharded()
+		updateHandler = NewRedisSharded()
 	case CLUSTER_TYPE_MSSQL_SINGLE:
 		updateHandler = NewMsSql()
 	case CLUSTER_TYPE_MSSQL_AO_ASYNC:
@@ -956,7 +986,7 @@ func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 		}
 
 		// The allowed batch of updates is Good. Therefore, it is a GO for update. Do it...
-		if err = updateHandler.HandleUpdate(newCtx, d, m, clusterInfo); err != nil {
+		if err = updateHandler.HandleUpdate(newCtx, d, apiClient, clusterInfo); err != nil {
 			slog.Error(err.Error())
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,

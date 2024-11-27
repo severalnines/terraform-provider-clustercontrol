@@ -124,9 +124,9 @@ func (m *MySQLMaria) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJ
 	return nil
 }
 
-func (c *MySQLMaria) HandleRead(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+func (c *MySQLMaria) HandleRead(ctx context.Context, d *schema.ResourceData, apiClient *openapi.APIClient, clusterInfo *openapi.ClusterResponse) error {
 
-	if err := c.Common.HandleRead(ctx, d, m, clusterInfo); err != nil {
+	if err := c.Common.HandleRead(ctx, d, apiClient, clusterInfo); err != nil {
 		return err
 	}
 
@@ -157,14 +157,14 @@ func (c *MySQLMaria) IsUpdateBatchAllowed(d *schema.ResourceData) error {
 	return nil
 }
 
-func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, apiClient *openapi.APIClient, clusterInfo *openapi.ClusterResponse) error {
 	funcName := "MySQLMaria::HandleUpdate"
 	slog.Debug(funcName)
 
 	var err error
 
 	// handle things like cluster-name, tags, and toggling cluster-auto-covery in base ...
-	if err = c.Common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {
+	if err = c.Common.HandleUpdate(ctx, d, apiClient, clusterInfo); err != nil {
 		return err
 	}
 
@@ -235,7 +235,7 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 		// nodeFromTf: "the" node from the resource data. It is this node which is to be added or removed to the cluster
 		// nodeToAddOrRemove: contains hostname of the node to be added or removed. Use it in the remove case
 
-		apiClient := m.(*openapi.APIClient)
+		//apiClient := m.(*openapi.APIClient)
 		addOrRemoveNodeJob := NewCCJob(CMON_JOB_CREATE_JOB)
 		addOrRemoveNodeJob.SetClusterId(clusterInfo.GetClusterId())
 		job := addOrRemoveNodeJob.GetJob()
@@ -321,7 +321,7 @@ func (c *MySQLMaria) HandleUpdate(ctx context.Context, d *schema.ResourceData, m
 	} // d.HasChange(TF_FIELD_CLUSTER_HOST)
 
 	if d.HasChange(TF_FIELD_CLUSTER_LOAD_BALANCER) {
-		apiClient := m.(*openapi.APIClient)
+		//apiClient := m.(*openapi.APIClient)
 		addOrRemoveNodeJob := NewCCJob(CMON_JOB_CREATE_JOB)
 		addOrRemoveNodeJob.SetClusterId(clusterInfo.GetClusterId())
 		job := addOrRemoveNodeJob.GetJob()

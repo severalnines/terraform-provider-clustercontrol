@@ -263,9 +263,9 @@ func (m *MongoDb) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 	return nil
 }
 
-func (c *MongoDb) HandleRead(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+func (c *MongoDb) HandleRead(ctx context.Context, d *schema.ResourceData, apiClient *openapi.APIClient, clusterInfo *openapi.ClusterResponse) error {
 
-	if err := c.Common.HandleRead(ctx, d, m, clusterInfo); err != nil {
+	if err := c.Common.HandleRead(ctx, d, apiClient, clusterInfo); err != nil {
 		return err
 	}
 
@@ -303,13 +303,13 @@ func (c *MongoDb) IsUpdateBatchAllowed(d *schema.ResourceData) error {
 	return nil
 }
 
-func (c *MongoDb) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+func (c *MongoDb) HandleUpdate(ctx context.Context, d *schema.ResourceData, apiClient *openapi.APIClient, clusterInfo *openapi.ClusterResponse) error {
 	funcName := "MongoDb::HandleUpdate"
 	slog.Debug(funcName)
 
 	var err error
 
-	if err := c.Common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {
+	if err := c.Common.HandleUpdate(ctx, d, apiClient, clusterInfo); err != nil {
 		return err
 	}
 
@@ -330,7 +330,7 @@ func (c *MongoDb) HandleUpdate(ctx context.Context, d *schema.ResourceData, m in
 			return errors.New("db_backup_dir must be set. It is an nfs mounted fs on all mongo hosts.")
 		}
 
-		apiClient := m.(*openapi.APIClient)
+		//apiClient := m.(*openapi.APIClient)
 
 		enablePbmJob := NewCCJob(CMON_JOB_CREATE_JOB)
 		job := enablePbmJob.GetJob()
@@ -359,7 +359,7 @@ func (c *MongoDb) HandleUpdate(ctx context.Context, d *schema.ResourceData, m in
 	}
 
 	if d.HasChange(TF_FIELD_CLUSTER_REPLICA_SET) {
-		apiClient := m.(*openapi.APIClient)
+		//apiClient := m.(*openapi.APIClient)
 		addOrRemoveNodeJob := NewCCJob(CMON_JOB_CREATE_JOB)
 		addOrRemoveNodeJob.SetClusterId(clusterInfo.GetClusterId())
 		job := addOrRemoveNodeJob.GetJob()

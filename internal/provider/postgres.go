@@ -94,9 +94,9 @@ func (m *PostgresSql) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJob
 	return nil
 }
 
-func (c *PostgresSql) HandleRead(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+func (c *PostgresSql) HandleRead(ctx context.Context, d *schema.ResourceData, apiClient *openapi.APIClient, clusterInfo *openapi.ClusterResponse) error {
 
-	if err := c.Common.HandleRead(ctx, d, m, clusterInfo); err != nil {
+	if err := c.Common.HandleRead(ctx, d, apiClient, clusterInfo); err != nil {
 		return err
 	}
 
@@ -126,14 +126,14 @@ func (c *PostgresSql) IsUpdateBatchAllowed(d *schema.ResourceData) error {
 	return nil
 }
 
-func (c *PostgresSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+func (c *PostgresSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, apiClient *openapi.APIClient, clusterInfo *openapi.ClusterResponse) error {
 	funcName := "PostgresSql::HandleUpdate"
 	slog.Debug(funcName)
 
 	var err error
 
 	// handle things like cluster-name, tags, and toggling cluster-auto-covery in base ...
-	if err = c.Common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {
+	if err = c.Common.HandleUpdate(ctx, d, apiClient, clusterInfo); err != nil {
 		return err
 	}
 
@@ -195,7 +195,7 @@ func (c *PostgresSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, 
 		// nodeFromTf: "the" node from the resource data. It is this node which is to be added or removed to the cluster
 		// nodeToAddOrRemove: contains hostname of the node to be added or removed. Use it in the remove case
 
-		apiClient := m.(*openapi.APIClient)
+		//apiClient := m.(*openapi.APIClient)
 		addOrRemoveNodeJob := NewCCJob(CMON_JOB_CREATE_JOB)
 		addOrRemoveNodeJob.SetClusterId(clusterInfo.GetClusterId())
 		job := addOrRemoveNodeJob.GetJob()
@@ -282,7 +282,7 @@ func (c *PostgresSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, 
 			// Don't support disabling pgbackrest at this time
 			return errors.New("Disabling PgBackRest is not currently supported")
 		}
-		apiClient := m.(*openapi.APIClient)
+		//apiClient := m.(*openapi.APIClient)
 
 		enablePbmJob := NewCCJob(CMON_JOB_CREATE_JOB)
 		job := enablePbmJob.GetJob()

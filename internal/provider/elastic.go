@@ -108,9 +108,9 @@ func (m *Elastic) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobS
 	return nil
 }
 
-func (c *Elastic) HandleRead(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+func (c *Elastic) HandleRead(ctx context.Context, d *schema.ResourceData, apiClient *openapi.APIClient, clusterInfo *openapi.ClusterResponse) error {
 
-	if err := c.Common.HandleRead(ctx, d, m, clusterInfo); err != nil {
+	if err := c.Common.HandleRead(ctx, d, apiClient, clusterInfo); err != nil {
 		return err
 	}
 
@@ -127,13 +127,13 @@ func (c *Elastic) IsUpdateBatchAllowed(d *schema.ResourceData) error {
 	return nil
 }
 
-func (c *Elastic) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+func (c *Elastic) HandleUpdate(ctx context.Context, d *schema.ResourceData, apiClient *openapi.APIClient, clusterInfo *openapi.ClusterResponse) error {
 	funcName := "Elastic::HandleUpdate"
 	slog.Debug(funcName)
 
 	var err error
 
-	if err := c.Common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {
+	if err := c.Common.HandleUpdate(ctx, d, apiClient, clusterInfo); err != nil {
 		return err
 	}
 
@@ -194,7 +194,7 @@ func (c *Elastic) HandleUpdate(ctx context.Context, d *schema.ResourceData, m in
 		// nodeFromTf: "the" node from the resource data. It is this node which is to be added or removed to the cluster
 		// nodeToAddOrRemove: contains hostname of the node to be added or removed. Use it in the remove case
 
-		apiClient := m.(*openapi.APIClient)
+		//apiClient := m.(*openapi.APIClient)
 		addOrRemoveNodeJob := NewCCJob(CMON_JOB_CREATE_JOB)
 		addOrRemoveNodeJob.SetClusterId(clusterInfo.GetClusterId())
 		job := addOrRemoveNodeJob.GetJob()

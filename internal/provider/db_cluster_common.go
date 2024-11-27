@@ -406,11 +406,12 @@ func (c *DbCommon) determineNodesDelta(nodes []openapi.JobsJobJobSpecJobDataNode
 			slog.Debug("In CMON", "host", hh[j].GetHostname(), "role", hh[j].GetRole(), "rs", hh[j].GetRs())
 			if strings.EqualFold(node.GetHostname(), hh[j].GetHostname()) {
 				// Hostnames match
+				slog.Info("In CMON", "host", hh[j].GetHostname(), "role", hh[j].GetRole(), "rs", hh[j].GetRs())
 				isFound = true
 			}
 		}
 		if !isFound {
-			slog.Debug(funcName, "Node not in CMON. Adding to CMON add-node list", node.GetHostname())
+			slog.Info(funcName, "Node not in CMON. Adding to CMON add-node list", node.GetHostname())
 			// Need to add this node to the cluster
 			nodesToAdd = append(nodesToAdd, node)
 		}
@@ -450,7 +451,7 @@ func (c *DbCommon) determineNodesDelta(nodes []openapi.JobsJobJobSpecJobDataNode
 			}
 		}
 		if !isFound {
-			slog.Debug(funcName, "Node not in TF. Adding to CMON remove-node list", h.GetHostname())
+			slog.Info(funcName, "Node not in TF. Adding to CMON remove-node list", h.GetHostname())
 			// Need to remove this node from the cluster
 			var n = openapi.JobsJobJobSpecJobDataNodesInner{}
 			n.SetHostname(h.GetHostname())

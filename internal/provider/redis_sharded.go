@@ -43,10 +43,12 @@ func (m *RedisSharded) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJo
 	jobData.SetRedisShardedPort(int32(iPort))
 	jobData.SetValkeyShardedPort(int32(iPort))
 
-	jobData.SetNodeTimeoutMs(1500)
+	nodeTimeoutMs := d.Get(TF_FIELD_CLUSTER_REDIS_NODE_TIMEOUT_MS).(int)
+	jobData.SetNodeTimeoutMs(int32(nodeTimeoutMs))
 
-	jobData.SetRedisClusterReplicaValidityFactor(10)
-	jobData.SetValkeyClusterReplicaValidityFactor(10)
+	replicaValidityFactor := d.Get(TF_FIELD_CLUSTER_REDIS_REPLICA_VALIDITY_FACTOR).(int)
+	jobData.SetRedisClusterReplicaValidityFactor(int32(replicaValidityFactor))
+	jobData.SetValkeyClusterReplicaValidityFactor(int32(replicaValidityFactor))
 
 	dbVendor := jobData.GetVendor()
 	dbVersion := jobData.GetVersion()
@@ -135,9 +137,9 @@ func (m *RedisSharded) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJo
 	return nil
 }
 
-func (c *RedisSharded) HandleRead(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+func (c *RedisSharded) HandleRead(ctx context.Context, d *schema.ResourceData, apiClient *openapi.APIClient, clusterInfo *openapi.ClusterResponse) error {
 
-	if err := c.RedisStuff.Common.HandleRead(ctx, d, m, clusterInfo); err != nil {
+	if err := c.RedisStuff.Common.HandleRead(ctx, d, apiClient, clusterInfo); err != nil {
 		return err
 	}
 
@@ -148,14 +150,14 @@ func (c *RedisSharded) IsUpdateBatchAllowed(d *schema.ResourceData) error {
 	return (c.RedisStuff.IsUpdateBatchAllowed(d))
 }
 
-func (c *RedisSharded) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+func (c *RedisSharded) HandleUpdate(ctx context.Context, d *schema.ResourceData, apiClient *openapi.APIClient, clusterInfo *openapi.ClusterResponse) error {
 	funcName := "RedisSharded::HandleUpdate"
 	slog.Debug(funcName)
 
 	var err error
 
 	// handle things like cluster-name, tags, and toggling cluster-auto-covery in base ...
-	if err := c.RedisStuff.Common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {
+	if err := c.RedisStuff.Common.HandleUpdate(ctx, d, apiClient, clusterInfo); err != nil {
 		return err
 	}
 
@@ -183,10 +185,16 @@ func (c *RedisSharded) HandleUpdate(ctx context.Context, d *schema.ResourceData,
 		isRemoveNode := len(nodesToRemove) > 0
 
 		if isAddNode && len(nodesToAdd) > 1 {
+			for i := 0; i < len(nodesToAdd); i++ {
+				slog.Info(funcName, "node", nodesToAdd[i].GetHostname())
+			}
 			return errors.New("Can't add more than one node at a time")
 		}
 
 		if isRemoveNode && len(nodesToRemove) > 1 {
+			for i := 0; i < len(nodesToAdd); i++ {
+				slog.Info(funcName, "node", nodesToAdd[i].GetHostname())
+			}
 			return errors.New("Can't remove more than one node at a time")
 		}
 
@@ -203,7 +211,7 @@ func (c *RedisSharded) HandleUpdate(ctx context.Context, d *schema.ResourceData,
 		} else {
 			//command = CMON_JOB_PROMOTE_REPLICAION_SLAVE_COMMAND
 			// Here we are dealing with a Role change (slave promotion to master)
-			return errors.New("Standby promotion is is not supported for Redis.")
+			return errors.New("Standby promotion is is not supported for Redis and Valkey.")
 		}
 
 		// From Terraform
@@ -224,7 +232,7 @@ func (c *RedisSharded) HandleUpdate(ctx context.Context, d *schema.ResourceData,
 		// nodeFromTf: "the" node from the resource data. It is this node which is to be added or removed to the cluster
 		// nodeToAddOrRemove: contains hostname of the node to be added or removed. Use it in the remove case
 
-		apiClient := m.(*openapi.APIClient)
+		//apiClient := m.(*openapi.APIClient)
 		addOrRemoveNodeJob := NewCCJob(CMON_JOB_CREATE_JOB)
 		addOrRemoveNodeJob.SetClusterId(clusterInfo.GetClusterId())
 		job := addOrRemoveNodeJob.GetJob()
@@ -232,12 +240,12 @@ func (c *RedisSharded) HandleUpdate(ctx context.Context, d *schema.ResourceData,
 		jobData := jobSpec.GetJobData()
 		jobSpec.SetCommand(command)
 
-		var primaryInCmon *openapi.ClusterResponseHostsInner
-		// Find the Primary/Master node in CMON
-		if primaryInCmon, err = c.RedisStuff.Common.findMasterNode(clusterInfo, hostClassName, CMON_DB_HOST_ROLE_MASTER); err != nil {
-			return err
-		}
-		slog.Debug(funcName, "Master:", primaryInCmon.GetHostname())
+		//var primaryInCmon *openapi.ClusterResponseHostsInner
+		//// Find the Primary/Master node in CMON
+		//if primaryInCmon, err = c.RedisStuff.Common.findMasterNode(clusterInfo, hostClassName, CMON_DB_HOST_ROLE_MASTER); err != nil {
+		//	return err
+		//}
+		//slog.Debug(funcName, "Master:", primaryInCmon.GetHostname())
 
 		jobData.SetInstallSoftware(tmpJobData.GetInstallSoftware())
 		jobData.SetDisableSelinux(tmpJobData.GetDisableSelinux())

@@ -95,9 +95,9 @@ func (m *MsSql) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpe
 	return nil
 }
 
-func (c *MsSql) HandleRead(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+func (c *MsSql) HandleRead(ctx context.Context, d *schema.ResourceData, apiClient *openapi.APIClient, clusterInfo *openapi.ClusterResponse) error {
 
-	if err := c.Common.HandleRead(ctx, d, m, clusterInfo); err != nil {
+	if err := c.Common.HandleRead(ctx, d, apiClient, clusterInfo); err != nil {
 		return err
 	}
 
@@ -114,9 +114,9 @@ func (c *MsSql) IsUpdateBatchAllowed(d *schema.ResourceData) error {
 	return nil
 }
 
-func (c *MsSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}, clusterInfo *openapi.ClusterResponse) error {
+func (c *MsSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, apiClient *openapi.APIClient, clusterInfo *openapi.ClusterResponse) error {
 
-	if err := c.Common.HandleUpdate(ctx, d, m, clusterInfo); err != nil {
+	if err := c.Common.HandleUpdate(ctx, d, apiClient, clusterInfo); err != nil {
 		return err
 	}
 
