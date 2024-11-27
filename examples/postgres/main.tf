@@ -16,7 +16,7 @@ resource "clustercontrol_db_cluster" "this" {
   db_cluster_name            = "mydbcluster-pg"
   db_cluster_type            = "pg-replication"
   db_vendor                  = "postgresql"
-  db_version                 = "15"
+  db_version                 = "16"
   db_admin_username          = "pgadmin"
   db_admin_user_password     = "blah%blah"
   db_auto_recovery           = true
@@ -37,20 +37,20 @@ resource "clustercontrol_db_cluster" "this" {
   db_tags                    = ["terraform", "someothertag"]
 
   db_host {
-    hostname = "test-primary"
+    hostname = "test-primary-1"
     # hostname_data = "foo"
     # hostname_internal = "foo"
     # config_file = "foo"
     # data_dir = "foo"
   }
 
-  #   db_host {
-  #     hostname = "test-primary-2"
-  #     # hostname_data = "foo"
-  #     # hostname_internal = "foo"
-  #     # config_file = "foo"
-  #     # data_dir = "foo"
-  #   }
+  # db_host {
+  #   hostname = "test-primary-2"
+  #   # hostname_data = "foo"
+  #   # hostname_internal = "foo"
+  #   # config_file = "foo"
+  #   # data_dir = "foo"
+  # }
 
 }
 

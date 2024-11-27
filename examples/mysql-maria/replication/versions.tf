@@ -2,7 +2,7 @@ terraform {
   required_providers {
     clustercontrol = {
       source = "severalnines/clustercontrol"
-      version = ">=0.2.0"
+      version = ">=0.2.20"
     }
   }
 }
@@ -11,7 +11,7 @@ terraform {
 #   required_providers {
 #     clustercontrol = {
 #       source = "severalnines.com/severalnines/clustercontrol"
-#       version = ">= 0.1"
+#       version = ">= 0.2.21"
 #     }
 #   }
 # }

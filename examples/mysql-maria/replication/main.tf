@@ -16,7 +16,7 @@ resource "clustercontrol_db_cluster" "this" {
   db_cluster_name          = "mydbcluster"
   db_cluster_type          = "mysql-replication"
   db_vendor                = "percona"
-  db_version               = "8.0"
+  db_version               = "8.4"
   db_admin_user_password   = "blah%blah"
   db_auto_recovery         = true
   db_mysql_port            = var.db_mysql_port
@@ -35,20 +35,20 @@ resource "clustercontrol_db_cluster" "this" {
   db_tags                  = ["terra-deploy"]
 
   db_host {
-    hostname = "test-primary"
+    hostname = "test-primary-1"
     # hostname_data = "foo"
     # hostname_internal = "foo"
     # config_file = "foo"
     # datadir = "foo"
   }
 
-  #     db_host {
-  #       hostname = "test-primary-2"
-  #       # hostname_data = "foo"
-  #       # hostname_internal = "foo"
-  #       # config_file = "foo"
-  #       # datadir = "foo"
-  #     }
+  # db_host {
+  #   hostname = "test-primary-2"
+  #   # hostname_data = "foo"
+  #   # hostname_internal = "foo"
+  #   # config_file = "foo"
+  #   # datadir = "foo"
+  # }
 
   #  db_topology {
   #    primary = "test-primary"

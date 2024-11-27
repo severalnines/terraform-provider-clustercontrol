@@ -50,12 +50,12 @@ resource "clustercontrol_db_cluster" "this" {
     host_role = "replica"
   }
 
-  db_host {
-    hostname = "test-primary-3"
-    # hostname_data     = "hnd-foo"
-    # hostname_internal = "hni-foo"
-    host_role = "primary"
-  }
+  # db_host {
+  #   hostname = "test-primary-3"
+  #   # hostname_data     = "hnd-foo"
+  #   # hostname_internal = "hni-foo"
+  #   host_role = "primary"
+  # }
 
   #   db_host {
   #     hostname         = "test-primary-5"
