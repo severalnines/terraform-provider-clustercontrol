@@ -1,6 +1,6 @@
-# Redis Examples
+# Valkey Examples
 
-This directory contains an example for deploying Redis (sharded and sentinel) clusters using the terraform provider for ClusterControl.
+This directory contains an example for deploying Valkey (sharded and sentinel) clusters using the terraform provider for ClusterControl.
 
 ## Resources
 
@@ -12,20 +12,20 @@ This directory contains an example for deploying Redis (sharded and sentinel) cl
 | [clustercontrol_db_cluster_maintenance](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_maintenance.md)             |
 
 
-## Choosing attribute values for Redis
+## Choosing attribute values for Valkey
 
-### `db_cluster_type` - valid values for Redis
+### `db_cluster_type` - valid values for Valkey
 
-| Cluster Type     | Description                          |
-|------------------|--------------------------------------|
-| `redis-sentinel` | 1 or 3 node redis sentinel cluster   |
-| `redis-sharded`  | mininum 2 node redis-sharded cluster |
+| Cluster Type      | Description                           |
+|-------------------|---------------------------------------|
+| `valkey-sentinel` | 1 or 3 node valkey sentinel cluster   |
+| `valkey-sharded`  | mininum 2 node valkey sharded cluster |
 
 ### `db_vendor` - valid values
 
-| Vendors | Description             |
-|---------|-------------------------|
-| redis   | Redis community edition |
+| Vendors | Description              |
+|---------|--------------------------|
+| valkey  | Valkey community edition |
 
 
 ### Adding/Removing nodes to an existing cluster - [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md)
