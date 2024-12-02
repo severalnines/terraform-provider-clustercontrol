@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
@@ -174,6 +175,12 @@ func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 		backupHandler = NewMongo()
 	case CLUSTER_TYPE_REDIS:
 		backupHandler = NewRedis()
+	case CLUSTER_TYPE_VALKEY:
+		backupHandler = NewRedis()
+	case CLUSTER_TYPE_REDIS_SHARDED:
+		backupHandler = NewRedisSharded()
+	case CLUSTER_TYPE_VALKEY_SHARDED:
+		backupHandler = NewRedisSharded()
 	case CLUSTER_TYPE_MSSQL_SINGLE:
 		backupHandler = NewMsSql()
 	case CLUSTER_TYPE_MSSQL_AO_ASYNC:
@@ -181,18 +188,22 @@ func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 	case CLUSTER_TYPE_ELASTIC:
 		backupHandler = NewElastic()
 	default:
-		slog.Warn(funcName, "Unknown cluster type", clusterType)
+		str := fmt.Sprintf("%s - Unknown cluster type: %s", funcName, clusterType)
+		slog.Warn(str)
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  str,
+		})
+		return diags
 	}
 
-	if backupHandler != nil {
-		if err = backupHandler.GetBackupInputs(d, &jobData); err != nil {
-			slog.Error(err.Error())
-			diags = append(diags, diag.Diagnostic{
-				Severity: diag.Error,
-				Summary:  "Error in DB cluster backup create handler.",
-			})
-			return diags
-		}
+	if err = backupHandler.GetBackupInputs(d, &jobData); err != nil {
+		slog.Error(err.Error())
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error in DB cluster backup create handler.",
+		})
+		return diags
 	}
 
 	if err = backupHandler.IsValidBackupOptions(vendor, clusterType, &jobData); err != nil {
@@ -292,6 +303,12 @@ func resourceDeleteDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 		backupHandler = NewMongo()
 	case CLUSTER_TYPE_REDIS:
 		backupHandler = NewRedis()
+	case CLUSTER_TYPE_VALKEY:
+		backupHandler = NewRedis()
+	case CLUSTER_TYPE_REDIS_SHARDED:
+		backupHandler = NewRedisSharded()
+	case CLUSTER_TYPE_VALKEY_SHARDED:
+		backupHandler = NewRedisSharded()
 	case CLUSTER_TYPE_MSSQL_SINGLE:
 		backupHandler = NewMsSql()
 	case CLUSTER_TYPE_MSSQL_AO_ASYNC:
@@ -299,24 +316,28 @@ func resourceDeleteDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 	case CLUSTER_TYPE_ELASTIC:
 		backupHandler = NewElastic()
 	default:
-		slog.Warn(funcName, "Unknown cluster type", clusterType)
+		str := fmt.Sprintf("%s - Unknown cluster type: %s", funcName, clusterType)
+		slog.Warn(str)
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  str,
+		})
+		return diags
 	}
 
-	if backupHandler != nil {
-		if err = backupHandler.GetBackupInputs(d, &jobData); err != nil {
-			slog.Error(err.Error())
-			diags = append(diags, diag.Diagnostic{
-				Severity: diag.Error,
-				Summary:  "Error in DB cluster backup create handler.",
-			})
-			return diags
-		}
-		if !backupHandler.IsBackupRemovable(clusterInfo, &jobData) {
-			d.SetId("")
-			d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC822))
-			// Silently return. Some backups are not removable (e.g. pgbackrest)
-			return diags
-		}
+	if err = backupHandler.GetBackupInputs(d, &jobData); err != nil {
+		slog.Error(err.Error())
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error in DB cluster backup create handler.",
+		})
+		return diags
+	}
+	if !backupHandler.IsBackupRemovable(clusterInfo, &jobData) {
+		d.SetId("")
+		d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC822))
+		// Silently return. Some backups are not removable (e.g. pgbackrest)
+		return diags
 	}
 
 	deleteBackup.SetClusterId(clusterInfo.GetClusterId())

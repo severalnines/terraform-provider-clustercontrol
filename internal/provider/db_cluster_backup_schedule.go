@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
@@ -188,6 +189,12 @@ func resourceCreateDbClusterBackupSched(ctx context.Context, d *schema.ResourceD
 		backupHandler = NewMongo()
 	case CLUSTER_TYPE_REDIS:
 		backupHandler = NewRedis()
+	case CLUSTER_TYPE_VALKEY:
+		backupHandler = NewRedis()
+	case CLUSTER_TYPE_REDIS_SHARDED:
+		backupHandler = NewRedisSharded()
+	case CLUSTER_TYPE_VALKEY_SHARDED:
+		backupHandler = NewRedisSharded()
 	case CLUSTER_TYPE_MSSQL_SINGLE:
 		backupHandler = NewMsSql()
 	case CLUSTER_TYPE_MSSQL_AO_ASYNC:
@@ -195,18 +202,22 @@ func resourceCreateDbClusterBackupSched(ctx context.Context, d *schema.ResourceD
 	case CLUSTER_TYPE_ELASTIC:
 		backupHandler = NewElastic()
 	default:
-		slog.Warn(funcName, "Unknown cluster type", clusterType)
+		str := fmt.Sprintf("%s - Unknown cluster type: %s", funcName, clusterType)
+		slog.Warn(str)
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  str,
+		})
+		return diags
 	}
 
-	if backupHandler != nil {
-		if err = backupHandler.GetBackupInputs(d, &jobData); err != nil {
-			slog.Error(err.Error())
-			diags = append(diags, diag.Diagnostic{
-				Severity: diag.Error,
-				Summary:  err.Error(),
-			})
-			return diags
-		}
+	if err = backupHandler.GetBackupInputs(d, &jobData); err != nil {
+		slog.Error(err.Error())
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  err.Error(),
+		})
+		return diags
 	}
 
 	if err = backupHandler.IsValidBackupOptions(vendor, clusterType, &jobData); err != nil {

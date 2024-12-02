@@ -20,6 +20,7 @@ const (
 	CLUSTER_TYPE_MOGNODB        = "mongodb"
 	CLUSTER_TYPE_PG_SINGLE      = "postgresql_single"
 	CLUSTER_TYPE_REDIS          = "redis"
+	CLUSTER_TYPE_VALKEY         = "valkey"
 	CLUSTER_TYPE_REDIS_SHARDED  = "redis_sharded"
 	CLUSTER_TYPE_VALKEY_SHARDED = "valkey_sharded"
 	CLUSTER_TYPE_MSSQL_AO_ASYNC = "mssql_ao_async"
@@ -49,6 +50,7 @@ const (
 	EXT_CLUSTER_TYPE_MONGODB            = "mongo"
 	EXT_CLUSTER_TYPE_REDIS_SENTINEL     = "redis-sentinel"
 	EXT_CLUSTER_TYPE_REDIS_SHARDED      = "redis-sharded"
+	EXT_CLUSTER_TYPE_VALKEY_SENTINEL    = "valkey-sentinel"
 	EXT_CLUSTER_TYPE_VALKEY_SHARDED     = "valkey-sharded"
 	EXT_CLUSTER_TYPE_ELASTICSEARH       = "elasticsearch"
 	EXT_CLUSTER_TYPE_MSSQL_ASYN         = "mssql-async"
@@ -89,7 +91,7 @@ const (
 const (
 	MYSQL_VERSION_8   = "8.0"
 	MYSQL_VERSION_8_4 = "8.4"
-	MYSQL_VERSION_5_7 = "5.7"
+	//MYSQL_VERSION_5_7 = "5.7"
 )
 
 const (
@@ -101,7 +103,7 @@ const (
 	MARIADB_VERSION_10_6  = "10.6"
 	MARIADB_VERSION_10_5  = "10.5"
 	MARIADB_VERSION_10_4  = "10.4"
-	MARIADB_VERSION_10_3  = "10.3"
+	//MARIADB_VERSION_10_3  = "10.3"
 )
 
 const (

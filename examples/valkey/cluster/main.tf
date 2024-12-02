@@ -95,10 +95,10 @@ resource "clustercontrol_db_cluster" "this" {
 #   db_backup_retention          = var.db_backup_retention
 # }
 
-# resource "clustercontrol_db_cluster_maintenance" "server-upgrade-03232024" {
+# resource "clustercontrol_db_cluster_maintenance" "server-upgrade-12042024" {
 #   depends_on          = [clustercontrol_db_cluster.this]
 #   db_cluster_id       = clustercontrol_db_cluster.this.id
-#   db_maint_start_time = "Mar-27-2024T22:00"
-#   db_maint_stop_time  = "Mar-28-2024T22:30"
+#   db_maint_start_time = "Dec-04-2024T22:00"
+#   db_maint_stop_time  = "Dec-04-2024T22:30"
 #   db_maint_reason     = "Hardware refresh March 27, 2024"
 # }

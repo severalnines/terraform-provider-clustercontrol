@@ -709,10 +709,11 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 		getInputs = NewMongo()
 	case CLUSTER_TYPE_REDIS:
 		getInputs = NewRedis()
+	case CLUSTER_TYPE_VALKEY:
+		getInputs = NewRedis()
 	case CLUSTER_TYPE_REDIS_SHARDED:
 		getInputs = NewRedisSharded()
 	case CLUSTER_TYPE_VALKEY_SHARDED:
-		//getInputs = NewValkeySharded()
 		getInputs = NewRedisSharded()
 	case CLUSTER_TYPE_MSSQL_SINGLE:
 		getInputs = NewMsSql()
@@ -730,15 +731,13 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 		return diags
 	}
 
-	if getInputs != nil {
-		if err = getInputs.GetInputs(d, &jobData); err != nil {
-			slog.Error(err.Error())
-			diags = append(diags, diag.Diagnostic{
-				Severity: diag.Error,
-				Summary:  "Error getting inputs for ClusterCreate",
-			})
-			return diags
-		}
+	if err = getInputs.GetInputs(d, &jobData); err != nil {
+		slog.Error(err.Error())
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error getting inputs for ClusterCreate",
+		})
+		return diags
 	}
 
 	jobSpec.SetJobData(jobData)
@@ -869,10 +868,11 @@ func resourceReadDbCluster(ctx context.Context, d *schema.ResourceData, m interf
 		readHandler = NewMongo()
 	case CLUSTER_TYPE_REDIS:
 		readHandler = NewRedis()
+	case CLUSTER_TYPE_VALKEY:
+		readHandler = NewRedis()
 	case CLUSTER_TYPE_REDIS_SHARDED:
 		readHandler = NewRedisSharded()
 	case CLUSTER_TYPE_VALKEY_SHARDED:
-		//getInputs = NewValkeySharded()
 		readHandler = NewRedisSharded()
 	case CLUSTER_TYPE_MSSQL_SINGLE:
 		readHandler = NewMsSql()
@@ -890,15 +890,13 @@ func resourceReadDbCluster(ctx context.Context, d *schema.ResourceData, m interf
 		return diags
 	}
 
-	if readHandler != nil {
-		if err = readHandler.HandleRead(newCtx, d, apiClient, clusterInfo); err != nil {
-			slog.Error(err.Error())
-			diags = append(diags, diag.Diagnostic{
-				Severity: diag.Error,
-				Summary:  "Error in DB cluster Read handler",
-			})
-			return diags
-		}
+	if err = readHandler.HandleRead(newCtx, d, apiClient, clusterInfo); err != nil {
+		slog.Error(err.Error())
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error in DB cluster Read handler",
+		})
+		return diags
 	}
 
 	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC822))
@@ -953,10 +951,11 @@ func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 		updateHandler = NewMongo()
 	case CLUSTER_TYPE_REDIS:
 		updateHandler = NewRedis()
+	case CLUSTER_TYPE_VALKEY:
+		updateHandler = NewRedis()
 	case CLUSTER_TYPE_REDIS_SHARDED:
 		updateHandler = NewRedisSharded()
 	case CLUSTER_TYPE_VALKEY_SHARDED:
-		//getInputs = NewValkeySharded()
 		updateHandler = NewRedisSharded()
 	case CLUSTER_TYPE_MSSQL_SINGLE:
 		updateHandler = NewMsSql()
@@ -974,26 +973,24 @@ func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 		return diags
 	}
 
-	if updateHandler != nil {
-		// NOTE: Must always check of the allowed batch of updates is allowed or not.
-		if err = updateHandler.IsUpdateBatchAllowed(d); err != nil {
-			slog.Error(err.Error())
-			diags = append(diags, diag.Diagnostic{
-				Severity: diag.Error,
-				Summary:  "Error in DB cluster update handler",
-			})
-			return diags
-		}
+	// NOTE: Must always check of the allowed batch of updates is allowed or not.
+	if err = updateHandler.IsUpdateBatchAllowed(d); err != nil {
+		slog.Error(err.Error())
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error in DB cluster update handler",
+		})
+		return diags
+	}
 
-		// The allowed batch of updates is Good. Therefore, it is a GO for update. Do it...
-		if err = updateHandler.HandleUpdate(newCtx, d, apiClient, clusterInfo); err != nil {
-			slog.Error(err.Error())
-			diags = append(diags, diag.Diagnostic{
-				Severity: diag.Error,
-				Summary:  "Error in DB cluster update handler",
-			})
-			return diags
-		}
+	// The allowed batch of updates is Good. Therefore, it is a GO for update. Do it...
+	if err = updateHandler.HandleUpdate(newCtx, d, apiClient, clusterInfo); err != nil {
+		slog.Error(err.Error())
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error in DB cluster update handler",
+		})
+		return diags
 	}
 
 	d.Set(TF_FIELD_LAST_UPDATED, time.Now().Format(time.RFC822))

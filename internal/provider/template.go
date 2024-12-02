@@ -2,6 +2,10 @@ package provider
 
 import "strings"
 
+// *************************************
+// OBSOLETE
+// *************************************
+
 type DbClusterTypeBase struct {
 	ClusterName           string
 	ClusterType           string
@@ -23,7 +27,7 @@ func NewClusterTypeBase(clusterType string, vendor string, version string) *DbCl
 			case MYSQL_VERSION_8:
 				ret.ClusterConfigTemplate = ""
 				break
-			case MYSQL_VERSION_5_7:
+				//case MYSQL_VERSION_5_7:
 				ret.ClusterConfigTemplate = ""
 				break
 			default:
@@ -39,7 +43,7 @@ func NewClusterTypeBase(clusterType string, vendor string, version string) *DbCl
 			case MARIADB_VERSION_10_6:
 			case MARIADB_VERSION_10_5:
 			case MARIADB_VERSION_10_4:
-			case MARIADB_VERSION_10_3:
+				//case MARIADB_VERSION_10_3:
 				ret.ClusterConfigTemplate = ""
 				break
 			default:
