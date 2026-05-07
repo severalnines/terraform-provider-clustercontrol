@@ -30,6 +30,7 @@ resource "clustercontrol_db_cluster" "this" {
   db_enable_ssl              = var.db_enable_ssl
   db_enable_timescale        = false
   db_enable_pgbackrest_agent = false
+  db_enable_pg_summarize_wal = true
   ssh_user                   = var.ssh_user
   ssh_user_password          = var.ssh_user_password
   ssh_key_file               = var.ssh_key_file

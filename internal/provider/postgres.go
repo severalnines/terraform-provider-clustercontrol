@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"log/slog"
 	"strconv"
 	"strings"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 )
 
 type PostgresSql struct {
@@ -304,6 +305,38 @@ func (c *PostgresSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, 
 		enablePbmJob.SetJob(job)
 
 		if err = SendAndWaitForJobCompletion(ctx, apiClient, enablePbmJob); err != nil {
+			slog.Error(err.Error())
+		}
+	} // d.HasChange(TF_FIELD_CLUSTER_ENABLE_PGBACKREST_AGENT)
+
+	if d.HasChange(TF_FIELD_CLUSTER_ENABLE_PG_SUMMARIZE_WAL) {
+		summarizeWal := d.Get(TF_FIELD_CLUSTER_ENABLE_PG_SUMMARIZE_WAL).(bool)
+
+		enableSummarizeWalJob := NewCCJob(CMON_JOB_CREATE_JOB)
+		job := enableSummarizeWalJob.GetJob()
+		jobSpec := job.GetJobSpec()
+		jobData := jobSpec.GetJobData()
+		enableSummarizeWalJob.SetClusterId(clusterInfo.GetClusterId())
+		jobSpec.SetCommand(CMON_JOB_ENABLE_LOG_ARCHIVING_COMMAND)
+
+		arciveDir := d.Get(TF_FIELD_CLUSTER_PG_WAL_ARCHIVE_DIR).(string)
+		if arciveDir != "" {
+			jobData.SetArchiveDir(arciveDir)
+		}
+		archiveMode := d.Get(TF_FIELD_CLUSTER_PG_WAL_ARCHIVE_MODE).(string)
+		if archiveMode != "" {
+			jobData.SetArchiveMode(archiveMode)
+		}
+		archiveCompress := d.Get(TF_FIELD_CLUSTER_PG_WAL_ARCHIVE_COMPRESS).(bool)
+		jobData.SetCompression(archiveCompress)
+
+		jobData.SetSummarizeWal(summarizeWal)
+
+		jobSpec.SetJobData(jobData)
+		job.SetJobSpec(jobSpec)
+		enableSummarizeWalJob.SetJob(job)
+
+		if err = SendAndWaitForJobCompletion(ctx, apiClient, enableSummarizeWalJob); err != nil {
 			slog.Error(err.Error())
 		}
 	} // d.HasChange(TF_FIELD_CLUSTER_ENABLE_PGBACKREST_AGENT)

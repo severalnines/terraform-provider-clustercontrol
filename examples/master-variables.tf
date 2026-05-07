@@ -310,6 +310,30 @@ variable "db_enable_pgbackrest_agent" {
   default     = false
 }
 
+variable "db_enable_pg_summarize_wal" {
+  description = "Enable summarize-WAL for PostgreSQL based clusters' incremental basebackup."
+  type        = bool
+  default     = false
+}
+
+variable "db_wal_archive_dir" {
+  description = "PostgreSQL WAL archive directory."
+  type        = string
+  default     = null
+}
+
+variable "db_wal_archive_mode" {
+  description = "PostgreSQL WAL archive mode [always,on,off]."
+  type        = string
+  default     = "always"
+}
+
+variable "db_wal_archive_compression" {
+  description = "Whether to compress WAL archive."
+  type        = bool
+  default     = true
+}
+
 variable "db_mongo_auth_db" {
   description = "The mongodb database to use for authentication purposes"
   type        = string
