@@ -16,7 +16,7 @@ resource "clustercontrol_db_cluster" "this" {
   db_cluster_name            = "mydbcluster-pg"
   db_cluster_type            = "pg-replication"
   db_vendor                  = "postgresql"
-  db_version                 = "16"
+  db_version                 = "18"
   db_admin_username          = "pgadmin"
   db_admin_user_password     = "blah%blah"
   db_auto_recovery           = true
@@ -30,7 +30,9 @@ resource "clustercontrol_db_cluster" "this" {
   db_enable_ssl              = var.db_enable_ssl
   db_enable_timescale        = false
   db_enable_pgbackrest_agent = false
-  db_enable_pg_summarize_wal = true
+  db_enable_pg_summarize_wal = false
+  db_wal_archive_compression = true
+  db_wal_archive_mode        = "always"
   ssh_user                   = var.ssh_user
   ssh_user_password          = var.ssh_user_password
   ssh_key_file               = var.ssh_key_file
@@ -38,7 +40,7 @@ resource "clustercontrol_db_cluster" "this" {
   db_tags                    = ["terraform", "someothertag"]
 
   db_host {
-    hostname = "test-primary-1"
+    hostname = "10.0.0.238"
     # hostname_data = "foo"
     # hostname_internal = "foo"
     # config_file = "foo"

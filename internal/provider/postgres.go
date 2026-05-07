@@ -326,9 +326,11 @@ func (c *PostgresSql) HandleUpdate(ctx context.Context, d *schema.ResourceData, 
 		archiveMode := d.Get(TF_FIELD_CLUSTER_PG_WAL_ARCHIVE_MODE).(string)
 		if archiveMode != "" {
 			jobData.SetArchiveMode(archiveMode)
+		} else {
+			jobData.SetArchiveMode("always")
 		}
-		archiveCompress := d.Get(TF_FIELD_CLUSTER_PG_WAL_ARCHIVE_COMPRESS).(bool)
-		jobData.SetCompression(archiveCompress)
+		//archiveCompress := d.Get(TF_FIELD_CLUSTER_PG_WAL_ARCHIVE_COMPRESS).(bool)
+		jobData.SetCompression(true)
 
 		jobData.SetSummarizeWal(summarizeWal)
 
