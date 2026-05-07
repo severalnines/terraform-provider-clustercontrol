@@ -95,6 +95,7 @@ const (
 )
 
 const (
+	MARIADB_VERSION_11_8  = "11.8"
 	MARIADB_VERSION_11_4  = "11.4"
 	MARIADB_VERSION_10_11 = "10.11"
 	MARIADB_VERSION_10_10 = "10.10"
@@ -107,6 +108,8 @@ const (
 )
 
 const (
+	POSTGRESQL_VERSION_18 = "18"
+	POSTGRESQL_VERSION_17 = "17"
 	POSTGRESQL_VERSION_16 = "16"
 	POSTGRESQL_VERSION_15 = "15"
 	POSTGRESQL_VERSION_14 = "14"
@@ -116,6 +119,7 @@ const (
 )
 
 const (
+	MONGODB_VERSION_8_0 = "8.0"
 	MONGODB_VERSION_7_0 = "7.0"
 	MONGODB_VERSION_6_0 = "6.0"
 	MONGODB_VERSION_5_0 = "5.0"
@@ -221,6 +225,7 @@ const (
 	CMON_JOB_PROMOTE_REPLICAION_SLAVE_COMMAND = "promote_replication_slave"
 	CMON_JOB_PBM_AGENT_COMMAND                = "pbmagent"
 	CMON_JOB_PGBACKREST_COMMAND               = "pgbackrest"
+	CMON_JOB_ENABLE_LOG_ARCHIVING_COMMAND     = "enable_log_archiving"
 )
 
 const (
@@ -255,22 +260,23 @@ const (
 )
 
 const (
-	BACKUP_METHOD_XTRABACKUP_FULL  = "xtrabackupfull"
-	BACKUP_METHOD_XTRABACKUP_INCR  = "xtrabackupincr"
-	BACKUP_METHOD_MARIABACKUP_FULL = "mariabackupfull"
-	BACKUP_METHOD_MARIABACKUP_INCR = "mariabackupincr"
-	BACKUP_METHOD_MYSQLDUMP        = "mysqldump"
-	BACKUP_METHOD_PG_BASEBACKUP    = "pg_basebackup"
-	BACKUP_METHOD_PG_BACKREST_FULL = "pgbackrestfull"
-	BACKUP_METHOD_PG_BACKREST_INCR = "pgbackrestincr"
-	BACKUP_METHOD_PG_BACKREST_DIRR = "pgbackrestdiff"
-	BACKUP_METHOD_PGDUMPALL        = "pgdumpall"
-	BACKUP_METHOD_MONGODUMP        = "mongodump"
-	BACKUP_METHOD_PBM              = "percona-backup-mongodb"
-	BACKUP_METHOD_ELASTI_SNAPSHOT  = "elasticsearch-snapshot"
-	BACKUP_MSSQL_FULL              = "mssqlfull"
-	BACKUP_MSSQL_DIFF              = "mssqldiff"
-	BACKUP_MSSQL_TRANSACTION_LOG   = "mssqllog"
+	BACKUP_METHOD_XTRABACKUP_FULL    = "xtrabackupfull"
+	BACKUP_METHOD_XTRABACKUP_INCR    = "xtrabackupincr"
+	BACKUP_METHOD_MARIABACKUP_FULL   = "mariabackupfull"
+	BACKUP_METHOD_MARIABACKUP_INCR   = "mariabackupincr"
+	BACKUP_METHOD_MYSQLDUMP          = "mysqldump"
+	BACKUP_METHOD_PG_BASEBACKUP      = "pg_basebackup"
+	BACKUP_METHOD_PG_BASEBACKUP_INCR = "pg_basebackupincr"
+	BACKUP_METHOD_PG_BACKREST_FULL   = "pgbackrestfull"
+	BACKUP_METHOD_PG_BACKREST_INCR   = "pgbackrestincr"
+	BACKUP_METHOD_PG_BACKREST_DIRR   = "pgbackrestdiff"
+	BACKUP_METHOD_PGDUMPALL          = "pgdumpall"
+	BACKUP_METHOD_MONGODUMP          = "mongodump"
+	BACKUP_METHOD_PBM                = "percona-backup-mongodb"
+	BACKUP_METHOD_ELASTI_SNAPSHOT    = "elasticsearch-snapshot"
+	BACKUP_MSSQL_FULL                = "mssqlfull"
+	BACKUP_MSSQL_DIFF                = "mssqldiff"
+	BACKUP_MSSQL_TRANSACTION_LOG     = "mssqllog"
 )
 
 const (
@@ -365,6 +371,10 @@ const (
 	TF_FIELD_CLUSTER_ENABLE_PGM_AGENT        = "db_enable_pbm_agent"
 	TF_FIELD_CLUSTER_PBM_BACKUP_DIR          = "db_pbm_backup_dir"
 	TF_FIELD_CLUSTER_ENABLE_PGBACKREST_AGENT = "db_enable_pgbackrest_agent"
+	TF_FIELD_CLUSTER_ENABLE_PG_SUMMARIZE_WAL = "db_enable_pg_summarize_wal"
+	TF_FIELD_CLUSTER_PG_WAL_ARCHIVE_DIR      = "db_wal_archive_dir"
+	TF_FIELD_CLUSTER_PG_WAL_ARCHIVE_MODE     = "db_wal_archive_mode"
+	TF_FIELD_CLUSTER_PG_WAL_ARCHIVE_COMPRESS = "db_wal_archive_compression"
 	TF_FIELD_CLUSTER_LOAD_BALANCER           = "db_load_balancer"
 
 	// Load balancer fields

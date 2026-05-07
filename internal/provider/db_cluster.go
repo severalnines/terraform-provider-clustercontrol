@@ -3,13 +3,14 @@ package provider
 import (
 	"context"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"log/slog"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 )
 
 type DbClusterInterface interface {
@@ -491,6 +492,26 @@ func resourceDbCluster() *schema.Resource {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "Enable PgBackRest for Postgres.",
+			},
+			TF_FIELD_CLUSTER_ENABLE_PG_SUMMARIZE_WAL: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Enable Summarize-WAL for Postgres. Required for incremental pg_basebackup.",
+			},
+			TF_FIELD_CLUSTER_PG_WAL_ARCHIVE_DIR: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Postgres WAL archival directory (optional).",
+			},
+			TF_FIELD_CLUSTER_PG_WAL_ARCHIVE_MODE: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Postgres WAL archival mode. One of [always, on, off]",
+			},
+			TF_FIELD_CLUSTER_PG_WAL_ARCHIVE_COMPRESS: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Postgres WAL archive compression.",
 			},
 			// ****************************
 			// Database load balancer attributes

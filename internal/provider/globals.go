@@ -152,6 +152,7 @@ var (
 				//MYSQL_VERSION_8_4: "my.cnf.84-pxc",
 			},
 			CLUSTER_TYPE_MOGNODB: {
+				MONGODB_VERSION_8_0: "mongodb.conf.8.0.percona",
 				MONGODB_VERSION_7_0: "mongodb.conf.7.0.percona",
 				MONGODB_VERSION_6_0: "mongodb.conf.6.0.percona",
 				MONGODB_VERSION_5_0: "mongodb.conf.5.0.percona",
@@ -161,6 +162,7 @@ var (
 		},
 		VENDOR_MARIADB: {
 			CLUSTER_TYPE_REPLICATION: {
+				MARIADB_VERSION_11_8:  "my.cnf.replication",
 				MARIADB_VERSION_11_4:  "my.cnf.replication",
 				MARIADB_VERSION_10_11: "my.cnf.mdb10x-replication",
 				MARIADB_VERSION_10_10: "my.cnf.mdb10x-replication",
@@ -172,6 +174,7 @@ var (
 				//MARIADB_VERSION_10_3:  "my.cnf.mdb10x-replication",
 			},
 			CLUSTER_TYPE_GALERA: {
+				MARIADB_VERSION_11_8:  "my.cnf.mdb106+-galera",
 				MARIADB_VERSION_11_4:  "my.cnf.mdb106+-galera",
 				MARIADB_VERSION_10_11: "my.cnf.mdb106+-galera",
 				MARIADB_VERSION_10_10: "my.cnf.mdb106+-galera",
@@ -185,6 +188,7 @@ var (
 		},
 		VENDOR_10GEN: {
 			CLUSTER_TYPE_MOGNODB: {
+				MONGODB_VERSION_8_0: "mongodb.conf.8.0.org",
 				MONGODB_VERSION_7_0: "mongodb.conf.7.0.org",
 				MONGODB_VERSION_6_0: "mongodb.conf.6.0.org",
 				MONGODB_VERSION_5_0: "mongodb.conf.5.0.org",
@@ -291,6 +295,7 @@ var (
 		CLUSTER_TYPE_PG_SINGLE: { //
 			VENDOR_DEFAULT: {
 				BACKUP_METHOD_PG_BASEBACKUP,
+				BACKUP_METHOD_PG_BASEBACKUP_INCR,
 				BACKUP_METHOD_PGDUMPALL,
 				BACKUP_METHOD_PG_BACKREST_FULL,
 				BACKUP_METHOD_PG_BACKREST_INCR,
@@ -298,6 +303,7 @@ var (
 			},
 			VENDOR_POSTGRESQL: {
 				BACKUP_METHOD_PG_BASEBACKUP,
+				BACKUP_METHOD_PG_BASEBACKUP_INCR,
 				BACKUP_METHOD_PGDUMPALL,
 				BACKUP_METHOD_PG_BACKREST_FULL,
 				BACKUP_METHOD_PG_BACKREST_INCR,
