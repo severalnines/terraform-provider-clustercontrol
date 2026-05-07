@@ -26,13 +26,14 @@ resource "clustercontrol_db_cluster" "this" {
   disable_selinux            = var.disable_selinux
   db_enable_uninstall        = var.db_enable_uninstall
   db_install_software        = var.db_install_software
-  db_deploy_agents           = var.db_deploy_agents
+  db_deploy_agents           = false #var.db_deploy_agents
   db_enable_ssl              = var.db_enable_ssl
   db_enable_timescale        = false
   db_enable_pgbackrest_agent = false
   db_enable_pg_summarize_wal = false
-  db_wal_archive_compression = true
-  db_wal_archive_mode        = "always"
+  db_wal_archive_compression = var.db_wal_archive_compression
+  db_wal_archive_mode        = var.db_wal_archive_mode
+  db_wal_archive_dir         = var.db_wal_archive_dir
   ssh_user                   = var.ssh_user
   ssh_user_password          = var.ssh_user_password
   ssh_key_file               = var.ssh_key_file
@@ -40,7 +41,7 @@ resource "clustercontrol_db_cluster" "this" {
   db_tags                    = ["terraform", "someothertag"]
 
   db_host {
-    hostname = "10.0.0.238"
+    hostname = "10.0.0.143"
     # hostname_data = "foo"
     # hostname_internal = "foo"
     # config_file = "foo"
@@ -61,6 +62,20 @@ resource "clustercontrol_db_cluster" "this" {
 #   depends_on                   = [clustercontrol_db_cluster.this]
 #   db_cluster_id                = clustercontrol_db_cluster.this.id
 #   db_backup_method             = "pg_basebackup"
+#   db_backup_dir                = var.db_backup_dir
+#   db_backup_subdir             = var.db_backup_subdir
+#   db_backup_encrypt            = var.db_backup_encrypt
+#   db_backup_host               = var.db_backup_host
+#   db_backup_storage_controller = var.db_backup_storage_controller
+#   db_backup_compression        = var.db_backup_compression
+#   db_backup_compression_level  = var.db_backup_compression_level
+#   db_backup_retention          = var.db_backup_retention
+# }
+
+# resource "clustercontrol_db_cluster_backup" "incremental-1" {
+#   depends_on                   = [clustercontrol_db_cluster.this]
+#   db_cluster_id                = clustercontrol_db_cluster.this.id
+#   db_backup_method             = "pg_basebackupincr"
 #   db_backup_dir                = var.db_backup_dir
 #   db_backup_subdir             = var.db_backup_subdir
 #   db_backup_encrypt            = var.db_backup_encrypt
