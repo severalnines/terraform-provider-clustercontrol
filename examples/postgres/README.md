@@ -38,6 +38,22 @@ resource "clustercontrol_db_cluster" "this" {
 ```
 
 
+### `db_enable_pg_summarize_wal` Enabling WAL summarization 
+Use the `db_enable_pg_summarize_wal` attributed in the [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md) to enable WAL summarization. This 
+a prerequiste to pb_basebackup incremental.
+
+**NOTE**: Have `db_enable_pg_summarize_wal=false` when creating the Postgres cluster. Then change it to `true` to enable WAL summaries.
+```text
+resource "clustercontrol_db_cluster" "this" {
+...
+  db_enable_pg_summarize_wal = true
+  db_wal_archive_compression = var.db_wal_archive_compression
+  db_wal_archive_mode        = var.db_wal_archive_mode
+  db_wal_archive_dir         = var.db_wal_archive_dir
+...
+}
+```
+
 ### `db_enable_pgbackrest_agent` Enabling PgBackRest agent
 Use the `db_enable_pgbackrest_agent` attributed in the [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md) to enable PgBackRest agent. Once
 the agent is enabled, you can use the pgbackrest(full,incr,diff) backup methods either in adhoc backups or backup schedules.
@@ -124,14 +140,48 @@ resource "clustercontrol_db_cluster_backup_schedule" "daily-full" {
 }
 ```
 
+```hcl
+resource "clustercontrol_db_cluster_backup_schedule" "30min-past-every-hr-incr" {
+  depends_on                   = [clustercontrol_db_cluster.this]
+  db_backup_sched_title        = "Daily full backup"
+  db_backup_sched_time         = "TZ=UTC 30 * * * *"
+  db_cluster_id                = clustercontrol_db_cluster.this.id
+  db_backup_method             = "pg_basebackupincr"
+  db_backup_dir                = var.db_backup_dir
+  db_backup_subdir             = var.db_backup_subdir
+  db_backup_encrypt            = var.db_backup_encrypt
+  db_backup_host               = var.db_backup_host
+  db_backup_storage_controller = var.db_backup_storage_controller
+  db_backup_compression        = var.db_backup_compression
+  db_backup_compression_level  = var.db_backup_compression_level
+  db_backup_retention          = var.db_backup_retention
+}
+```
+
 ### Taking adhoc backups using the - [clustercontrol_db_cluster_backup](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup.md) resource
 You can take adhoc backups (full or incremental) of a cluster using the `clustercontrol_db_cluster_backup` resource.
 
 ```hcl
-resource "clustercontrol_db_cluster_backup" "full-1" {
+resource "clustercontrol_db_cluster_backup" "full" {
   depends_on                   = [clustercontrol_db_cluster.this]
   db_cluster_id                = clustercontrol_db_cluster.this.id
   db_backup_method             = "pg_basebackup"
+  db_backup_dir                = var.db_backup_dir
+  db_backup_subdir             = var.db_backup_subdir
+  db_backup_encrypt            = var.db_backup_encrypt
+  db_backup_host               = var.db_backup_host
+  db_backup_storage_controller = var.db_backup_storage_controller
+  db_backup_compression        = var.db_backup_compression
+  db_backup_compression_level  = var.db_backup_compression_level
+  db_backup_retention          = var.db_backup_retention
+}
+```
+
+```hcl
+resource "clustercontrol_db_cluster_backup" "incr-1" {
+  depends_on                   = [clustercontrol_db_cluster.this]
+  db_cluster_id                = clustercontrol_db_cluster.this.id
+  db_backup_method             = "pg_basebackupincr"
   db_backup_dir                = var.db_backup_dir
   db_backup_subdir             = var.db_backup_subdir
   db_backup_encrypt            = var.db_backup_encrypt
