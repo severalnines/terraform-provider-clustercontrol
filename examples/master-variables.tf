@@ -46,7 +46,7 @@ variable "db_cluster_type" {
 }
 
 variable "db_vendor" {
-  description = "Database vendor - oracle, percona, mariadb, 10gen, microsoft, redis, elasticsearch, for postgresql it is `default` etc"
+  description = "Database vendor - oracle, percona, mariadb, 10gen, microsoft, redis, elasticsearch, clickhouse, for postgresql it is `default` etc"
   type        = string
   default     = null
 }
@@ -152,6 +152,18 @@ variable "db_elasticsearch_transfer_port" {
   description = "The port on which Elasticsearch will accept client connections for data transfer(?)"
   type        = string
   default     = null
+}
+
+variable "db_clickhouse_native_port" {
+  description = "The secure (TLS) port on which ClickHouse will accept native TCP protocol client connections. SSL is mandatory for ClickHouse."
+  type        = string
+  default     = "9440"
+}
+
+variable "db_clickhouse_keeper_port" {
+  description = "The secure (TLS) client port for the embedded ClickHouse Keeper instance used for replica coordination. SSL is mandatory for ClickHouse."
+  type        = string
+  default     = "9281"
 }
 
 variable "db_data_directory" {
@@ -511,7 +523,7 @@ variable "db_maint_reason" {
 # --------------------------
 
 variable "db_backup_method" {
-  description = "Which backup to use - mariabackup, xtrabackup, mysqldump, pbm, etc"
+  description = "Which backup to use - mariabackup, xtrabackup, mysqldump, pbm, clickhouse-native (full), clickhouse-native-incr (incremental), etc"
   type        = string
   default     = null
 }

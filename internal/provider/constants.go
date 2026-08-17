@@ -186,6 +186,8 @@ const (
 	CMON_CLASS_NAME_PGBACKREST_HOST    = "CmonPgBackRestHost"
 	CMON_CLASS_NAME_MONGO_HOST         = "CmonMongoHost"
 	CMON_CLASS_NAME_PBM_AGENT_HOST     = "CmonPBMAgentHost"
+	CMON_CLASS_PGBOUNCER_HOST          = "CmonPgBouncerHost"
+	CMON_CLASS_CLICKHOUSE_HOST         = "CmonClickHouseHost"
 )
 
 const (
@@ -277,6 +279,8 @@ const (
 	BACKUP_MSSQL_FULL                = "mssqlfull"
 	BACKUP_MSSQL_DIFF                = "mssqldiff"
 	BACKUP_MSSQL_TRANSACTION_LOG     = "mssqllog"
+	BACKUP_CLICKHOUSE_NATIVE_FULL    = "clickhouse-native"
+	BACKUP_CLICKHOUSE_NATIVE_INCR    = "clickhouse-native-incr"
 )
 
 const (
