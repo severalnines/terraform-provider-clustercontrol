@@ -26,6 +26,7 @@ const (
 	CLUSTER_TYPE_MSSQL_AO_ASYNC = "mssql_ao_async"
 	CLUSTER_TYPE_MSSQL_SINGLE   = "mssql_single"
 	CLUSTER_TYPE_ELASTIC        = "elastic"
+	CLUSTER_TYPE_CLICKHOUSE     = "clickhouse"
 )
 
 const (
@@ -41,6 +42,7 @@ const (
 	VENDOR_POSTGRESQL = "postgresql"
 	VENDOR_EDB        = "EDB"
 	VENDOR_10GEN      = "10gen"
+	VENDOR_CLICKHOUSE = "clickhouse"
 )
 
 const (
@@ -55,6 +57,7 @@ const (
 	EXT_CLUSTER_TYPE_ELASTICSEARH       = "elasticsearch"
 	EXT_CLUSTER_TYPE_MSSQL_ASYN         = "mssql-async"
 	EXT_CLUSTER_TYPE_MSSQL_STANDALONE   = "mssql-standalone"
+	EXT_CLUSTER_TYPE_CLICKHOUSE         = "clickhouse"
 	//EXT_CLUSTER_TYPE_ = ""
 )
 
@@ -69,6 +72,7 @@ const (
 	EXT_VENDOR_VALKEY     = "valkey"
 	EXT_VENDOR_POSTGRESQL = "postgresql"
 	EXT_VENDOR_MONGO_ENT  = "mongodb-X"
+	EXT_VENDOR_CLICKHOUSE = "clickhouse"
 
 	//EXT_VENDOR_ = ""
 )
@@ -86,6 +90,10 @@ const (
 	DEFAULT_MSSQL_PORT             = "1433"
 	DEFAULT_PROXYSQL_ADMIN_PORT    = "6032"
 	DEFAULT_PROXYSQL_LISTEN_PORT   = "6033"
+	// ClickHouse defaults are the SECURE (TLS) variants - SSL is mandatory for ClickHouse.
+	// Plaintext defaults (9000 / 9181) are intentionally not used here.
+	DEFAULT_CLICKHOUSE_NATIVE_PORT = "9440"
+	DEFAULT_CLICKHOUSE_KEEPER_PORT = "9281"
 )
 
 const (
@@ -320,6 +328,8 @@ const (
 	TF_FIELD_CLUSTER_MSSQL_SERVER_PORT             = "db_mssqlserver_port"
 	TF_FIELD_CLUSTER_ELASTIC_HTTP_PORT             = "db_elasticsearch_http_port"
 	TF_FIELD_CLUSTER_ELASTIC_TRANSFER_PORT         = "db_elasticsearch_transfer_port"
+	TF_FIELD_CLUSTER_CLICKHOUSE_NATIVE_PORT        = "db_clickhouse_native_port"
+	TF_FIELD_CLUSTER_CLICKHOUSE_KEEPER_PORT        = "db_clickhouse_keeper_port"
 
 	TF_FIELD_CLUSTER_DATA_DIR           = "db_data_directory"
 	TF_FIELD_CLUSTER_CFG_TEMPLATE       = "db_config_template"

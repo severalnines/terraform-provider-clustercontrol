@@ -201,6 +201,8 @@ func resourceCreateDbClusterBackupSched(ctx context.Context, d *schema.ResourceD
 		backupHandler = NewMsSql()
 	case CLUSTER_TYPE_ELASTIC:
 		backupHandler = NewElastic()
+	case CLUSTER_TYPE_CLICKHOUSE:
+		backupHandler = NewClickHouse()
 	default:
 		str := fmt.Sprintf("%s - Unknown cluster type: %s", funcName, clusterType)
 		slog.Warn(str)
