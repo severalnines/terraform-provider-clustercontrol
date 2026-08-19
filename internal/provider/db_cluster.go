@@ -288,12 +288,22 @@ func resourceDbCluster() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 							Description: "Applicable to Elasticsearch - the role of this host (master-data: host will " +
-								"be designated as the master node and a data node, etc)",
+								"be designated as the master node and a data node, etc). Also applicable to " +
+								"ClickHouse - one of `replica` (clickhouse-server; CMON manages embedded Keeper " +
+								"placement among replica hosts automatically) or `keeper` (dedicated Keeper-only " +
+								"host, no clickhouse-server). Defaults to `replica` if unset.",
 						},
 						TF_FIELD_CLUSTER_HOST_ROLE: {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Applicable to Redis or Valkey (Sharded) Cluster - the role of this host (primary or replica)",
+						},
+						TF_FIELD_CLUSTER_HOST_SHARD: {
+							Type:     schema.TypeString,
+							Optional: true,
+							Description: "Applicable to ClickHouse - the shard this host belongs to. NOT YET " +
+								"actionable: sharded ClickHouse is on ClusterControl's roadmap and not shipped " +
+								"yet, so this value is accepted/validated but not currently sent to CMON.",
 						},
 					},
 				},

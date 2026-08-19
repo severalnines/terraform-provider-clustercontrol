@@ -195,7 +195,11 @@ const (
 	CMON_CLASS_NAME_MONGO_HOST         = "CmonMongoHost"
 	CMON_CLASS_NAME_PBM_AGENT_HOST     = "CmonPBMAgentHost"
 	CMON_CLASS_PGBOUNCER_HOST          = "CmonPgBouncerHost"
-	CMON_CLASS_CLICKHOUSE_HOST         = "CmonClickHouseHost"
+	// CONFIRMED against the real CMON backend: there is only ONE host class
+	// for ClickHouse, used for every node regardless of role. Dedicated
+	// Keeper-only hosts use this same class_name and are distinguished only
+	// by the per-node "nodetype" field (see CLICKHOUSE_NODETYPE_KEEPER below).
+	CMON_CLASS_CLICKHOUSE_HOST = "CmonClickHouseHost"
 )
 
 const (
@@ -299,6 +303,20 @@ const (
 	ES_ROLES_MASTER_DATA = "master-data"
 	ES_ROLES_MASTER      = "master"
 	ES_ROLES_DATA        = "data"
+	// ClickHouse db_host "roles" values (shares the generic TF_FIELD_CLUSTER_HOST_ROLES
+	// field with Elasticsearch, above). CONFIRMED against real CMON job_data:
+	// there is only one host class (CMON_CLASS_CLICKHOUSE_HOST) and job_data
+	// cannot distinguish a keeper-less replica from a replica that also runs
+	// embedded Keeper - both produce an identical payload (nodetype omitted).
+	// So only two roles are exposed: "replica" (nodetype omitted; CMON itself
+	// decides embedded-Keeper placement among these) and "keeper" (dedicated
+	// Keeper-only host - see CLICKHOUSE_NODETYPE_KEEPER below).
+	CLICKHOUSE_ROLE_REPLICA = "replica"
+	CLICKHOUSE_ROLE_KEEPER  = "keeper"
+	// Per-node "nodetype" value (JobsJobJobSpecJobDataNodesInner.Nodetype) -
+	// CONFIRMED against real CMON job_data. Omitted entirely for "replica"
+	// nodes; set to this value for dedicated Keeper-only nodes.
+	CLICKHOUSE_NODETYPE_KEEPER = "clickhouse_keeper"
 )
 
 const (
@@ -360,14 +378,19 @@ const (
 	// Currently only used in Load Balancer config
 	TF_FIELD_CLUSTER_HOST_PORT = "port"
 
-	TF_FIELD_CLUSTER_HOST_DD                 = "datadir"
-	TF_FIELD_CLUSTER_HOST_PRIORITY           = "priority"
-	TF_FIELD_CLUSTER_HOST_SLAVE_DELAY        = "slave_delay"
-	TF_FIELD_CLUSTER_HOST_ARBITER_ONLY       = "arbiter_only"
-	TF_FIELD_CLUSTER_HOST_HIDDEN             = "hidden"
-	TF_FIELD_CLUSTER_HOST_PROTO              = "protocol"
-	TF_FIELD_CLUSTER_HOST_ROLES              = "roles"
-	TF_FIELD_CLUSTER_HOST_ROLE               = "host_role"
+	TF_FIELD_CLUSTER_HOST_DD           = "datadir"
+	TF_FIELD_CLUSTER_HOST_PRIORITY     = "priority"
+	TF_FIELD_CLUSTER_HOST_SLAVE_DELAY  = "slave_delay"
+	TF_FIELD_CLUSTER_HOST_ARBITER_ONLY = "arbiter_only"
+	TF_FIELD_CLUSTER_HOST_HIDDEN       = "hidden"
+	TF_FIELD_CLUSTER_HOST_PROTO        = "protocol"
+	TF_FIELD_CLUSTER_HOST_ROLES        = "roles"
+	TF_FIELD_CLUSTER_HOST_ROLE         = "host_role"
+	// New: per-host shard identifier for ClickHouse. Accepted and validated in
+	// Terraform, but NOT YET wired into job_data - sharded ClickHouse is on
+	// ClusterControl's roadmap, not shipped yet, so there is nothing on the
+	// CMON side to send this to today. See clickhouse.go GetInputs.
+	TF_FIELD_CLUSTER_HOST_SHARD              = "shard"
 	TF_FIELD_CLUSTER_TOPOLOGY                = "db_topology"
 	TF_FIELD_CLUSTER_PRIMARY                 = "primary"
 	TF_FIELD_CLUSTER_REPLICA                 = "replica"

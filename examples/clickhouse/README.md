@@ -1,27 +1,28 @@
-# ClickHouse Examples
+# ClickHouse Example
 
 > **Status:** ClickHouse support does not exist yet in `terraform-provider-clustercontrol`
-> or in the underlying `clustercontrol-client-sdk`. These examples are scaffolding for
-> the provider changes proposed earlier (a new `clickhouse.go` engine, `CLUSTER_TYPE_CLICKHOUSE`,
-> etc). Attribute names below (`db_cluster_type = "clickhouse"`, `db_vendor = "clickhouse"`,
-> `db_clickhouse_native_port`, `db_clickhouse_keeper_port`) are **proposed**, following this
-> repo's existing naming conventions — they are not yet confirmed against the real CMON
-> `job_data` contract. Treat this directory as a template to validate/adjust once that
-> lands, not as ready-to-apply Terraform against a live ClusterControl instance.
+> or in the underlying `clustercontrol-client-sdk`. This example is scaffolding for
+> the provider changes discussed for CLUS-8376 (a new `clickhouse.go` engine,
+> `CLUSTER_TYPE_CLICKHOUSE`, etc). `db_cluster_type = "clickhouse"`, `db_vendor
+> = "clickhouse"`, `db_clickhouse_native_port`, and `db_clickhouse_keeper_port`
+> are **proposed**, following this repo's existing naming conventions - not yet
+> confirmed against the real CMON `job_data` contract. The host `class_name`
+> (`CmonClickHouseHost`, used for every node regardless of role) and the
+> dedicated-Keeper `nodetype` value (`clickhouse_keeper`) ARE confirmed
+> against real CMON job_data.
 >
-> **SSL is mandatory** for ClickHouse: `db_enable_ssl` is hardcoded to `true` in both
-> examples, and the port defaults are ClickHouse's secure (TLS) variants.
+> **SSL is mandatory** for ClickHouse: `db_enable_ssl` is hardcoded to `true`.
+>
+> **Sharding is on ClusterControl's roadmap, not shipped yet.** The `shard`
+> attribute below is accepted and validated by the provider but has no effect
+> on the job sent to CMON today - see the `shard` row in the table below.
 
-This directory contains examples for deploying ClickHouse clusters using the terraform
-provider for ClusterControl, based on ClusterControl 2.5's ClickHouse support:
-single-node (standalone) instances, or replicated clusters using ClickHouse's
-**embedded Keeper** for replica coordination (no separate Keeper host tier, no
-sharding yet — both are on the ClusterControl roadmap).
-
-| Directory      | Topology                                                              |
-|----------------|------------------------------------------------------------------------|
-| `standalone/`  | A single ClickHouse node, no replication, no Keeper                   |
-| `replicated/`  | 3+ ClickHouse nodes, `ReplicatedMergeTree`-style replication, embedded Keeper on each node |
+This directory contains a single example for deploying a ClickHouse cluster using
+the terraform provider for ClusterControl. One `db_cluster` resource now covers
+every topology - standalone, replicated, or replicated with dedicated Keeper
+hosts - purely through how many `db_host` blocks you declare and what
+`roles`/`shard` you give each one. There is no longer a separate `standalone/`
+vs `replicated/` split.
 
 ## Resources
 
@@ -34,60 +35,34 @@ sharding yet — both are on the ClusterControl roadmap).
 
 ## Choosing attribute values for ClickHouse
 
-### `db_cluster_type` - proposed values for ClickHouse
+### `db_cluster_type` / `db_vendor` - proposed values
 
-| Cluster Type  | Description                                                    |
-|---------------|-----------------------------------------------------------------|
-| `clickhouse`  | ClickHouse cluster — 1 node (standalone) or 3+ nodes (replicated, embedded Keeper) |
+| Attribute         | Value        | Description                          |
+|--------------------|--------------|-----------------------------------------|
+| `db_cluster_type`  | `clickhouse` | ClickHouse cluster, any topology below |
+| `db_vendor`        | `clickhouse` | ClickHouse (open source)               |
 
-### `db_vendor` - proposed values
+### `db_host` attributes
 
-| Vendors      | Description        |
-|--------------|---------------------|
-| `clickhouse` | ClickHouse (open source) |
+| Attribute  | Applies to | Description |
+|------------|------------|--------------|
+| `hostname` | all        | Required. Hostname or IP of the node. |
+| `roles`    | all        | One of `replica` (clickhouse-server; CMON manages embedded Keeper placement among replica hosts on its own - job_data can't distinguish a keeper-less replica from one that also runs embedded Keeper) or `keeper` (dedicated Keeper-only host, no clickhouse-server). Defaults to `replica` if omitted. Available now. |
+| `shard`    | `replica` hosts only | Which shard this clickhouse-server host belongs to. **Not yet actionable** - sharded ClickHouse is coming to ClusterControl but isn't shipped yet, so this is validated (rejected on `keeper`-role hosts) but not currently sent to CMON. |
 
-### `db_host`
+Topology examples using just these two attributes:
 
-Every node that makes up the cluster needs a `db_host` block. Unlike Elasticsearch
-(which needs `roles`) or Redis Sentinel (which needs a separate sentinel companion
-process), ClickHouse replicated nodes are symmetric peers — no role attribute is
-required. Each node runs both `clickhouse-server` and the embedded `clickhouse-keeper`.
-
-```hcl
-resource "clustercontrol_db_cluster" "this" {
-    ...
-    db_host {
-        hostname = "host-1"
-    }
-    db_host {
-        hostname = "host-2"
-    }
-    db_host {
-        hostname = "host-3"
-    }
-}
-```
+- **Standalone**: a single `db_host` block, no `roles`/`shard` set (defaults to `replica`).
+- **Replicated** (what ClusterControl 2.5 ships today): 3+ `db_host` blocks, all `roles = "replica"`. CMON manages embedded Keeper placement among them automatically.
+- **Replicated with dedicated Keeper hosts** (available now): some hosts `roles = "keeper"` (Keeper only, no ClickHouse data), others `roles = "replica"` (ClickHouse data).
+- **Sharded** (roadmap, not shippable yet): multiple `replica` hosts carrying different `shard` values, as shown in `main.tf`'s 6-host example. Terraform will accept this shape today; CMON has nothing to act on it with until sharded ClickHouse ships.
 
 ### Ports
 
 | Variable                     | Default | Purpose                                                 |
 |-------------------------------|---------|-----------------------------------------------------------|
-| `db_clickhouse_native_port`   | `9440`  | Secure (TLS) native TCP client protocol (all topologies)  |
-| `db_clickhouse_keeper_port`   | `9281`  | Secure (TLS) embedded Keeper client port (replicated topology only) |
-
-### SSL is mandatory
-
-These examples require SSL — `db_enable_ssl` is hardcoded to `true` in `main.tf`
-(not exposed as a variable), and the port defaults above are ClickHouse's
-**secure** variants rather than its plaintext defaults (`9000` and `9181`
-respectively). Do not set `db_enable_ssl = false` or swap in the plaintext
-port numbers unless you're intentionally deviating from this mandate.
-
-### Adding/removing replica nodes - [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md)
-
-Same pattern as Redis/Elasticsearch: add or remove a `db_host` block inside the
-`clustercontrol_db_cluster` resource to add/remove a replica node from an existing
-replicated cluster. See `replicated/main.tf` for a 3-node starting point.
+| `db_clickhouse_native_port`   | `9440`  | Secure (TLS) native TCP client protocol - the per-node `port` for every `replica` host |
+| `db_clickhouse_keeper_port`   | `9281`  | Secure (TLS) Keeper client port - the per-node `port` for every dedicated `keeper` host |
 
 ### Backup methods
 
@@ -95,6 +70,14 @@ replicated cluster. See `replicated/main.tf` for a 3-node starting point.
 |-----------------------------|---------------------|----------------------------------------|
 | `clickhouse-native`         | Full                | Full backup using ClickHouse-native tooling       |
 | `clickhouse-native-incr`    | Incremental         | Incremental backup using ClickHouse-native tooling |
+
+### Adding/removing nodes - [clustercontrol_db_cluster](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster.md)
+
+Add or remove a `db_host` block to add/remove a node from an existing cluster, same
+pattern as Redis/Elasticsearch. There is only one CMON host class for ClickHouse
+(`replica` and `keeper` roles are distinguished purely by the per-node `nodetype`
+and `port` values, not by class), so this follows the same single-class, one-node-
+at-a-time restriction as other engines.
 
 ### Scheduling Backups using the - [clustercontrol_db_cluster_backup_schedule](https://github.com/severalnines/terraform-provider-clustercontrol/blob/main/docs/resources/db_cluster_backup_schedule.md) Resource
 

@@ -9,26 +9,27 @@ package provider
 //     for it). This file is written against the SDK version available at the
 //     time of writing and will not compile until the SDK is regenerated with
 //     ClickHouse support added to clustercontrol-v2.yaml.
-//   - CMON_CLASS_CLICKHOUSE_HOST (constants.go) is a proposed value, not
-//     confirmed against the real CMON backend.
-//   - There is no dedicated "keeper port" field on JobsJobJobSpecJobData today.
-//     The call to jobData.SetKeeperPort(...) below is commented out and marked
-//     TODO; it needs a corresponding job_data field added to the OpenAPI spec
-//     (see clustercontrol-client-sdk/clustercontrol-v2.yaml) before it can be
-//     wired in for real. Everything else in this file uses fields that already
-//     exist on JobsJobJobSpecJobData today (Port, Nodes, ClassName, Hostname,
-//     etc.) and should compile as-is.
-//   - Topology: ClusterControl 2.5 supports standalone (1 node) or replicated
-//     (3+ nodes) ClickHouse with embedded Keeper - no separate Keeper host
-//     tier, no sharding yet. This mirrors Elastic's single-host-class model
-//     (see elastic.go) rather than Mongo's tiered config-server/shard model:
-//     every ClickHouse node is a symmetric peer, so no "roles" attribute is
-//     needed on db_host the way Elasticsearch needs master/data roles.
+//   - Host class_name (CMON_CLASS_CLICKHOUSE_HOST) and the per-node "nodetype"
+//     value for dedicated Keeper hosts (CLICKHOUSE_NODETYPE_KEEPER) are BOTH
+//     CONFIRMED against real CMON job_data (not guesses). There is only ONE
+//     host class for ClickHouse - every node uses it, regardless of role.
+//   - job_data cannot distinguish a keeper-less replica from a replica that
+//     also happens to run embedded Keeper - both produce an identical node
+//     payload (no "nodetype" field). So only two roles are exposed here:
+//     "replica" (nodetype omitted - CMON manages embedded Keeper placement
+//     among replica hosts on its own) and "keeper" (dedicated Keeper-only
+//     host: nodetype = "clickhouse_keeper", and its "port" is the Keeper
+//     client port rather than the ClickHouse native port).
+//   - Sharded ClickHouse is on ClusterControl's roadmap, not shipped yet.
+//     The per-host "shard" attribute (TF_FIELD_CLUSTER_HOST_SHARD) is
+//     accepted and validated here, but deliberately NOT sent to CMON -
+//     there is nothing on the backend to receive it yet.
 // *******************************************************************************
 
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"log/slog"
@@ -39,6 +40,40 @@ import (
 type ClickHouse struct {
 	Common DbCommon
 	Backup DbBackupCommon
+}
+
+// resolveClickHouseRole normalizes and validates a db_host's "roles" value
+// for ClickHouse, defaulting to CLICKHOUSE_ROLE_REPLICA when unset (mirrors
+// Elastic's default-when-empty pattern).
+func resolveClickHouseRole(role string) (string, error) {
+	if role == "" {
+		return CLICKHOUSE_ROLE_REPLICA, nil
+	}
+	switch strings.ToLower(role) {
+	case CLICKHOUSE_ROLE_REPLICA, CLICKHOUSE_ROLE_KEEPER:
+		return strings.ToLower(role), nil
+	default:
+		return "", fmt.Errorf(
+			"invalid ClickHouse host role %q - must be one of %q, %q (or unset, defaults to %q)",
+			role, CLICKHOUSE_ROLE_REPLICA, CLICKHOUSE_ROLE_KEEPER, CLICKHOUSE_ROLE_REPLICA)
+	}
+}
+
+// applyClickHouseNodeAttrs sets the class_name/nodetype/port on a node per
+// its resolved role, and defaults hostname_data to hostname when not
+// explicitly given (matches the shape of real CMON job_data, which always
+// carries a populated hostname_data).
+func applyClickHouseNodeAttrs(node *openapi.JobsJobJobSpecJobDataNodesInner, role string, nativePort string, keeperPort string) {
+	node.SetClassName(CMON_CLASS_CLICKHOUSE_HOST)
+	if role == CLICKHOUSE_ROLE_KEEPER {
+		node.SetNodetype(CLICKHOUSE_NODETYPE_KEEPER)
+		node.SetPort(keeperPort)
+	} else {
+		node.SetPort(nativePort)
+	}
+	if node.GetHostnameData() == "" {
+		node.SetHostnameData(node.GetHostname())
+	}
 }
 
 func (c *ClickHouse) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJobSpecJobData) error {
@@ -58,27 +93,23 @@ func (c *ClickHouse) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJ
 
 	// Native TCP port (secure/TLS variant by default - see DEFAULT_CLICKHOUSE_NATIVE_PORT)
 	var iPort int
-	port := d.Get(TF_FIELD_CLUSTER_CLICKHOUSE_NATIVE_PORT).(string)
-	if err = CheckForEmptyAndSetDefault(&port, gDefultDbPortMap, clusterType); err != nil {
+	nativePort := d.Get(TF_FIELD_CLUSTER_CLICKHOUSE_NATIVE_PORT).(string)
+	if err = CheckForEmptyAndSetDefault(&nativePort, gDefultDbPortMap, clusterType); err != nil {
 		return err
 	}
-	if iPort, err = strconv.Atoi(port); err != nil {
+	if iPort, err = strconv.Atoi(nativePort); err != nil {
 		slog.Error(funcName, "ERROR", "Non-numeric database port")
 		return err
 	}
 	jobData.SetPort(int32(iPort))
 
-	// Embedded ClickHouse Keeper client port (replicated topology only;
-	// harmless to send for standalone too, CMON should ignore it there).
+	// Keeper client port - used per-node for dedicated "keeper" hosts (see
+	// applyClickHouseNodeAttrs). Confirmed via real CMON job_data that this
+	// is a per-node Port value, not a separate cluster-wide job_data field.
 	keeperPort := d.Get(TF_FIELD_CLUSTER_CLICKHOUSE_KEEPER_PORT).(string)
 	if keeperPort == "" {
 		keeperPort = DEFAULT_CLICKHOUSE_KEEPER_PORT
 	}
-	// TODO: jobData.SetKeeperPort(keeperPort) - field does not exist yet on
-	// JobsJobJobSpecJobData. Needs to be added to clustercontrol-v2.yaml and
-	// the SDK regenerated (see clustercontrol-client-sdk/generate_go.sh)
-	// before this can be sent to CMON.
-	_ = keeperPort
 
 	hosts := d.Get(TF_FIELD_CLUSTER_HOST)
 	nodes := []openapi.JobsJobJobSpecJobDataNodesInner{}
@@ -87,22 +118,40 @@ func (c *ClickHouse) GetInputs(d *schema.ResourceData, jobData *openapi.JobsJobJ
 		hostname := f[TF_FIELD_CLUSTER_HOSTNAME].(string)
 		hostname_data := f[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
 		hostname_internal := f[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
+		rawRole := f[TF_FIELD_CLUSTER_HOST_ROLES].(string)
+		shard := f[TF_FIELD_CLUSTER_HOST_SHARD].(string)
 
 		if hostname == "" {
 			return errors.New("Hostname cannot be empty")
 		}
+
+		role, err := resolveClickHouseRole(rawRole)
+		if err != nil {
+			return err
+		}
+
+		// Shard is accepted/validated but not yet actionable (see
+		// TF_FIELD_CLUSTER_HOST_SHARD) - sharded ClickHouse isn't shipped
+		// by ClusterControl yet. Dedicated Keeper-only hosts never belong
+		// to a shard, so catch that combination as a config error now
+		// rather than silently ignoring it.
+		if role == CLICKHOUSE_ROLE_KEEPER && shard != "" {
+			return fmt.Errorf("host %q: shard cannot be set on a dedicated \"keeper\" host", hostname)
+		}
+		// TODO: once ClusterControl supports sharded ClickHouse, thread
+		// `shard` through into job_data here (field TBD - needs SDK support).
+		_ = shard
+
 		var node = openapi.JobsJobJobSpecJobDataNodesInner{
 			Hostname: &hostname,
 		}
-		node.SetClassName(CMON_CLASS_CLICKHOUSE_HOST)
 		if hostname_data != "" {
 			node.SetHostnameData(hostname_data)
 		}
 		if hostname_internal != "" {
 			node.SetHostnameInternal(hostname_internal)
 		}
-		// No roles/protocol needed - ClickHouse nodes are symmetric peers,
-		// unlike Elasticsearch's master/data roles.
+		applyClickHouseNodeAttrs(&node, role, nativePort, keeperPort)
 		nodes = append(nodes, node)
 	}
 	jobData.SetNodes(nodes)
@@ -148,10 +197,11 @@ func (c *ClickHouse) HandleUpdate(ctx context.Context, d *schema.ResourceData, a
 		var nodesToAdd []openapi.JobsJobJobSpecJobDataNodesInner
 		var nodesToRemove []openapi.JobsJobJobSpecJobDataNodesInner
 
+		// Only one CMON host class exists for ClickHouse (confirmed), so a
+		// single delta pass covers all hosts regardless of role.
 		hostClassName := CMON_CLASS_CLICKHOUSE_HOST
 		command := CMON_JOB_ADD_NODE_COMMAND
 
-		// Compare Terraform and CMON to determine whether adding or removing a node
 		nodes, _ := c.Common.getHosts(d)
 		if nodesToAdd, nodesToRemove, err = c.Common.determineNodesDelta(nodes, clusterInfo, hostClassName); err != nil {
 			return err
@@ -209,23 +259,32 @@ func (c *ClickHouse) HandleUpdate(ctx context.Context, d *schema.ResourceData, a
 			var nodes []openapi.JobsJobJobSpecJobDataNodesInner
 			var node openapi.JobsJobJobSpecJobDataNodesInner
 
-			node.SetClassName(hostClassName)
 			node.SetHostname(nodeFromTf.GetHostname())
 
 			// NOTE: host is guaranteed to be non-nil.
 			hostTfRec := c.Common.findHostEntry(nodeFromTf.GetHostname(), d.Get(TF_FIELD_CLUSTER_HOST))
 			hostname_data := hostTfRec[TF_FIELD_CLUSTER_HOSTNAME_DATA].(string)
 			hostname_internal := hostTfRec[TF_FIELD_CLUSTER_HOSTNAME_INT].(string)
+			rawRole := hostTfRec[TF_FIELD_CLUSTER_HOST_ROLES].(string)
+
+			role, err := resolveClickHouseRole(rawRole)
+			if err != nil {
+				return err
+			}
 
 			if hostname_data != "" {
 				node.SetHostnameData(hostname_data)
-			} else {
-				node.SetHostnameData(node.GetHostname())
 			}
 			if hostname_internal != "" {
 				node.SetHostnameInternal(hostname_internal)
 			}
-			node.SetPort(strconv.Itoa(int(tmpJobData.GetPort())))
+
+			nativePort := strconv.Itoa(int(tmpJobData.GetPort()))
+			keeperPort := d.Get(TF_FIELD_CLUSTER_CLICKHOUSE_KEEPER_PORT).(string)
+			if keeperPort == "" {
+				keeperPort = DEFAULT_CLICKHOUSE_KEEPER_PORT
+			}
+			applyClickHouseNodeAttrs(&node, role, nativePort, keeperPort)
 
 			nodes = append(nodes, node)
 			jobData.SetNodes(nodes)
