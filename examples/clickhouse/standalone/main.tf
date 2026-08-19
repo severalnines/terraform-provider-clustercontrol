@@ -50,6 +50,7 @@ resource "clustercontrol_db_cluster" "this" {
 
   db_host {
     hostname = "test-primary-1"
+    roles    = "replica-keeper"
     # hostname_data = "foo"
     # hostname_internal = "foo"
     # port = "foo"

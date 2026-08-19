@@ -21,7 +21,7 @@
 provider "clustercontrol" {
   cc_api_user          = var.cc_api_user
   cc_api_user_password = var.cc_api_user_password
-  cc_api_url            = var.cc_api_url
+  cc_api_url           = var.cc_api_url
 }
 
 locals {
@@ -30,45 +30,62 @@ locals {
 }
 
 resource "clustercontrol_db_cluster" "this" {
-  db_cluster_create              = true
-  db_cluster_import              = false
-  db_cluster_name                = "mydbcluster"
-  db_cluster_type                = "clickhouse"
-  db_vendor                      = "clickhouse"
-  db_version                     = "24.8"
-  db_admin_username               = "chadmin"
-  db_admin_user_password          = "blah%blah"
-  db_auto_recovery                = true
-  db_clickhouse_native_port       = var.db_clickhouse_native_port
-  db_clickhouse_keeper_port       = var.db_clickhouse_keeper_port
-  db_data_directory                = var.db_data_directory
-  disable_firewall                 = var.disable_firewall
-  disable_selinux                  = var.disable_selinux
-  db_enable_uninstall               = var.db_enable_uninstall
-  db_install_software               = var.db_install_software
-  db_deploy_agents                  = var.db_deploy_agents
-  db_enable_ssl                     = true # SSL is mandatory for ClickHouse - not user-configurable
-  ssh_user                          = var.ssh_user
-  ssh_user_password                 = var.ssh_user_password
-  ssh_key_file                      = var.ssh_key_file
-  ssh_port                          = var.ssh_port
-  db_tags                           = ["terra-deploy"]
+  db_cluster_create         = true
+  db_cluster_import         = false
+  db_cluster_name           = "mydbcluster"
+  db_cluster_type           = "clickhouse"
+  db_vendor                 = "clickhouse"
+  db_version                = "24.8"
+  db_admin_username         = "chadmin"
+  db_admin_user_password    = "blah%blah"
+  db_auto_recovery          = true
+  db_clickhouse_native_port = var.db_clickhouse_native_port
+  db_clickhouse_keeper_port = var.db_clickhouse_keeper_port
+  db_data_directory         = var.db_data_directory
+  disable_firewall          = var.disable_firewall
+  disable_selinux           = var.disable_selinux
+  db_enable_uninstall       = var.db_enable_uninstall
+  db_install_software       = var.db_install_software
+  db_deploy_agents          = var.db_deploy_agents
+  db_enable_ssl             = true # SSL is mandatory for ClickHouse - not user-configurable
+  ssh_user                  = var.ssh_user
+  ssh_user_password         = var.ssh_user_password
+  ssh_key_file              = var.ssh_key_file
+  ssh_port                  = var.ssh_port
+  db_tags                   = ["terra-deploy"]
 
   db_host {
     hostname = "test-primary-1"
+    roles    = "replica-keeper"
+    shard    = "01"
   }
 
   db_host {
     hostname = "test-primary-2"
+    roles    = "replica-keeper"
+    shard    = "01"
   }
 
   db_host {
     hostname = "test-primary-3"
+    roles    = "replica-keeper"
+    shard    = "01"
   }
 
-  # db_host {
-  #   hostname = "test-primary-4"
-  # }
+  db_host {
+    hostname = "test-primary-4"
+    roles    = "keeper"
+  }
+
+  db_host {
+    hostname = "test-primary-5"
+    roles    = "keeper"
+  }
+
+  db_host {
+    hostname = "test-primary-6"
+    roles    = "replica"
+  }
 
   # timeouts = {
   #   create = lookup(var.timeouts, "create", null)
