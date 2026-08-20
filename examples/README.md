@@ -15,7 +15,8 @@ The sub-folders contain examples on the following:
 | [MongoDB](../examples/mongo/README.md)               | Both sharded clusters and single Replicaset clusters                     |
 | [Redis](../examples/redis/README.md)                 | Redis sentinel clusters                                                  |
 | [Microsoft SQL Server](../examples/mssql/README.md)  | Both standalone and hot-standby cluster with one hot-standby (async)     |
-| [Elasticsearch](../examples/elastic/README.md)                | Elasticsearch clusters                                                   |
+| [Elasticsearch](../examples/elastic/README.md)       | Elasticsearch clusters                                                   |
+| [ClickHouse](../examples/clickhouse/README.md)       | ClickHouse clusters                                                      |
 
 
 
@@ -107,6 +108,7 @@ The following types are supported.
 | Redis         | Redis           | Use the value `""` to indicate (aof - Redis default)          |
 | SQL Server    | Microsoft       | `mssql_full`                                                  |
 | Elasticsearch | Elastic         | Use the value `""` to indicate default Elasticsearch snapshot |
+| ClickHouse    | ClickHouse      | `clickhouse-native`, `clickhouse-native-incr`                 |
 
 ### Setting a maintenance window using the - [clustercontrol_db_cluster_maintenance](../docs/resources/db_cluster_maintenance.md#clustercontrol_db_cluster_maintenance-resource) resource
 You can set a maintenance window for a cluster using the `clustercontrol_db_cluster_backup` resource.

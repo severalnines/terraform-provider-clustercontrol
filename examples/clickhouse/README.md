@@ -1,15 +1,5 @@
 # ClickHouse Example
 
-> **Status:** ClickHouse support does not exist yet in `terraform-provider-clustercontrol`
-> or in the underlying `clustercontrol-client-sdk`. This example is scaffolding for
-> the provider changes discussed for CLUS-8376 (a new `clickhouse.go` engine,
-> `CLUSTER_TYPE_CLICKHOUSE`, etc). `db_cluster_type = "clickhouse"`, `db_vendor
-> = "clickhouse"`, `db_clickhouse_native_port`, and `db_clickhouse_keeper_port`
-> are **proposed**, following this repo's existing naming conventions - not yet
-> confirmed against the real CMON `job_data` contract. The host `class_name`
-> (`CmonClickHouseHost`, used for every node regardless of role) and the
-> dedicated-Keeper `nodetype` value (`clickhouse_keeper`) ARE confirmed
-> against real CMON job_data.
 >
 > **SSL is mandatory** for ClickHouse: `db_enable_ssl` is hardcoded to `true`.
 >
@@ -21,8 +11,7 @@ This directory contains a single example for deploying a ClickHouse cluster usin
 the terraform provider for ClusterControl. One `db_cluster` resource now covers
 every topology - standalone, replicated, or replicated with dedicated Keeper
 hosts - purely through how many `db_host` blocks you declare and what
-`roles`/`shard` you give each one. There is no longer a separate `standalone/`
-vs `replicated/` split.
+`roles`/`shard` you give each one. 
 
 ## Resources
 
