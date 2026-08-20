@@ -779,6 +779,7 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error getting inputs for ClusterCreate",
+			Detail:   err.Error(),
 		})
 		return diags
 	}
@@ -792,6 +793,7 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Job Failed for ClusterCreate",
+			Detail:   err.Error(),
 		})
 		return diags
 	}
@@ -940,6 +942,7 @@ func resourceReadDbCluster(ctx context.Context, d *schema.ResourceData, m interf
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error in DB cluster Read handler",
+			Detail:   err.Error(),
 		})
 		return diags
 	}
@@ -1026,6 +1029,7 @@ func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error in DB cluster update handler",
+			Detail:   err.Error(),
 		})
 		return diags
 	}
@@ -1036,6 +1040,7 @@ func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error in DB cluster update handler",
+			Detail:   err.Error(),
 		})
 		return diags
 	}
@@ -1082,6 +1087,7 @@ func resourceDeleteDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Job Failed for ClusterDelete",
+			Detail:   err.Error(),
 		})
 		return diags
 	}
