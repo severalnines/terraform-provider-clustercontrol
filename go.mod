@@ -5,7 +5,7 @@ go 1.26.2
 require (
 	github.com/hashicorp/terraform-plugin-docs v0.19.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.33.0
-	github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi v0.0.0-20260817211933-0c23de073c63
+	github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi v0.0.0-20260820143653-908a4556bb1e
 )
 
 require (

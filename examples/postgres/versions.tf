@@ -1,3 +1,4 @@
+# The below block is for the tf provider from TF registry...
 terraform {
   required_providers {
     clustercontrol = {
@@ -6,6 +7,8 @@ terraform {
     }
   }
 }
+
+# The below is for dev testing locally built tf provider...
 # terraform {
 #   required_version = ">= 1.0"
 #   required_providers {

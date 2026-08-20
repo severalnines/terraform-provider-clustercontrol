@@ -1,40 +1,15 @@
 package provider
 
-// *******************************************************************************
-// ClickHouse engine support.
-//
-// STATUS / CAVEATS:
-//   - ClickHouse is entirely absent from the current clustercontrol-client-sdk
-//     OpenAPI spec (no cluster_type, vendor, or host class_name entries exist
-//     for it). This file is written against the SDK version available at the
-//     time of writing and will not compile until the SDK is regenerated with
-//     ClickHouse support added to clustercontrol-v2.yaml.
-//   - Host class_name (CMON_CLASS_CLICKHOUSE_HOST) and the per-node "nodetype"
-//     value for dedicated Keeper hosts (CLICKHOUSE_NODETYPE_KEEPER) are BOTH
-//     CONFIRMED against real CMON job_data (not guesses). There is only ONE
-//     host class for ClickHouse - every node uses it, regardless of role.
-//   - job_data cannot distinguish a keeper-less replica from a replica that
-//     also happens to run embedded Keeper - both produce an identical node
-//     payload (no "nodetype" field). So only two roles are exposed here:
-//     "replica" (nodetype omitted - CMON manages embedded Keeper placement
-//     among replica hosts on its own) and "keeper" (dedicated Keeper-only
-//     host: nodetype = "clickhouse_keeper", and its "port" is the Keeper
-//     client port rather than the ClickHouse native port).
-//   - Sharded ClickHouse is on ClusterControl's roadmap, not shipped yet.
-//     The per-host "shard" attribute (TF_FIELD_CLUSTER_HOST_SHARD) is
-//     accepted and validated here, but deliberately NOT sent to CMON -
-//     there is nothing on the backend to receive it yet.
-// *******************************************************************************
-
 import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 	"log/slog"
 	"strconv"
 	"strings"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/severalnines/clustercontrol-client-sdk/go/pkg/openapi"
 )
 
 type ClickHouse struct {
