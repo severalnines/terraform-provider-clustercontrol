@@ -69,37 +69,37 @@ resource "clustercontrol_db_cluster" "this" {
   db_tags                   = ["terra-deploy"]
 
   db_host {
-    hostname = "test-primary-1"
-    roles    = "replica"
-    shard    = "01"
-  }
-
-  db_host {
-    hostname = "test-primary-2"
-    roles    = "replica"
-    shard    = "01"
-  }
-
-  db_host {
-    hostname = "test-primary-3"
-    roles    = "replica"
-    shard    = "01"
-  }
-
-  db_host {
-    hostname = "test-primary-4"
+    hostname = "clickhouse-1"
     roles    = "keeper"
+    # shard    = "01" # keeper can't have shard!!!
   }
 
   db_host {
-    hostname = "test-primary-5"
-    roles    = "keeper"
-  }
-
-  db_host {
-    hostname = "test-primary-6"
+    hostname = "clickhouse-2"
     roles    = "replica"
+    shard    = "01"
   }
+
+  # db_host {
+  #   hostname = "test-primary-3"
+  #   roles    = "replica"
+  #   shard    = "01"
+  # }
+  #
+  # db_host {
+  #   hostname = "test-primary-4"
+  #   roles    = "keeper"
+  # }
+  #
+  # db_host {
+  #   hostname = "test-primary-5"
+  #   roles    = "keeper"
+  # }
+  #
+  # db_host {
+  #   hostname = "test-primary-6"
+  #   roles    = "replica"
+  # }
 
   # timeouts = {
   #   create = lookup(var.timeouts, "create", null)
@@ -118,12 +118,21 @@ resource "clustercontrol_db_cluster" "this" {
 #   db_backup_retention   = var.db_backup_retention
 # }
 
-# resource "clustercontrol_db_cluster_backup" "full-1" {
-#   depends_on          = [clustercontrol_db_cluster.this]
-#   db_cluster_id       = clustercontrol_db_cluster.this.id
-#   db_backup_method    = "clickhouse-native"
-#   db_backup_retention = var.db_backup_retention
-# }
+# Tested (Aug 20, 2026)
+resource "clustercontrol_db_cluster_backup" "full-1" {
+  depends_on          = [clustercontrol_db_cluster.this]
+  db_cluster_id       = clustercontrol_db_cluster.this.id
+  db_backup_method    = "clickhouse-native"
+  db_backup_retention = var.db_backup_retention
+}
+
+# Tested (Aug 20, 2026)
+resource "clustercontrol_db_cluster_backup" "incr-1" {
+  depends_on          = [clustercontrol_db_cluster.this]
+  db_cluster_id       = clustercontrol_db_cluster.this.id
+  db_backup_method    = "clickhouse-native-incr"
+  db_backup_retention = var.db_backup_retention
+}
 
 # resource "clustercontrol_db_cluster_maintenance" "server-upgrade-03232024" {
 #   depends_on          = [clustercontrol_db_cluster.this]
