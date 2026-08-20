@@ -26,6 +26,7 @@ const (
 	CLUSTER_TYPE_MSSQL_AO_ASYNC = "mssql_ao_async"
 	CLUSTER_TYPE_MSSQL_SINGLE   = "mssql_single"
 	CLUSTER_TYPE_ELASTIC        = "elastic"
+	CLUSTER_TYPE_CLICKHOUSE     = "clickhouse"
 )
 
 const (
@@ -41,6 +42,7 @@ const (
 	VENDOR_POSTGRESQL = "postgresql"
 	VENDOR_EDB        = "EDB"
 	VENDOR_10GEN      = "10gen"
+	VENDOR_CLICKHOUSE = "clickhouse"
 )
 
 const (
@@ -55,6 +57,7 @@ const (
 	EXT_CLUSTER_TYPE_ELASTICSEARH       = "elasticsearch"
 	EXT_CLUSTER_TYPE_MSSQL_ASYN         = "mssql-async"
 	EXT_CLUSTER_TYPE_MSSQL_STANDALONE   = "mssql-standalone"
+	EXT_CLUSTER_TYPE_CLICKHOUSE         = "clickhouse"
 	//EXT_CLUSTER_TYPE_ = ""
 )
 
@@ -69,6 +72,7 @@ const (
 	EXT_VENDOR_VALKEY     = "valkey"
 	EXT_VENDOR_POSTGRESQL = "postgresql"
 	EXT_VENDOR_MONGO_ENT  = "mongodb-X"
+	EXT_VENDOR_CLICKHOUSE = "clickhouse"
 
 	//EXT_VENDOR_ = ""
 )
@@ -86,6 +90,10 @@ const (
 	DEFAULT_MSSQL_PORT             = "1433"
 	DEFAULT_PROXYSQL_ADMIN_PORT    = "6032"
 	DEFAULT_PROXYSQL_LISTEN_PORT   = "6033"
+	// ClickHouse defaults are the SECURE (TLS) variants - SSL is mandatory for ClickHouse.
+	// Plaintext defaults (9000 / 9181) are intentionally not used here.
+	DEFAULT_CLICKHOUSE_NATIVE_PORT = "9440"
+	DEFAULT_CLICKHOUSE_KEEPER_PORT = "9281"
 )
 
 const (
@@ -186,6 +194,12 @@ const (
 	CMON_CLASS_NAME_PGBACKREST_HOST    = "CmonPgBackRestHost"
 	CMON_CLASS_NAME_MONGO_HOST         = "CmonMongoHost"
 	CMON_CLASS_NAME_PBM_AGENT_HOST     = "CmonPBMAgentHost"
+	CMON_CLASS_PGBOUNCER_HOST          = "CmonPgBouncerHost"
+	// CONFIRMED against the real CMON backend: there is only ONE host class
+	// for ClickHouse, used for every node regardless of role. Dedicated
+	// Keeper-only hosts use this same class_name and are distinguished only
+	// by the per-node "nodetype" field (see CLICKHOUSE_NODETYPE_KEEPER below).
+	CMON_CLASS_CLICKHOUSE_HOST = "CmonClickHouseHost"
 )
 
 const (
@@ -277,6 +291,8 @@ const (
 	BACKUP_MSSQL_FULL                = "mssqlfull"
 	BACKUP_MSSQL_DIFF                = "mssqldiff"
 	BACKUP_MSSQL_TRANSACTION_LOG     = "mssqllog"
+	BACKUP_CLICKHOUSE_NATIVE_FULL    = "clickhouse-native"
+	BACKUP_CLICKHOUSE_NATIVE_INCR    = "clickhouse-native-incr"
 )
 
 const (
@@ -287,6 +303,20 @@ const (
 	ES_ROLES_MASTER_DATA = "master-data"
 	ES_ROLES_MASTER      = "master"
 	ES_ROLES_DATA        = "data"
+	// ClickHouse db_host "roles" values (shares the generic TF_FIELD_CLUSTER_HOST_ROLES
+	// field with Elasticsearch, above). CONFIRMED against real CMON job_data:
+	// there is only one host class (CMON_CLASS_CLICKHOUSE_HOST) and job_data
+	// cannot distinguish a keeper-less replica from a replica that also runs
+	// embedded Keeper - both produce an identical payload (nodetype omitted).
+	// So only two roles are exposed: "replica" (nodetype omitted; CMON itself
+	// decides embedded-Keeper placement among these) and "keeper" (dedicated
+	// Keeper-only host - see CLICKHOUSE_NODETYPE_KEEPER below).
+	CLICKHOUSE_ROLE_REPLICA = "replica"
+	CLICKHOUSE_ROLE_KEEPER  = "keeper"
+	// Per-node "nodetype" value (JobsJobJobSpecJobDataNodesInner.Nodetype) -
+	// CONFIRMED against real CMON job_data. Omitted entirely for "replica"
+	// nodes; set to this value for dedicated Keeper-only nodes.
+	CLICKHOUSE_NODETYPE_KEEPER = "clickhouse_keeper"
 )
 
 const (
@@ -316,6 +346,8 @@ const (
 	TF_FIELD_CLUSTER_MSSQL_SERVER_PORT             = "db_mssqlserver_port"
 	TF_FIELD_CLUSTER_ELASTIC_HTTP_PORT             = "db_elasticsearch_http_port"
 	TF_FIELD_CLUSTER_ELASTIC_TRANSFER_PORT         = "db_elasticsearch_transfer_port"
+	TF_FIELD_CLUSTER_CLICKHOUSE_NATIVE_PORT        = "db_clickhouse_native_port"
+	TF_FIELD_CLUSTER_CLICKHOUSE_KEEPER_PORT        = "db_clickhouse_keeper_port"
 
 	TF_FIELD_CLUSTER_DATA_DIR           = "db_data_directory"
 	TF_FIELD_CLUSTER_CFG_TEMPLATE       = "db_config_template"
@@ -346,14 +378,19 @@ const (
 	// Currently only used in Load Balancer config
 	TF_FIELD_CLUSTER_HOST_PORT = "port"
 
-	TF_FIELD_CLUSTER_HOST_DD                 = "datadir"
-	TF_FIELD_CLUSTER_HOST_PRIORITY           = "priority"
-	TF_FIELD_CLUSTER_HOST_SLAVE_DELAY        = "slave_delay"
-	TF_FIELD_CLUSTER_HOST_ARBITER_ONLY       = "arbiter_only"
-	TF_FIELD_CLUSTER_HOST_HIDDEN             = "hidden"
-	TF_FIELD_CLUSTER_HOST_PROTO              = "protocol"
-	TF_FIELD_CLUSTER_HOST_ROLES              = "roles"
-	TF_FIELD_CLUSTER_HOST_ROLE               = "host_role"
+	TF_FIELD_CLUSTER_HOST_DD           = "datadir"
+	TF_FIELD_CLUSTER_HOST_PRIORITY     = "priority"
+	TF_FIELD_CLUSTER_HOST_SLAVE_DELAY  = "slave_delay"
+	TF_FIELD_CLUSTER_HOST_ARBITER_ONLY = "arbiter_only"
+	TF_FIELD_CLUSTER_HOST_HIDDEN       = "hidden"
+	TF_FIELD_CLUSTER_HOST_PROTO        = "protocol"
+	TF_FIELD_CLUSTER_HOST_ROLES        = "roles"
+	TF_FIELD_CLUSTER_HOST_ROLE         = "host_role"
+	// New: per-host shard identifier for ClickHouse. Accepted and validated in
+	// Terraform, but NOT YET wired into job_data - sharded ClickHouse is on
+	// ClusterControl's roadmap, not shipped yet, so there is nothing on the
+	// CMON side to send this to today. See clickhouse.go GetInputs.
+	TF_FIELD_CLUSTER_HOST_SHARD              = "shard"
 	TF_FIELD_CLUSTER_TOPOLOGY                = "db_topology"
 	TF_FIELD_CLUSTER_PRIMARY                 = "primary"
 	TF_FIELD_CLUSTER_REPLICA                 = "replica"

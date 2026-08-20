@@ -147,6 +147,16 @@ func resourceDbCluster() *schema.Resource {
 				Optional:    true,
 				Description: "The port on which Elasticsearch will accept client connections for data transfer(?)",
 			},
+			TF_FIELD_CLUSTER_CLICKHOUSE_NATIVE_PORT: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The secure (TLS) port on which ClickHouse will accept native TCP protocol client connections. SSL is mandatory for ClickHouse.",
+			},
+			TF_FIELD_CLUSTER_CLICKHOUSE_KEEPER_PORT: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The secure (TLS) client port for the embedded ClickHouse Keeper instance used for replica coordination. Only applicable to replicated ClickHouse clusters.",
+			},
 			TF_FIELD_CLUSTER_DATA_DIR: {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -278,12 +288,22 @@ func resourceDbCluster() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 							Description: "Applicable to Elasticsearch - the role of this host (master-data: host will " +
-								"be designated as the master node and a data node, etc)",
+								"be designated as the master node and a data node, etc). Also applicable to " +
+								"ClickHouse - one of `replica` (clickhouse-server; CMON manages embedded Keeper " +
+								"placement among replica hosts automatically) or `keeper` (dedicated Keeper-only " +
+								"host, no clickhouse-server). Defaults to `replica` if unset.",
 						},
 						TF_FIELD_CLUSTER_HOST_ROLE: {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Applicable to Redis or Valkey (Sharded) Cluster - the role of this host (primary or replica)",
+						},
+						TF_FIELD_CLUSTER_HOST_SHARD: {
+							Type:     schema.TypeString,
+							Optional: true,
+							Description: "Applicable to ClickHouse - the shard this host belongs to. NOT YET " +
+								"actionable: sharded ClickHouse is on ClusterControl's roadmap and not shipped " +
+								"yet, so this value is accepted/validated but not currently sent to CMON.",
 						},
 					},
 				},
@@ -742,6 +762,8 @@ func resourceCreateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 		getInputs = NewMsSql()
 	case CLUSTER_TYPE_ELASTIC:
 		getInputs = NewElastic()
+	case CLUSTER_TYPE_CLICKHOUSE:
+		getInputs = NewClickHouse()
 	default:
 		str := fmt.Sprintf("%s - Unknown cluster type: %s", funcName, clusterType)
 		slog.Warn(str)
@@ -901,6 +923,8 @@ func resourceReadDbCluster(ctx context.Context, d *schema.ResourceData, m interf
 		readHandler = NewMsSql()
 	case CLUSTER_TYPE_ELASTIC:
 		readHandler = NewElastic()
+	case CLUSTER_TYPE_CLICKHOUSE:
+		readHandler = NewClickHouse()
 	default:
 		str := fmt.Sprintf("%s - Unknown cluster type: %s", funcName, clusterType)
 		slog.Warn(str)
@@ -984,6 +1008,8 @@ func resourceUpdateDbCluster(ctx context.Context, d *schema.ResourceData, m inte
 		updateHandler = NewMsSql()
 	case CLUSTER_TYPE_ELASTIC:
 		updateHandler = NewElastic()
+	case CLUSTER_TYPE_CLICKHOUSE:
+		updateHandler = NewClickHouse()
 	default:
 		str := fmt.Sprintf("%s - Unknown cluster type: %s", funcName, clusterType)
 		slog.Warn(str)

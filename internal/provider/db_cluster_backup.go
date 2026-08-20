@@ -187,6 +187,8 @@ func resourceCreateDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 		backupHandler = NewMsSql()
 	case CLUSTER_TYPE_ELASTIC:
 		backupHandler = NewElastic()
+	case CLUSTER_TYPE_CLICKHOUSE:
+		backupHandler = NewClickHouse()
 	default:
 		str := fmt.Sprintf("%s - Unknown cluster type: %s", funcName, clusterType)
 		slog.Warn(str)
@@ -315,6 +317,8 @@ func resourceDeleteDbClusterBackup(ctx context.Context, d *schema.ResourceData, 
 		backupHandler = NewMsSql()
 	case CLUSTER_TYPE_ELASTIC:
 		backupHandler = NewElastic()
+	case CLUSTER_TYPE_CLICKHOUSE:
+		backupHandler = NewClickHouse()
 	default:
 		str := fmt.Sprintf("%s - Unknown cluster type: %s", funcName, clusterType)
 		slog.Warn(str)
